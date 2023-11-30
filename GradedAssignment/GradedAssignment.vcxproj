@@ -130,7 +130,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BubbleSort.cpp" />
-    <ClCompile Include="GradedAssignment.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="InsertionSort.cpp" />
     <ClCompile Include="QuickSort.cpp" />
   </ItemGroup>

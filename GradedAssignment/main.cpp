@@ -21,10 +21,10 @@ BubbleSort bub{};
 QuickSort qui{};
 
 int repeatMeasurements{ 100 };
-std::chrono::duration<double> insertionSortTotalTime{};
-std::chrono::duration<double> bubbleSortTotalTime{};
-std::chrono::duration<double> quickSortTotalTime{};
-std::chrono::duration<double> zero{ std::chrono::duration<double>::zero() };
+std::chrono::duration<double, std::milli> insertionSortTotalTime{};
+std::chrono::duration<double, std::milli> bubbleSortTotalTime{};
+std::chrono::duration<double, std::milli> quickSortTotalTime{};
+std::chrono::duration<double, std::milli> zero{ std::chrono::duration<double>::zero() };
 
 int instanceArray[arr5Size];
 
@@ -50,7 +50,7 @@ void performSpecifiedSortMethod(int sortMethod, int arrSize) { // perform specif
 	}
 }
 
-void addToTotalTime(int sortMethod, std::chrono::duration<double> elapsedSeconds) { //increases total time each time a sort method is performed, later to be used to calculate an average time.
+void addToTotalTime(int sortMethod, std::chrono::duration<double, std::milli> elapsedSeconds) { //increases total time each time a sort method is performed, later to be used to calculate an average time.
 	switch (sortMethod) {
 	case 1:
 		insertionSortTotalTime = insertionSortTotalTime + elapsedSeconds;
@@ -64,7 +64,7 @@ void addToTotalTime(int sortMethod, std::chrono::duration<double> elapsedSeconds
 	}
 }
 
-std::chrono::duration<double> sortReturnTime(int sortMethod, int arr[], int arrSize) { //calls functions for setting up arrays for sorting and performing sort methods. Also takes time measurement and stores it in a variable.
+std::chrono::duration<double, std::milli> sortReturnTime(int sortMethod, int arr[], int arrSize) { //calls functions for setting up arrays for sorting and performing sort methods. Also takes time measurement and stores it in a variable.
 	
 	copyFromArgumentArray(arr, arrSize);
 
@@ -74,11 +74,10 @@ std::chrono::duration<double> sortReturnTime(int sortMethod, int arr[], int arrS
 
 	const auto end{ currentPointInTime() };
 
-	const std::chrono::duration<double> elapsedSeconds{ end - start };
+	const std::chrono::duration<double, std::milli> elapsedSeconds{ end - start };
 
 	addToTotalTime(sortMethod, elapsedSeconds);				
-
-	return elapsedSeconds;
+	return elapsedSeconds; //(milliseconds)
 }
 
 void populateArray(int arr[], int arrSize) { //populate our array with random numbers
@@ -135,6 +134,7 @@ int main()
 	performMeasurements(arr3, arr3Size);
 	performMeasurements(arr4, arr4Size);
 	performMeasurements(arr5, arr5Size);
+
 
 	return 0;
 }
