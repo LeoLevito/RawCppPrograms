@@ -3,11 +3,10 @@ int QuickSort::partition(int arr[], int start, int end) {
 	int pivot{ arr[end] };
 	int i{ start - 1 };
 	int j{};
-	for (j = start; j <= (end - 1); j++) {
-		if (arr[j] < pivot) {
+	for (j = start; j < (end - 1); j++) {
+		if (arr[j] <= pivot) {
 			i++;
-			int temp{};
-			temp = arr[i];
+			int temp{ arr[i] };
 			arr[i] = arr[j];
 			arr[j] = temp;
 		}
