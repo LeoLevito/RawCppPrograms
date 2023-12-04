@@ -7,45 +7,33 @@
 #include <sstream>
 #include <chrono>
 
-void Graph::InitializeGraphFromFile(const char* path/*, int startNodeID, int endNodeID*/)
+void Graph::InitializeGraphFromFile(const char* path)
 {
-	// This will not really be a node graph. More like a grid
-	// Parse the text file and create nodes. On 'o' create a node. On 'X' don't do anything
-	int graphNodeIds = 0;
+	int graphNodeID = 0;
 	float xPos = 0;
 	float yPos = 0;
 	std::string line{};
 	std::ifstream myFile(path);
+
 	if (myFile.is_open()){
 		while (std::getline(myFile, line)){
-			//std::cout << line << "\n";
-			if (yPos < 20) { //stop from going to text below the grid.
-				// Parse and create nodes
-				for (char c : line){
+																				//std::cout << line << "\n";
+			if (yPos < 20) {													//stop it from reading the text "Load 'o's as nodes, 'X's are walls...", since that is not part of our graph.
+				for (char c : line){											//create nodes for each char c except for the 'X' walls.
 					if (c != 'X'){
 						if (c == 'S') {
-							startNodeID = graphNodeIds;
-							Node* gNode = new Node({ xPos, yPos }, graphNodeIds);
-							nodes.push_back(*gNode);
-
-							++graphNodeIds;
+							startNodeID = graphNodeID;							//save startNodeID
 						}
-						else if (c == 'G') {
-							endNodeID = graphNodeIds;
-							Node* gNode = new Node({ xPos, yPos }, graphNodeIds);
-							nodes.push_back(*gNode);
-							++graphNodeIds;
+						if (c == 'G') {
+							endNodeID = graphNodeID;							//save endNodeID
 						}
-						else {
-							Node* gNode = new Node({ xPos, yPos }, graphNodeIds);
-							nodes.push_back(*gNode);
-							++graphNodeIds;
-						}
+						Node* gNode = new Node({ xPos, yPos }, graphNodeID);	//create new node with position of (xPos, yPos) and apply the current ID value. 														
+						nodes.push_back(*gNode);
+						++graphNodeID;											//NOTE how IDs are assigned: from left to right on each line in the text file, ID increases with each node that's added.
 					}
 					++xPos;
 				}
-				// New line
-				xPos = 0;
+				xPos = 0;														//New line
 				++yPos;
 			}
 		}
@@ -56,4 +44,3 @@ void Graph::InitializeGraphFromFile(const char* path/*, int startNodeID, int end
 		return;
 	}
 }
-

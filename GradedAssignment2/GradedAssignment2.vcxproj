@@ -129,6 +129,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BreadthFirstSearch.cpp" />
     <ClCompile Include="DepthFirstSearch.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Graph.cpp" />
@@ -136,6 +137,7 @@
     <ClCompile Include="Vec2.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BreadthFirstSearch.h" />
     <ClInclude Include="DepthFirstSearch.h" />
     <ClInclude Include="Graph.h" />
     <ClInclude Include="Node.h" />

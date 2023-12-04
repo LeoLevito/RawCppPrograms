@@ -1,7 +1,6 @@
 #pragma once
-#include <list>
 #include "Node.h"
-#include <vector>
+#include <list>
 class Graph{
 public:
 	int startNodeID{};
@@ -9,8 +8,3 @@ public:
 	std::list<Node> nodes{};
 	void InitializeGraphFromFile(const char* path);
 };
-
-
-
-
-
