@@ -9,6 +9,12 @@
 #include <sstream>
 #include <chrono>
 
+/*---------------------------------------------------------------------------------------------------------------------
+	This program reads a graph from a text file and assigns nodes to the elements
+	in that graph and then performs a Depth-first search and a Breadth-first search
+	and measures the time taken to traverse the graph from a specified start node to a specified end node.
+---------------------------------------------------------------------------------------------------------------------*/
+
 Graph graph{};
 DepthFirstSearch DFS{};
 BreadthFirstSearch BFS{};

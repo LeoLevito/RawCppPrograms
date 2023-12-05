@@ -4,6 +4,13 @@
 #include "QuickSort.h"
 #include <chrono>
 
+/*---------------------------------------------------------------------------------------------------------------------
+	This program takes five integer arrays with different sizes and randomized
+	elements, and sorts them using different sorting algorithms. The sorting is
+	repeated multiple times for each sorting algorithm and each array.
+	Average sorting time is measured for each sorting algorithm and for each array. 
+---------------------------------------------------------------------------------------------------------------------*/
+
 const int arr1Size{ 10 };
 const int arr2Size{ 50 };
 const int arr3Size{ 100 };
