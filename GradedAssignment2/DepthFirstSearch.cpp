@@ -12,7 +12,7 @@ void DepthFirstSearch::depthFirstSearch(int nodeID, int endNodeID, size_t nodesL
 		nodeID = stack.top();																						//top of stack
 		stack.pop();
 		if (!visited[nodeID] && !visited[endNodeID]) {																//stops the while loop when endNodeID is visited, since the stack becomes empty.
-			std::cout << "visited: " << nodeID << "\n";
+																													//std::cout << "visited: " << nodeID << "\n";
 			visited[nodeID] = true;
 			for (auto i = adjc[nodeID].begin(); i != adjc[nodeID].end(); ++i) {
 				stack.push(*i);

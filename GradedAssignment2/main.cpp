@@ -9,10 +9,12 @@
 #include <sstream>
 #include <chrono>
 
+#define NAMEOF(variable) ((decltype(&variable))nullptr, #variable)
+
 /*---------------------------------------------------------------------------------------------------------------------
 	This program reads a graph from a text file and assigns nodes to the elements
-	in that graph and then performs a Depth-first search and a Breadth-first search
-	and measures the time taken to traverse the graph from a specified start node to a specified end node.
+	in that graph and then performs a Depth-first search and a Breadth-first search multiple times
+	and measures the average time taken to traverse the graph from a specified start node to a specified end node.
 ---------------------------------------------------------------------------------------------------------------------*/
 
 Graph graph{};
@@ -21,6 +23,10 @@ BreadthFirstSearch BFS{};
 
 std::size_t nodesListSize{};
 std::list<int>* adjc;
+
+int repeatMeasurements{ 1000 };
+std::chrono::duration<double, std::milli> totalSearchTime{};
+std::chrono::duration<double, std::milli> zero{ std::chrono::duration<double>::zero() };
 
 auto currentPointInTime() {
 	return  std::chrono::steady_clock::now();
@@ -41,16 +47,20 @@ void performSpecifiedSearchMethod(int searchMethod) {
 	}
 }
 
-std::chrono::duration<double, std::milli> searchReturnTime(int searchMethod) {
-	const auto start{ currentPointInTime() };
-	performSpecifiedSearchMethod(searchMethod);			// perform specified search method
-	const auto end{ currentPointInTime() };
-	const std::chrono::duration<double, std::milli> elapsedSeconds{ end - start };
-	return elapsedSeconds;
+void runSearchAndTakeTime(int searchMethod, std::string searchMethodName) {
+	for (int i = 0; i < repeatMeasurements; i++) {
+		const auto start{ currentPointInTime() };
+		performSpecifiedSearchMethod(searchMethod);			// perform specified search method
+		const auto end{ currentPointInTime() };
+		const std::chrono::duration<double, std::milli> elapsedSeconds{ end - start };
+		totalSearchTime = totalSearchTime + elapsedSeconds;
+	}
+	std::cout << "Average time for " << searchMethodName << " (" << repeatMeasurements << " repeat measurements)" << ": " << totalSearchTime / repeatMeasurements << "\n";
+	totalSearchTime = zero;
 }
 
 void specifyNeighbors() {
-														//after nodes list has been filled, resize the adjc list according to nodes list size.
+	//after nodes list has been filled, resize the adjc list according to nodes list size.
 	nodesListSize = graph.nodes.size();
 	adjc = new std::list<int>[nodesListSize];
 	adjc->resize(nodesListSize);
@@ -61,9 +71,9 @@ void specifyNeighbors() {
 		std::advance(iterator, i);						//advance in the nodes list each loop.
 		Node node = *iterator;
 		Vec2 nodePos = node.position;
-														//std::cout << "\nid: " << node.id << " " << "| pos: (" << node.position.x << ", " << node.position.y << ")\n";
+		//std::cout << "\nid: " << node.id << " " << "| pos: (" << node.position.x << ", " << node.position.y << ")\n";
 
-														//neighbor positions, used in the coming for-loop.	
+		//neighbor positions, used in the coming for-loop.	
 		const Vec2 upNeighborPos = { nodePos.x, nodePos.y - 1 };
 		const Vec2 rightNeighborPos = { nodePos.x + 1, nodePos.y };
 		const Vec2 downNeighborPos = { nodePos.x, nodePos.y + 1 };
@@ -78,33 +88,33 @@ void specifyNeighbors() {
 
 			if (node2Pos.isEqualTo(upNeighborPos)) {
 				addNeighbor(node.id, node2.id);
-														//std::cout << "UP add edge: " << node.id << "-" << node2.id << "\n";
+				//std::cout << "UP add edge: " << node.id << "-" << node2.id << "\n";
 			}
 			else if (node2Pos.isEqualTo(rightNeighborPos)) {
 				addNeighbor(node.id, node2.id);
-														//std::cout << "RIGHT add edge: " << node.id << "-" << node2.id << "\n";
+				//std::cout << "RIGHT add edge: " << node.id << "-" << node2.id << "\n";
 			}
 			else if (node2Pos.isEqualTo(downNeighborPos)) {
 				addNeighbor(node.id, node2.id);
-														//std::cout << "DOWN add edge: " << node.id << "-" << node2.id << "\n";
+				//std::cout << "DOWN add edge: " << node.id << "-" << node2.id << "\n";
 			}
 			else if (node2Pos.isEqualTo(leftNeighborPos)) {
 				addNeighbor(node.id, node2.id);
-														//std::cout << "LEFT add edge: " << node.id << "-" << node2.id << "\n";
+				//std::cout << "LEFT add edge: " << node.id << "-" << node2.id << "\n";
 			}
 		}
 	}
 }
 
 int main() {
-	graph.InitializeGraphFromFile("AssignmentNodes.txt");
+	graph.initializeGraphFromFile("AssignmentNodes.txt");
 	specifyNeighbors();
 
 	int depthFirstSearch{ 1 };
 	int breadthFirstSearch{ 2 };
 
-	std::cout << "\nTime for Depth-first search: " << searchReturnTime(depthFirstSearch) << " \n";
-	std::cout << "\nTime for Breadth-first search: " << searchReturnTime(breadthFirstSearch) << " \n";
+	runSearchAndTakeTime(depthFirstSearch, NAMEOF(depthFirstSearch));
+	runSearchAndTakeTime(breadthFirstSearch, NAMEOF(breadthFirstSearch));
 
 	return 0;
 }

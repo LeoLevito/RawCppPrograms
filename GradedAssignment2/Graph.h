@@ -6,5 +6,5 @@ public:
 	int startNodeID{};
 	int endNodeID{};
 	std::list<Node> nodes{};
-	void InitializeGraphFromFile(const char* path);
+	void initializeGraphFromFile(const char* path);
 };

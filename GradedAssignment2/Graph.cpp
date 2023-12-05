@@ -7,7 +7,7 @@
 #include <sstream>
 #include <chrono>
 
-void Graph::InitializeGraphFromFile(const char* path)
+void Graph::initializeGraphFromFile(const char* path)
 {
 	int graphNodeID = 0;
 	float xPos = 0;

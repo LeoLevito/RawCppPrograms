@@ -11,7 +11,7 @@ void BreadthFirstSearch::breadthFirstSearch(int nodeID, int endNodeID, size_t no
 																		//std::cout << "\n \nentered BFS \n";
 	while (!q.empty()) {
 		int front = q.front();
-		std::cout << "visited: " << q.front() << "\n";
+																		//std::cout << "visited: " << q.front() << "\n";
 		q.pop();
 		if (front == endNodeID) {
 																		//std::cout << "FOUND THE BFS END NODE " << front << "\n";
@@ -21,7 +21,7 @@ void BreadthFirstSearch::breadthFirstSearch(int nodeID, int endNodeID, size_t no
 			if (!visited[*i] && !visited[endNodeID]) {					//stops the while-loop when endNodeID is visited, since the queue becomes empty.
 				visited[*i] = true;
 				q.push(*i);
-				std::cout << " queued: " << q.back() << "\n";
+																		//std::cout << " queued: " << q.back() << "\n";
 			}
 		}
 	}
