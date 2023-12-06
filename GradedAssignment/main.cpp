@@ -27,7 +27,7 @@ InsertionSort ins{};
 BubbleSort bub{};
 QuickSort qui{};
 
-int repeatMeasurements{ 100 };
+int repeatMeasurements{ 5 };
 std::chrono::duration<double, std::milli> insertionSortTotalTime{};
 std::chrono::duration<double, std::milli> bubbleSortTotalTime{};
 std::chrono::duration<double, std::milli> quickSortTotalTime{};
@@ -95,7 +95,8 @@ void populateArray(int arr[], int arrSize) { //populate our array with random nu
 }
 
 void performMeasurements(int arr[], int arrSize) { //printing tables of time measurements. Calls functions that call functions that perform sorting and time keeping inline of std::cout.
-	std::cout << "-----------------------------------------Array Size: " << arrSize;
+	std::cout << "\n \n//////////////////////////////////////////////////////////////////////////////////////////////////";
+	std::cout << "\nperform measurements for Array Size: " << arrSize << "\n";
 	//reset numerator for average calculations so it doesn't pile up and cause inaccurate results.
 	insertionSortTotalTime = zero;
 	bubbleSortTotalTime = zero;
@@ -109,7 +110,7 @@ void performMeasurements(int arr[], int arrSize) { //printing tables of time mea
 
 	//cout sort times.
 	while (iterator < repeatMeasurements) {	
-		std::cout << "\n \n \n----Sorting cycle " << iterator + 1 << " (array size: " << arrSize << ")" << '\n';
+		std::cout << "\n----Measure times" << " (array size: " << arrSize << ")" << " (Sorting cycle #" << iterator + 1 << ")\n";
 		std::cout << "\nTABLE:\n";
 		std::cout << std::left << std::setw(20) << "Sort Method" << "Sorting Time" << "\n \n";
 		std::cout << std::left << std::setw(20) << "Insertion Sort" << sortReturnTime(insertionSort, arr, arrSize) << '\n';
@@ -118,13 +119,14 @@ void performMeasurements(int arr[], int arrSize) { //printing tables of time mea
 		iterator++;
 	}
 
-	//cout average sort times.
-	std::cout << "\n \n \n----Calculate averages" << " (array size: " << arrSize << ")" << '\n';
+	//output average sort times.
+	std::cout << "\n \n/-/-/-/-/-/-/-/ Calculate averages" << " (array size: " << arrSize << ")" << '\n';
 	std::cout << "\nTABLE (avg):\n";
 	std::cout << std::left << std::setw(20) << "Sort Method" << "Sorting Time (avg)" << "\n \n";
 	std::cout << std::left << std::setw(20) << "Insertion Sort" << insertionSortTotalTime / repeatMeasurements << " (avg)" << '\n';
 	std::cout << std::left << std::setw(20) << "Bubble Sort" << bubbleSortTotalTime / repeatMeasurements << " (avg)" << '\n';
 	std::cout << std::left << std::setw(20) << "Quick Sort" << quickSortTotalTime / repeatMeasurements << " (avg)" << '\n';
+	std::cout << "\n(for " << repeatMeasurements << " repeat measurements)";
 	std::cout << "\n \n \n \n";
 }
 
@@ -151,5 +153,5 @@ int main()
 
 
 //(G) "measure time spent on unsorted data" = "measure time spent sorting unsorted data"
-//(VG) "measure them on both unsorted and sorted data" = measure time spent sorting unsorted data and time spent sorting already sorted data
+//(VG) "measure them on both unsorted and sorted data" = "measure time spent sorting unsorted data and time spent sorting already sorted data"
 //                       (i.e. having the algorithm go through the array and see how long it takes for it to figure out it is already sorted).

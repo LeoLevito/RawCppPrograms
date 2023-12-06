@@ -1,6 +1,5 @@
 #pragma once
-class QuickSort
-{
+class QuickSort{
 public:
 	int partition(int arr[], int start, int end);
 	void quickSort(int arr[], int start, int end);

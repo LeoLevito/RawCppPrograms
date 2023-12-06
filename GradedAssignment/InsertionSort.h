@@ -1,6 +1,5 @@
 #pragma once
-class InsertionSort
-{
+class InsertionSort{
 public:
 	void insertionSort(int arr[], int n);
 };
