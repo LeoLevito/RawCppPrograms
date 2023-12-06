@@ -29,6 +29,7 @@ void Graph::initializeGraphFromFile(const char* path)
 						}
 						Node* gNode = new Node({ xPos, yPos }, graphNodeID);	//create new node with position of (xPos, yPos) and apply the current ID value. 														
 						nodes.push_back(*gNode);
+						nodePositions.push_back(gNode->position);
 						++graphNodeID;											//NOTE how IDs are assigned: from left to right on each line in the text file, ID increases with each node that's added.
 					}
 					++xPos;

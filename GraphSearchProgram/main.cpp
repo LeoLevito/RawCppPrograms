@@ -39,10 +39,10 @@ void addNeighbor(int p, int q) {
 void performSpecifiedSearchMethod(int searchMethod) {
 	switch (searchMethod) {
 	case 1:
-		DFS.depthFirstSearch(graph.startNodeID, graph.endNodeID, nodesListSize, adjc);
+		DFS.depthFirstSearch(graph.startNodeID, graph.endNodeID, nodesListSize, adjc, graph.nodePositions);
 		break;
 	case 2:
-		BFS.breadthFirstSearch(graph.startNodeID, graph.endNodeID, nodesListSize, adjc);
+		BFS.breadthFirstSearch(graph.startNodeID, graph.endNodeID, nodesListSize, adjc, graph.nodePositions);
 		break;
 	}
 }
@@ -65,8 +65,7 @@ void specifyNeighbors() {
 	adjc = new std::list<int>[nodesListSize];
 	adjc->resize(nodesListSize);
 
-	for (std::size_t i = 0; i < graph.nodes.size(); i++)
-	{
+	for (std::size_t i = 0; i < graph.nodes.size(); i++){
 		auto iterator = graph.nodes.begin();
 		std::advance(iterator, i);						//advance in the nodes list each loop.
 		Node node = *iterator;
@@ -79,8 +78,7 @@ void specifyNeighbors() {
 		const Vec2 downNeighborPos = { nodePos.x, nodePos.y + 1 };
 		const Vec2 leftNeighborPos = { nodePos.x - 1, nodePos.y };
 
-		for (std::size_t n = 0; n < graph.nodes.size(); n++)
-		{
+		for (std::size_t n = 0; n < graph.nodes.size(); n++){
 			auto iterator2 = graph.nodes.begin();
 			std::advance(iterator2, n);					//advance in the nodes list each loop, again.
 			Node node2 = *iterator2;
