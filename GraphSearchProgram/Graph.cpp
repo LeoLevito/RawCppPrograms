@@ -17,7 +17,7 @@ void Graph::initializeGraphFromFile(const char* path)
 
 	if (myFile.is_open()){
 		while (std::getline(myFile, line)){
-																				//std::cout << line << "\n";
+			//std::cout << line << "\n";
 			if (yPos < 20) {													//stop it from reading the text "Load 'o's as nodes, 'X's are walls...", since that is not part of our graph.
 				for (char c : line){											//create nodes for each char c except for the 'X' walls.
 					if (c != 'X'){

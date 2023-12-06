@@ -13,8 +13,9 @@
 
 /*---------------------------------------------------------------------------------------------------------------------
 	This program reads a graph from a text file and assigns nodes to the elements
-	in that graph and then performs a Depth-first search and a Breadth-first search multiple times
-	and measures the average time taken to traverse the graph from a specified start node to a specified end node.
+	in that graph and then performs a Depth-first search and a Breadth-first 
+	search multiple times and measures the average time taken to traverse 
+	the graph from a pre-specified start node to a pre-specified end node.
 ---------------------------------------------------------------------------------------------------------------------*/
 
 Graph graph{};
@@ -27,6 +28,8 @@ std::list<int>* adjc;
 int repeatMeasurements{ 1000 };
 std::chrono::duration<double, std::milli> totalSearchTime{};
 std::chrono::duration<double, std::milli> zero{ std::chrono::duration<double>::zero() };
+
+bool onlyShowAverages{ false };
 
 auto currentPointInTime() {
 	return  std::chrono::steady_clock::now();
@@ -54,8 +57,11 @@ void runSearchAndTakeTime(int searchMethod, std::string searchMethodName) {
 		const auto end{ currentPointInTime() };
 		const std::chrono::duration<double, std::milli> elapsedSeconds{ end - start };
 		totalSearchTime = totalSearchTime + elapsedSeconds;
+		if (!onlyShowAverages) {
+			std::cout << "\nTime for " << searchMethodName << " (cycle #" << i + 1 << "): " << elapsedSeconds;
+		}
 	}
-	std::cout << "Average time for " << searchMethodName << " (" << repeatMeasurements << " repeat measurements)" << ": " << totalSearchTime / repeatMeasurements << "\n";
+	std::cout << "\nAverage time for " << searchMethodName << " (" << repeatMeasurements << " repeat measurements)" << ": " << totalSearchTime / repeatMeasurements << "\n";
 	totalSearchTime = zero;
 }
 
@@ -105,6 +111,22 @@ void specifyNeighbors() {
 }
 
 int main() {
+	std::cout << "/*-------------------------------------------------------------------------------------------------\n"
+		"This program reads a graph from a text file and assigns nodes to the elements\n"
+		"in that graph. It then performs a Depth-first search and a Breadth-first search\n"
+		"from a pre-specified start node to a pre-specified end node. This is repeated multiple\n"
+		"times to calculate the average time taken to traverse the graph for each search algorithm.\n"
+		"-------------------------------------------------------------------------------------------------*/ \n\n";
+
+	std::cout << "How many times do you want to repeat the time measurements?" <<
+		"\n--Insert amount here: ";
+	std::cin >> repeatMeasurements;
+
+	std::cout << "\nDo you want to only show the average times, or show times for each repeat measurement as well?" <<
+		"\nInserting [1] will only show average times, else Inserting [0] will show all time measurements." <<
+		"\n--Insert [1] or [0] here: ";
+	std::cin >> onlyShowAverages;
+
 	graph.initializeGraphFromFile("AssignmentNodes.txt");
 	specifyNeighbors();
 

@@ -8,7 +8,7 @@
 	This program takes five integer arrays with different sizes and randomized
 	elements, and sorts them using different sorting algorithms. The sorting is
 	repeated multiple times for each sorting algorithm and each array.
-	Average sorting time is measured for each sorting algorithm and for each array. 
+	Average sorting time is measured for each sorting algorithm and for each array.
 ---------------------------------------------------------------------------------------------------------------------*/
 
 const int arr1Size{ 10 };
@@ -27,13 +27,15 @@ InsertionSort ins{};
 BubbleSort bub{};
 QuickSort qui{};
 
-int repeatMeasurements{ 5 };
+int repeatMeasurements{ 1000 };
 std::chrono::duration<double, std::milli> insertionSortTotalTime{};
 std::chrono::duration<double, std::milli> bubbleSortTotalTime{};
 std::chrono::duration<double, std::milli> quickSortTotalTime{};
 std::chrono::duration<double, std::milli> zero{ std::chrono::duration<double>::zero() };
 
 int instanceArray[arr5Size];
+
+bool onlyShowAverages{ false };
 
 auto currentPointInTime() {
 	return  std::chrono::steady_clock::now();
@@ -72,7 +74,7 @@ void addToTotalTime(int sortMethod, std::chrono::duration<double, std::milli> el
 }
 
 std::chrono::duration<double, std::milli> sortReturnTime(int sortMethod, int arr[], int arrSize) { //calls functions for setting up arrays for sorting and performing sort methods. Also takes time measurement and stores it in a variable.
-	
+
 	copyFromArgumentArray(arr, arrSize);
 
 	const auto start{ currentPointInTime() };
@@ -83,7 +85,7 @@ std::chrono::duration<double, std::milli> sortReturnTime(int sortMethod, int arr
 
 	const std::chrono::duration<double, std::milli> elapsedSeconds{ end - start };
 
-	addToTotalTime(sortMethod, elapsedSeconds);				
+	addToTotalTime(sortMethod, elapsedSeconds);
 	return elapsedSeconds; //(milliseconds)
 }
 
@@ -107,15 +109,22 @@ void performMeasurements(int arr[], int arrSize) { //printing tables of time mea
 	int quickSort{ 3 };
 
 	int iterator{};
-
 	//cout sort times.
-	while (iterator < repeatMeasurements) {	
-		std::cout << "\n----Measure times" << " (array size: " << arrSize << ")" << " (Sorting cycle #" << iterator + 1 << ")\n";
-		std::cout << "\nTABLE:\n";
-		std::cout << std::left << std::setw(20) << "Sort Method" << "Sorting Time" << "\n \n";
-		std::cout << std::left << std::setw(20) << "Insertion Sort" << sortReturnTime(insertionSort, arr, arrSize) << '\n';
-		std::cout << std::left << std::setw(20) << "Bubble Sort" << sortReturnTime(bubbleSort, arr, arrSize) << '\n';
-		std::cout << std::left << std::setw(20) << "Quick Sort" << sortReturnTime(quickSort, arr, arrSize) << '\n';
+	while (iterator < repeatMeasurements) {
+
+		if (!onlyShowAverages) {
+			std::cout << "\n----Measure times" << " (array size: " << arrSize << ")" << " (Sorting cycle #" << iterator + 1 << ")\n";
+			std::cout << "\nTABLE:\n";
+			std::cout << std::left << std::setw(20) << "Sort Method" << "Sorting Time" << "\n \n";
+			std::cout << std::left << std::setw(20) << "Insertion Sort" << sortReturnTime(insertionSort, arr, arrSize) << '\n';
+			std::cout << std::left << std::setw(20) << "Bubble Sort" << sortReturnTime(bubbleSort, arr, arrSize) << '\n';
+			std::cout << std::left << std::setw(20) << "Quick Sort" << sortReturnTime(quickSort, arr, arrSize) << '\n';
+		}
+		else {
+			sortReturnTime(insertionSort, arr, arrSize);
+			sortReturnTime(bubbleSort, arr, arrSize);
+			sortReturnTime(quickSort, arr, arrSize);
+		}
 		iterator++;
 	}
 
@@ -132,6 +141,21 @@ void performMeasurements(int arr[], int arrSize) { //printing tables of time mea
 
 int main()
 {
+	std::cout << "/*-------------------------------------------------------------------------------------------------\n"
+		"This program takes five integer arrays with different sizes and randomized\n"
+		"elements, and sorts them using different sorting algorithms. The sorting is\n"
+		"repeated multiple times for each sorting algorithm and each array.\n"
+		"Average sorting time is measured for each sorting algorithm and for each array.\n"
+		"-------------------------------------------------------------------------------------------------*/ \n\n";
+	std::cout << "How many times do you want to repeat the time measurements?" << 
+		"\nInsert amount here: ";
+	std::cin >> repeatMeasurements;
+
+	std::cout << "\nDo you want to only show the average times, or show times for each repeat measurement as well?" << 
+		"\nInserting [1] will only show average times, else Inserting [0] will show all time measurements." << 
+		"\nInsert [1] or [0] here: ";
+	std::cin >> onlyShowAverages;
+
 	populateArray(arr1, arr1Size);
 	populateArray(arr2, arr2Size);
 	populateArray(arr3, arr3Size);
