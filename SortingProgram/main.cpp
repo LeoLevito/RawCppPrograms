@@ -168,7 +168,7 @@ int main()
 	performMeasurements(arr4, arr4Size);
 	performMeasurements(arr5, arr5Size);
 
-
+	std::cout << "PROGRAM FINISHED. \n";
 	return 0;
 }
 

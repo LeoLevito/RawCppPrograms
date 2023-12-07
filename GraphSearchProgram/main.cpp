@@ -136,5 +136,6 @@ int main() {
 	runSearchAndTakeTime(depthFirstSearch, NAMEOF(depthFirstSearch));
 	runSearchAndTakeTime(breadthFirstSearch, NAMEOF(breadthFirstSearch));
 
+	std::cout << "\n\nPROGRAM FINISHED.\n";
 	return 0;
 }
