@@ -18,7 +18,7 @@ void printQueuedNode(std::list<Vec2> nodePositions, int backOfQueue) {
 	std::cout << " queued: " << backOfQueue << " (" << queuedPos.x << ", " << queuedPos.y << ")\n";
 }
 
-void BreadthFirstSearch::breadthFirstSearch(int nodeID, int endNodeID, size_t nodesListSize, std::list<int>* adjc, std::list<Vec2> nodePositions){
+void BreadthFirstSearch::breadthFirstSearch(int nodeID, int endNodeID, size_t nodesListSize, std::list<int>* adjc, std::list<Vec2> nodePositions){ //non-recursive BFS implementation
 	//std::cout << "\n \nentered BFS \n";
 	std::vector<bool> visited(nodesListSize, false);
 	std::queue<int> q{};
