@@ -60,6 +60,8 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;SDL_MAIN_HANDLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>include</AdditionalIncludeDirectories>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -88,12 +90,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Actor.cpp" />
+    <ClCompile Include="src\PlayerInput.cpp" />
     <ClCompile Include="src\Engine\TinyEngine.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Math\Vector.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Actor.h" />
+    <ClInclude Include="src\PlayerInput.h" />
     <ClInclude Include="src\Engine\Input.h" />
     <ClInclude Include="src\Engine\TinyEngine.h" />
+    <ClInclude Include="src\Math\Vector.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
