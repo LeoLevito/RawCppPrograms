@@ -1,34 +1,34 @@
 #include "Engine/TinyEngine.h"
 #include "PlayerInput.h"
 #include "Actor.h"
+#include "Game/Game.h"
 
 
-
-
-#define numActors 20 //macro, very powerful, need to learn more. could also do const int in this case.
-
-//so, here's a DECLARATION
-void DrawActor(Actor actor);
-
+int hello3{ 0 }; //Static memory allocation, since we're outside any function.
 int main() {
 
 	engInit("Tiny Engine", 800, 600); //name and size of window
-	//Actor player = Actor(Vector(50.f, 50.f), Vector(32.f), COLOR_WHITE);
-	//// Literals (any hard coded value)
-	float speed{ 100.f }; //floating point literal, .f instead of just f in c#, otherwise it would just be an int before being automatically converted to float anyways.
-	//const int numActors{ 10 };
-	Actor actors[numActors];
 
-	for (int i = 0; i < numActors; i++) {
-		actors[i] = Actor(Vector(engRandom(800), engRandom(600)), Vector(16.f), COLOR_SALMON);
-	}
-	Actor* player = &actors[0];
+	Actor* actors[maxActors]{nullptr}; //array of pointers, need to initialize array now. Illegal to reference nullpointers
+	actors[0] = new Actor(Vector(400.f, 300.f), Vector(32.f), COLOR_WHITE); //Heap allocated actor.
+	/*actors[1] = new Actor(Vector(100.f, 100.f), Vector(20.f), COLOR_GREEN);
+	actors[2] = new Actor(Vector(600.f, 400.f), Vector(40.f), COLOR_CYAN);*/ //if doing actors[1] again, it allocates on the heap again, overwriting the pointer and thus we are unable to de-allocate that specific pointer ever again. Memory leak, don't do this mistake.
+	int actorCount{ 0 };
+
+
+	Actor* player = actors[0];
 	(*player) = Actor(Vector(400.f, 300.f), Vector(32.f), COLOR_WHITE); //utilizing constructor instead of setting position, size and color individually
+
+	int* hello = new int(); // Heap allocation. (right?), yes new int is allocating on heap, 
+	int hello2{ 0 }; // Stack allocation, since we're inside a function. Stack overflow happens when a function attempts to allocate too much memory. Careful with self-recursive functions.
+	*hello = 20; // dynamic heap allocation.
+
+	delete hello; //de-allocate heap allocated data. i.e. free up memory. very important, if you're doing 'new int()' multiple times at runtime, you need to use delete operator to avoid memory leak.
 
 
 	int myInt{ 10 };
 	int myInt2{ 10 };
-	int* myPointer{ &myInt}; //pointer is a type + address, stores an adress to something.
+	int* myPointer{ &myInt }; //pointer is a type + address, stores an adress to something.
 	*myPointer = 50;//de-reference of a pointer, i.e set myInt to 50
 	myPointer = &myInt2;
 	*myPointer = 100;//de-reference of a pointer, again. i.e set myInt2 to 100
@@ -39,17 +39,42 @@ int main() {
 		engSetDrawColor(COLOR_DARK_GRAY);
 		engClearScreen();
 
-		UpdateInput(player->position, speed); //player->position == (*player).position
+		if (engKeyPressed(Key::I)) {
+			if (actorCount < maxActors - 1) {
+				actors[actorCount + 1] = new Actor(Vector(engRandom(0, 800), engRandom(0, 800)), Vector(engRandom(16, 32)), COLOR_RED);
+				actorCount++;
+			}
+		}
+		if (engKeyPressed(Key::U)) {
+			if (actorCount > 0) {
+				actorCount--;
+				delete actors[actorCount + 1];		//most common crash in c++ is trying to reference de-allocated memory
+				actors[actorCount + 1] = nullptr; // delete doesn't automatically nullptr a pointer. Need to do that manually.
+			}
+		}
+
+		
 		//DrawActor(player);
 
-		//draw all actors
 
-		for (int i = 0; i < numActors; i++) {
-			actors[i].Draw();
-		}
 
 		if (engKeyPressed(Key::Escape)) {
-			break;
+			return 0;
 		}
+
+
+
+
+
+
+
+
+
+
+
+
+
+		game.Update();
+		game.Render();
 	}
 }

@@ -26,6 +26,7 @@ struct Vector { //struct: a way to group variables in a neat way. //members of s
 
 //operator overloading
 inline Vector operator+(Vector lhs, Vector rhs) { return Vector(lhs.x + rhs.x, lhs.y + rhs.y); }
+inline Vector operator-(Vector lhs, Vector rhs) { return Vector(lhs.x - rhs.x, lhs.y - rhs.y); }
 inline Vector operator*(Vector lhs, float rhs) { return Vector(lhs.x * rhs, lhs.y * rhs); }
 inline Vector operator*(float lhs, Vector rhs) { return Vector(rhs.x * lhs, rhs.y * lhs); }
 

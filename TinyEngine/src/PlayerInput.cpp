@@ -30,9 +30,3 @@ void UpdateInput(Vector& position, float& speed) {
 		speed -= 50.f;
 	}
 }
-//int addIntegers(int a, int b) {
-//	return a + b;
-//}
-//int multiplyIntegers(int a, int b) {
-//	return a * b;
-//}
