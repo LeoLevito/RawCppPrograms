@@ -4,6 +4,7 @@ class Player : public Actor { //constructors are not inherited.
 public:
 	Player(Vector position); //thus make own constructor for player.
 	void Update() override;
-	float speed{ 100.f };
+	void Draw() override;
+	float speed{ 300.f };
 };
 

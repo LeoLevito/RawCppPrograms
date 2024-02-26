@@ -11,6 +11,9 @@
 // #Include's are kinda expensive because of its copy paste nature in compile time.
 class Actor;
 
+//forward-declare enum
+enum class CollisionChannel;
+
 class Game{
 public:
 	Game();
@@ -20,6 +23,11 @@ public:
 	Actor* GetPlayer() { //Getter function
 		return player; 
 	}
+
+	void SpawnActor(Actor* actor);
+
+	Actor* GetCollidingActor(Actor* other, CollisionChannel channel);
+
 private:
 	Actor* actors[maxActors]{nullptr};
 	Actor* player{ nullptr };
