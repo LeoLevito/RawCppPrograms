@@ -37,6 +37,7 @@ static int mouse_y;
 // Time keeping stuff
 static LARGE_INTEGER clock_freq;
 static LARGE_INTEGER last_frame_time;
+static LARGE_INTEGER startup_time;
 
 void engInit(const char* title, int width, int height)
 {
@@ -57,7 +58,8 @@ void engInit(const char* title, int width, int height)
 
 	// Initialize clock for delta time calculation
 	QueryPerformanceFrequency(&clock_freq);
-	QueryPerformanceCounter(&last_frame_time);
+	QueryPerformanceCounter(&startup_time);
+	last_frame_time = startup_time;
 
 	is_open = true;
 }
@@ -143,6 +145,16 @@ bool engBeginFrame()
 	SDL_Delay(1);
 
 	return true;
+}
+
+float engCurrentTime()
+{
+	return float(last_frame_time.QuadPart - startup_time.QuadPart) / clock_freq.QuadPart;
+}
+
+float engTimePassedSince(float time)
+{
+	return engCurrentTime() - time;
 }
 
 float engDeltaTime() { return delta_time; }

@@ -32,6 +32,12 @@ Key engWaitKey();
 // Returns false if 'engClose' was called or the user closed the window
 bool engBeginFrame();
 
+// Returns the current duration (in seconds) since engInit()
+float engCurrentTime();
+
+// Returns amount of time passed since given point
+float engTimePassedSince(float time);
+
 // Returns the time passed (in seconds) between previous and current frame
 float engDeltaTime();
 
