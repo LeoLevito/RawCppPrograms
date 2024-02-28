@@ -8,14 +8,14 @@ Enemy::Enemy(Vector position)
 }
 
 void Enemy::Update() {
-	if (game.GetPlayer() != nullptr) {
-		Vector direction = game.GetPlayer()->position - position; //position - position is possible because I defined an inline operator overload in the Vector.h file.
+	if (game->GetPlayer() != nullptr) {
+		Vector direction = game->GetPlayer()->position - position; //position - position is possible because I defined an inline operator overload in the Vector.h file.
 		Vector direction2 = direction;
 		direction.Normalize();
 
 		position += direction * speed * engDeltaTime();
 
-		Actor* player = game.GetCollidingActor(this, CollisionChannel::Player);
+		Actor* player = game->GetCollidingActor(this, CollisionChannel::Player);
 		if (player) {
 			player->Destroy();
 			//engClose();

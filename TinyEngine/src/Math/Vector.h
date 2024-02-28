@@ -22,6 +22,8 @@ struct Vector { //struct: a way to group variables in a neat way. //members of s
 	
 	float x{ 0.f };
 	float y{ 0.f };
+
+	static Vector lerp(Vector a, Vector b, float t);
 };
 
 //operator overloading

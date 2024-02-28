@@ -18,6 +18,7 @@ using Color = unsigned int;
 #define COLOR_MAGENTA 0xFF00FFFF
 #define COLOR_VIOLET 0x8A2BE2FF
 #define COLOR_LAVENDER 0xE6E6FAFF
+#define COLOR_
 
 // --- Engine functions ---
 // Opens a window! Must be called before any other eng- functions

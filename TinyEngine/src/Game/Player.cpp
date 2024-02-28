@@ -36,19 +36,22 @@ void Player::Update() {
 
 	if (engMouseButtonPressed(Mouse_Button::Left)) {
 		// Spawn a bullet
-		Vector bulletDirection = Vector(engMouseX(), engMouseY()) - position;
+		Vector mousePosition = Vector(engMouseX(), engMouseY());
+		mousePosition = game->GetCamera().screenToWorld(mousePosition);
+		Vector bulletDirection = mousePosition - position;
 		bulletDirection.Normalize();
-		game.SpawnActor(new Bullet(position, bulletDirection));
+		game->SpawnActor(new Bullet(position, bulletDirection));
 	}
 }
 
 void Player::Draw() {
-
-	Vector aimDirection = Vector(engMouseX(), engMouseY()) - position;
+	Vector mousePosition = Vector(engMouseX(), engMouseY());
+	mousePosition = game->GetCamera().screenToWorld(mousePosition);
+	Vector aimDirection = mousePosition - position;
 	aimDirection.Normalize();
 
-	Vector crossHairStart = position + aimDirection * 45.f;
-	Vector crossHairEnd = position + aimDirection * 5000.f;
+	Vector crossHairStart = game->GetCamera().worldToScreen(position + aimDirection * 45.f);
+	Vector crossHairEnd = game->GetCamera().worldToScreen(position + aimDirection * 5000.f);
 
 	engSetDrawColor(COLOR_RED);
 	engDrawLine(crossHairStart.x, crossHairStart.y, crossHairEnd.x, crossHairEnd.y);

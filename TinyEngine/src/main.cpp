@@ -1,12 +1,14 @@
 #include "Engine/TinyEngine.h"
 #include "Actor.h"
 #include "Game/Game.h"
+#include "Config.h"
 
 
 int hello3{ 0 }; //Static memory allocation, since we're outside any function.
 int main() {
 
-	engInit("Tiny Engine", 800, 600); //name and size of window
+	engInit("Tiny Engine", Config::WINDOWWIDTH, Config::WINDOWHEIGHT); //name and size of window
+	game = new Game();
 
 	Actor* actors[maxActors]{nullptr}; //array of pointers, need to initialize array now. Illegal to reference nullpointers
 	actors[0] = new Actor(Vector(400.f, 300.f), Vector(32.f), COLOR_WHITE); //Heap allocated actor.
@@ -73,7 +75,9 @@ int main() {
 
 
 
-		game.Update();
-		game.Render();
+		game->Update();
+		game->Render();
 	}
+
+	delete game;
 }
