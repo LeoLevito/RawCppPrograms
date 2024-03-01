@@ -2,6 +2,7 @@
 #include "Actor.h"
 #include "Player.h"
 #include "Enemy.h"
+#include "PickUp.h"
 #include "Math/AABB.h"
 #include <cmath>
 #include "Math/Math.h"
@@ -18,11 +19,22 @@ Game::Game() {
 
 void Game::Update() {//update whole game before drawing something, common way of doing things.
 	if (engTimePassedSince(lastSpawnTime) > SPAWNINTERVAL && player != nullptr) {
-		float angle = engRandomF() * Math::TAU;
-		Vector offset = Vector(cosf(angle), sinf(angle)) * 1000.f;
+		if (Enemy::NUMENEMIES < 20) {
+			float angle = engRandomF() * Math::TAU;
+			Vector offset = Vector(cosf(angle), sinf(angle)) * 1000.f;
 
-		SpawnActor(new Enemy(player->position + offset));
-		lastSpawnTime = engCurrentTime();
+			SpawnActor(new Enemy(player->position + offset));
+			lastSpawnTime = engCurrentTime();
+
+		}
+	}
+
+	if (engTimePassedSince(lastPickupSpawnTime) > PICKUPINTERVAL && player != nullptr) {
+		float angle = engRandomF() * Math::TAU;
+		Vector offset = Vector(cosf(angle), sinf(angle)) * 300.f;
+
+		SpawnActor(new PickUp(player->position + offset));
+		lastPickupSpawnTime = engCurrentTime();
 	}
 
 	for (int i = 0; i < maxActors; i++) {

@@ -90,6 +90,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Game\PickUp.cpp" />
     <ClCompile Include="src\Math\Math.cpp" />
     <ClCompile Include="src\Config.cpp" />
     <ClCompile Include="src\Game\Camera.cpp" />
@@ -104,6 +105,7 @@
     <ClCompile Include="src\Math\Vector.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Game\PickUp.h" />
     <ClInclude Include="src\Math\Math.h" />
     <ClInclude Include="src\Config.h" />
     <ClInclude Include="src\Game\Camera.h" />

@@ -30,6 +30,7 @@ public:
 
 private:
 	static constexpr float SPAWNINTERVAL{ 0.5f };
+	static constexpr float PICKUPINTERVAL{ 5.f };
 	static constexpr float GRIDSIZE{ 100.f };
 
 	Actor* actors[maxActors]{ nullptr };
@@ -40,6 +41,7 @@ private:
 	// Literals (any hard coded value)
 	float speed{ 100.f }; //floating point literal, .f instead of just f in c#, otherwise it would just be an int before being automatically converted to float anyways.
 	float lastSpawnTime{ 0 };
+	float lastPickupSpawnTime{ 0 };
 };
 
 

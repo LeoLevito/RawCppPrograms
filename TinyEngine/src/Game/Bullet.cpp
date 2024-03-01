@@ -14,7 +14,7 @@ void Bullet::Update()
 	//check for collisions
 	Actor* hitActor = game->GetCollidingActor(this, CollisionChannel::Enemy);
 	if (hitActor != nullptr) { //flag actors for destruction.
-		hitActor->Destroy();
+		hitActor->Hit(DAMAGE);
 		Destroy();
 	}
 

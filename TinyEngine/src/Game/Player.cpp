@@ -42,6 +42,14 @@ void Player::Update() {
 		bulletDirection.Normalize();
 		game->SpawnActor(new Bullet(position, bulletDirection));
 	}
+
+	if (health < MAXHEALTH) {
+		Actor* pickupActor = game->GetCollidingActor(this, CollisionChannel::PickUp);
+		if (pickupActor) {
+			pickupActor->Destroy();
+			health++;
+		}
+	}
 }
 
 void Player::Draw() {
@@ -55,6 +63,30 @@ void Player::Draw() {
 
 	engSetDrawColor(COLOR_RED);
 	engDrawLine(crossHairStart.x, crossHairStart.y, crossHairEnd.x, crossHairEnd.y);
+
+	//Draw health ui;
+	for (int i = 0; i < MAXHEALTH; i++) {
+		if (i < health) {
+			engSetDrawColor(COLOR_WHITE);
+		}
+		else {
+			engSetDrawColor(0xFFFFFF55); //white with alpha value at 55.
+		}
+		engFillRect(10 + 40 * i, 10, 32, 32);
+	}
+
+	//Flash player when invincible
+	if (isInvincible()) {
+		if (int(engCurrentTime() * 15) % 2) { // % is called modulo, don't know what it means.
+			color = 0xFFFFFF77;
+		}
+		else {
+			color = COLOR_WHITE;
+		}
+	}
+	else {
+		color = COLOR_WHITE;
+	}
 
 	Actor::Draw(); //call original function after performing override stuff above.
 }
