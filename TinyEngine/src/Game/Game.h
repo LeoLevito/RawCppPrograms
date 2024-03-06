@@ -1,6 +1,7 @@
 #pragma once
 //#include "Actor.h"
 #include "Camera.h"
+#include "TimerSystem.h"
 
 // macro
 #define maxActors 100 //macro, very powerful, need to learn more. could also do const int in this case.
@@ -37,6 +38,7 @@ private:
 	Actor* player{ nullptr };
 
 	Camera camera;
+	TimerSystem timers;
 
 	// Literals (any hard coded value)
 	float speed{ 100.f }; //floating point literal, .f instead of just f in c#, otherwise it would just be an int before being automatically converted to float anyways.

@@ -2,10 +2,38 @@
 #include "Actor.h"
 #include "Game/Game.h"
 #include "Config.h"
+#include <stdio.h>
 
 
 int hello3{ 0 }; //Static memory allocation, since we're outside any function.
+
+void myFunction(int a, int b) {
+	printf("myFunction(%i, %i)\n", a, b);
+}
+
+//Typedef: rename a type for personal organisation
+typedef int EmilInteger; //rename a type
+typedef int i32; //integer can max be 32bit high and low, i.e. +- 2,147,483,648 (32bit integer limit)
+typedef unsigned int u32; //unsigned means can only be 0 up to (2 * 2,147,483,648).
+typedef short i16; //integer can max be 16bit high and low, i.e. +- 32,768 (16bit integer limit)
+typedef unsigned short ui16; //unsigned means can only be 0 up to (2 * 32,768).
+
+//typedef void(*FunctionPointer)(int, int);
+
+//Using: more modern version of the typedef, functionally the same.
+using FunctionPointer = void(*)(int, int); //neat way of defining a function pointer instead of doing it inline.
+using int32 = int; 
+
+void myOtherFunction(int a, int b) {
+	printf("myOtherFunction(%i, %i)\n", a, b);
+}
+
 int main() {
+	EmilInteger{ 50 };
+	FunctionPointer myNewPointer = &myFunction; //function pointer, holds address to specified function.
+	myNewPointer(50, 100); //call function at address that's being pointed to.
+	myNewPointer = &myOtherFunction; //assign function pointer to new address, i.e. myOtherFucntion. new function needs to match the signature of the function pointer declaration, i.e. have the same parameters and be same type of function (i.e. in this case 2 integers and be a void).
+	myNewPointer(25, 122); //call function at address that's being pointed to.
 
 	engInit("Tiny Engine", Config::WINDOWWIDTH, Config::WINDOWHEIGHT); //name and size of window
 	game = new Game();

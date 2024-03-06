@@ -10,23 +10,32 @@
 
 Game* game{ nullptr }; //global variable, dynamically allocated memory pecause it's a pointer.
 
+void spawnEnemy() {
+	if (Enemy::NUMENEMIES < 20) {
+		float angle = engRandomF() * Math::TAU;
+		Vector offset = Vector(cosf(angle), sinf(angle)) * 200.f;
+
+		game->SpawnActor(new Enemy(game->GetPlayer()->position + offset));
+	}
+}
+
 Game::Game() {
 	actors[0] = new Player(Vector(100.f, 100.f)); //Heap allocated actor. Player is inheriting from Actor
 	player = actors[0]; //set player to newly allocated actor.
-	actors[1] = new Enemy(Vector(600.f, 250.f));
-	engCurrentTime();
+	//actors[1] = new Enemy(Vector(600.f, 250.f));
+	timers.addTimer(5.f, &spawnEnemy);
+	lastSpawnTime = engCurrentTime();
 }
 
 void Game::Update() {//update whole game before drawing something, common way of doing things.
-	if (engTimePassedSince(lastSpawnTime) > SPAWNINTERVAL && player != nullptr) {
+	/*if (engTimePassedSince(lastSpawnTime) > SPAWNINTERVAL && player != nullptr) {
 		if (Enemy::NUMENEMIES < 20) {
 			float angle = engRandomF() * Math::TAU;
 			Vector offset = Vector(cosf(angle), sinf(angle)) * 1000.f;
 
 			SpawnActor(new Enemy(player->position + offset));
-			lastSpawnTime = engCurrentTime();
-
 		}
+		lastSpawnTime = engCurrentTime();
 	}
 
 	if (engTimePassedSince(lastPickupSpawnTime) > PICKUPINTERVAL && player != nullptr) {
@@ -35,7 +44,9 @@ void Game::Update() {//update whole game before drawing something, common way of
 
 		SpawnActor(new PickUp(player->position + offset));
 		lastPickupSpawnTime = engCurrentTime();
-	}
+	}*/
+
+	timers.Update();
 
 	for (int i = 0; i < maxActors; i++) {
 		if (actors[i] != nullptr) { //Check if not nullpointer, since those are illegal to reference.

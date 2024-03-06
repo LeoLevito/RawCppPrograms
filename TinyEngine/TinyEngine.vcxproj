@@ -103,6 +103,7 @@
     <ClCompile Include="src\Engine\TinyEngine.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Math\Vector.cpp" />
+    <ClCompile Include="src\Game\TimerSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Game\PickUp.h" />
@@ -118,6 +119,7 @@
     <ClInclude Include="src\Engine\Input.h" />
     <ClInclude Include="src\Engine\TinyEngine.h" />
     <ClInclude Include="src\Math\Vector.h" />
+    <ClInclude Include="src\Game\TimerSystem.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
