@@ -13,7 +13,7 @@ void TimerSystem::addTimer(float duration, Callback callback){
 
 void TimerSystem::Update(){
 	for (int i = 0; i < timers.size(); i++) {
-		if (engTimePassedSince(timers[i].startTime >= timers[i].duration)) {
+		if (engTimePassedSince(timers[i].startTime) >= timers[i].duration) {
 			timers[i].callback();
 			timers.erase(timers.begin() + i);
 
