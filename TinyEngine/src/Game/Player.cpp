@@ -40,7 +40,8 @@ void Player::Update() {
 		mousePosition = game->GetCamera().screenToWorld(mousePosition);
 		Vector bulletDirection = mousePosition - position;
 		bulletDirection.Normalize();
-		game->SpawnActor(new Bullet(position, bulletDirection));
+		auto* bullet = game->SpawnActor<Bullet>(position);
+		bullet->setDirection(bulletDirection);
 	}
 
 	if (health < MAXHEALTH) {

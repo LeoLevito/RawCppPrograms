@@ -10,20 +10,28 @@
 
 Game* game{ nullptr }; //global variable, dynamically allocated memory pecause it's a pointer.
 
-void spawnEnemy() {
-	if (Enemy::NUMENEMIES < 20) {
-		float angle = engRandomF() * Math::TAU;
-		Vector offset = Vector(cosf(angle), sinf(angle)) * 200.f;
-
-		game->SpawnActor(new Enemy(game->GetPlayer()->position + offset));
-	}
-}
-
 Game::Game() {
+	float myFloating = 50.f;
+
 	actors[0] = new Player(Vector(100.f, 100.f)); //Heap allocated actor. Player is inheriting from Actor
 	player = actors[0]; //set player to newly allocated actor.
-	//actors[1] = new Enemy(Vector(600.f, 250.f));
-	timers.addTimer(5.f, &spawnEnemy);
+
+	timers.addTimer(5.f, [this]() { //what the heck is going on here, we just in-lined a lambda (i think) into the function parameter. To me this is kinda ugly code, but maybe this is very powerful. The 'this' keeps this lambda in the scope of this member function (Game::Game).
+		if (Enemy::NUMENEMIES < 20) {
+
+			game->SpawnActor<Enemy>((game->GetPlayer()->position + Vector::randomPointOnCircle(200.f)));
+		}
+		//lambda, basically a function stored in a variable (auto is just a var).
+	}, true);
+
+	timers.addTimer(10.f, [this]() { //what the heck is going on here, we just in-lined a lambda (i think) into the function parameter. To me this is kinda ugly code, but maybe this is very powerful. The 'this' keeps this lambda in the scope of this member function (Game::Game).
+		if (Enemy::NUMENEMIES < 20) {
+
+			game->SpawnActor<PickUp>((game->GetPlayer()->position + Vector::randomPointOnCircle(200.f)));
+		}
+		//lambda, basically a function stored in a variable (auto is just a var).
+	}, true);
+
 	lastSpawnTime = engCurrentTime();
 }
 
@@ -90,15 +98,6 @@ void Game::Render() {
 	for (int i = 0; i < maxActors; i++) {
 		if (actors[i] != nullptr) { //Check if not nullpointer, since those are illegal to reference.
 			actors[i]->Draw(); //((*actors[i]).draw()). 
-		}
-	}
-}
-
-void Game::SpawnActor(Actor* actor) {
-	for (int i = 0; i < maxActors; i++) {
-		if (actors[i] == nullptr) {
-			actors[i] = actor;
-			break;
 		}
 	}
 }

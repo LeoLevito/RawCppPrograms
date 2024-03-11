@@ -1,6 +1,32 @@
 #pragma once
 #include <cmath>
 
+template<typename ElementType>
+struct TemplatedVector { //classes and structs can also be templated, pretty common with classes, rarer for structs.
+public:
+	TemplatedVector(ElementType x, ElementType y)
+		: x(x), y(y) {}
+
+	void operator+(ElementType other) {
+		x += other;
+		y += other;
+	}
+
+	void SomeFunction() {
+		ElementType a = x + y;
+		x = a;
+		y = a * 10;
+	}
+	ElementType x;
+	ElementType y;
+};
+////example usage:
+//TemplatedVector<float> floatVector;
+//TemplatedVector<double> doubleVector;
+//TemplatedVector<int> floatVector;
+//using FVector = TemplatedVector<float>;
+//using IVector = TemplatedVector<int>;
+
 //struct IntVector{
 //	IntVector(const Vector& other) //copy constructor example, need to do it on both type's constructors.
 //		: x(other.x), y(other.y) {}
@@ -53,6 +79,7 @@ struct Vector { //struct: a way to group variables in a neat way. //members of s
 	float y{ 0.f };
 
 	static Vector lerp(Vector a, Vector b, float t);
+	static Vector randomPointOnCircle(float radius);
 };
 
 //operator overloading

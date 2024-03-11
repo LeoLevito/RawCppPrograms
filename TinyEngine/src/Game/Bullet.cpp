@@ -1,8 +1,8 @@
 #include "Bullet.h"
 #include "Game.h"
 
-Bullet::Bullet(Vector position, Vector direction)
-	: Actor(position, Vector(4.f), COLOR_YELLOW), direction(direction)
+Bullet::Bullet(Vector position)
+	: Actor(position, Vector(4.f), COLOR_YELLOW)
 {
 	spawnTime = engCurrentTime();
 }

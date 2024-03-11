@@ -3,6 +3,24 @@
 #include "Game/Game.h"
 #include "Config.h"
 #include <stdio.h>
+#include "Math/Math.h"
+
+int addInts(int a, int b) {
+	return a + b;
+}
+
+
+//Preprocessor operation (evaluated before anything compiles) 
+//Macro:
+#define WRITEHELLO(msg) printf(#msg) //copy-paste happens when macros are used. As we know. #msg just automatically puts quotes around whatever you input there, neat!
+#define TESTEXPRESSION(test, expectedValue)\
+	if(test == expectedValue)\
+		printf(#test " PASS\n"); \
+	else \
+		printf(#test " FAILED (expected %d, got %d)\n", expectedValue, test); //multi-line macro. Needs the backslash after every line.
+
+#define PLATFORMWINDOWS
+#define PLATFORMMAC
 
 
 int hello3{ 0 }; //Static memory allocation, since we're outside any function.
@@ -22,13 +40,41 @@ typedef unsigned short ui16; //unsigned means can only be 0 up to (2 * 32,768).
 
 //Using: more modern version of the typedef, functionally the same.
 using FunctionPointer = void(*)(int, int); //neat way of defining a function pointer instead of doing it inline.
-using int32 = int; 
+using int32 = int;
 
 void myOtherFunction(int a, int b) {
 	printf("myOtherFunction(%i, %i)\n", a, b);
 }
 
 int main() {
+	WRITEHELLO(hello\n); //see, automatic quotation marks!
+	TESTEXPRESSION(addInts(5, 10), 16);
+	TESTEXPRESSION(addInts(5, 10), 15);
+
+	float myFloat = 0.f;
+
+	//lambda, see game.cpp for a little more info.
+	auto lambdacChangeFloat = [&myFloat](float amount) -> float /*return type if needed*/ {
+		myFloat += amount;
+		return myFloat * 10;
+		};
+
+
+	printf("MyFloat: %f\n", lambdacChangeFloat(50.f));
+
+	//ifdef = if define = if specified macro is currently defined (e.g. not commented), run all code until #endif.
+#ifdef PLATFORMWINDOWS 
+	printf("Running on Windows\n");
+#endif
+#ifdef	PLATFORMMAC
+	printf("Running on Mac\n");
+#endif
+
+	Math::Max<float>(5.f, 10.f);
+	Math::Max<int>(5, 10);
+	Math::Max <double>(5, 10);
+	Math::Lerp<Vector>(Vector(0.f), Vector(10.f, 50.f), engDeltaTime());
+
 	EmilInteger{ 50 };
 	FunctionPointer myNewPointer = &myFunction; //function pointer, holds address to specified function.
 	myNewPointer(50, 100); //call function at address that's being pointed to.
@@ -38,7 +84,7 @@ int main() {
 	engInit("Tiny Engine", Config::WINDOWWIDTH, Config::WINDOWHEIGHT); //name and size of window
 	game = new Game();
 
-	Actor* actors[maxActors]{nullptr}; //array of pointers, need to initialize array now. Illegal to reference nullpointers
+	Actor* actors[maxActors]{ nullptr }; //array of pointers, need to initialize array now. Illegal to reference nullpointers
 	actors[0] = new Actor(Vector(400.f, 300.f), Vector(32.f), COLOR_WHITE); //Heap allocated actor.
 	/*actors[1] = new Actor(Vector(100.f, 100.f), Vector(20.f), COLOR_GREEN);
 	actors[2] = new Actor(Vector(600.f, 400.f), Vector(40.f), COLOR_CYAN);*/ //if doing actors[1] again, it allocates on the heap again, overwriting the pointer and thus we are unable to de-allocate that specific pointer ever again. Memory leak, don't do this mistake.
@@ -82,7 +128,7 @@ int main() {
 			}
 		}
 
-		
+
 		//DrawActor(player);
 
 

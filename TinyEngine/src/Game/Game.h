@@ -25,7 +25,18 @@ public:
 	Actor* GetPlayer() { return player; }//Getter function
 	Camera& GetCamera() { return camera; }//returns reference to have the actual camera instead of copying the camera, if i understand correctly.
 
-	void SpawnActor(Actor* actor);
+
+	template<typename ActorType>
+	ActorType* SpawnActor(Vector position) {
+		for (int i = 0; i < maxActors; i++) {
+			if (actors[i] == nullptr) {
+				ActorType* newActor = new ActorType(position);
+				actors[i] = newActor;
+				return newActor;
+			}
+		}
+		return nullptr;		
+	}
 
 	Actor* GetCollidingActor(Actor* other, CollisionChannel channel);
 
@@ -33,6 +44,7 @@ private:
 	static constexpr float SPAWNINTERVAL{ 0.5f };
 	static constexpr float PICKUPINTERVAL{ 5.f };
 	static constexpr float GRIDSIZE{ 100.f };
+
 
 	Actor* actors[maxActors]{ nullptr };
 	Actor* player{ nullptr };
