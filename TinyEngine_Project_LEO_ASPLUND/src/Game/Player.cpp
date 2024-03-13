@@ -2,6 +2,7 @@
 #include "Game.h"
 #include "Enemy.h"
 #include "Bullet.h"
+#include <stdio.h> //include stdio for debugging
 
 Player::Player(Vector position)
 	: Actor(position, Vector(32), COLOR_WHITE)
@@ -11,6 +12,7 @@ Player::Player(Vector position)
 
 void Player::update()
 {
+
 	Vector input;
 
 	if (engKeyDown(Key::W))
@@ -30,17 +32,23 @@ void Player::update()
 	if (engKeyPressed(Key::Q))
 		speed -= 50.f;
 
-	if (engMouseButtonPressed(Mouse_Button::Left))
+	if (engMouseButtonPressed(Mouse_Button::Left)) //change: MouseButtonDown instead of Pressed.
 	{
 		Vector mouse_position = Vector(engMouseX(), engMouseY());
 		mouse_position = game->get_camera().screen_to_world(mouse_position);
-
 		Vector bullet_direction = mouse_position - position;
 		bullet_direction.normalize();
-
 		auto* bullet = game->spawn_actor<Bullet>(position);
 		bullet->set_direction(bullet_direction);
 	}
+
+	if (engMouseButtonDown(Mouse_Button::Left)) {
+		bulletTimer.add_timer(0.3f, [this]() {
+			printf("start timer\n");
+			}, true);
+		bulletTimer.update();
+	}
+
 
 	if (health < MAX_HEALTH)
 	{

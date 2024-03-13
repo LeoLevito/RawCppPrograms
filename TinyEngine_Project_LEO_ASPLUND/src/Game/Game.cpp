@@ -37,7 +37,7 @@ Game::Game()
 				get_player()->position + Vector::random_point_on_circle(500.f)
 			);
 		}
-		}, true);
+	}, true);
 
 	timers.add_timer(10.f, [this]() {
 		if (get_player() == nullptr)

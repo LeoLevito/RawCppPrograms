@@ -10,6 +10,7 @@ public:
 	void set_direction(Vector new_direction)
 	{
 		direction = new_direction;
+
 	}
 
 private:

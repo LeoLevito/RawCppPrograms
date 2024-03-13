@@ -1,5 +1,6 @@
 #pragma once
 #include "Actor.h"
+#include "TimerSystem.h"
 
 class Player : public Actor
 {
@@ -36,4 +37,6 @@ private:
 
 	int health = MAX_HEALTH;
 	float last_hit_time = -INVINCIBILITY_TIME;
+
+	Timer_System bulletTimer; //Add: Timer_System variable bulletTimer.
 };

@@ -46,6 +46,7 @@ private:
 
 	Camera camera;
 	Timer_System timers;
+	Timer_System bulletTimer2;
 };
 
 extern Game* game;
