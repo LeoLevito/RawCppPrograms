@@ -40,12 +40,12 @@ void Enemy::draw()
 		Vector screen_position = game->get_camera().world_to_screen(position);
 
 		engSetDrawColor(0x000000AA);
-		engFillRect(screen_position.x - 26.f, screen_position.y - 30.f, 26.f * 2.f, 8.f);
+		engFillRect(screen_position.x - 26.f, screen_position.y - ((size.y / 2) + 15), 26.f * 2.f, 8.f); //change: screen_position.y - ((size.y / 2 + 15) instead of 30.f, to make the health bar appear with the same offset above different enemy sizes.
 
 		engSetDrawColor(COLOR_RED);
 		engFillRect(
 			screen_position.x - 26.f,
-			screen_position.y - 30.f,
+			screen_position.y - ((size.y / 2) + 15), //change: screen_position.y - ((size.y / 2 + 15) instead of 30.f, to make the health bar appear with the same offset above different enemy sizes.
 			26.f * 2.f * health_percentage,
 			8.f
 		);

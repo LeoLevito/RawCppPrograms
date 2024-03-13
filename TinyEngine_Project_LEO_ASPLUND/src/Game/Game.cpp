@@ -2,6 +2,7 @@
 #include "Actor.h"
 #include "Player.h"
 #include "Enemy.h"
+#include "Tank.h" //Add: Include Tank.h
 #include "PickUp.h"
 #include "Math/AABB.h"
 #include "Math/Math.h"
@@ -25,6 +26,18 @@ Game::Game()
 			);
 		}
 	}, true);
+
+	timers.add_timer(15.f, [this]() { //Copy-Add: Timer for spawning tank enemies, every 15 seconds.
+		if (get_player() == nullptr)
+			return;
+
+		if (Enemy::NUM_ENEMIES < 20)
+		{
+			spawn_actor<Tank>( //change: Tank instead of Enemy
+				get_player()->position + Vector::random_point_on_circle(500.f)
+			);
+		}
+		}, true);
 
 	timers.add_timer(10.f, [this]() {
 		if (get_player() == nullptr)
