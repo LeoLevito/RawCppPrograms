@@ -3,11 +3,29 @@
 #include "Enemy.h"
 #include "Bullet.h"
 #include <stdio.h> //include stdio for debugging
+#include <iostream> //include iostream for debugging
 
 Player::Player(Vector position)
 	: Actor(position, Vector(32), COLOR_WHITE)
 {
 	collision_channel = Collision_Channel::Player;
+}
+
+void Player::shoot() //Add: Shoot function. Moved shooting code here.
+{
+	if (ammo > 0) //Add: ammo check, can't shoot when you have no ammo.
+	{ 
+		Vector mouse_position = Vector(engMouseX(), engMouseY());
+		mouse_position = game->get_camera().screen_to_world(mouse_position);
+
+		Vector bullet_direction = mouse_position - position;
+		bullet_direction.normalize();
+
+		auto* bullet = game->spawn_actor<Bullet>(position);
+		bullet->set_direction(bullet_direction);
+
+		ammo--; //decrease ammo when shooting.
+	}
 }
 
 void Player::update()
@@ -32,21 +50,25 @@ void Player::update()
 	if (engKeyPressed(Key::Q))
 		speed -= 50.f;
 
-	if (engMouseButtonPressed(Mouse_Button::Left)) //change: MouseButtonDown instead of Pressed.
+	if (engMouseButtonPressed(Mouse_Button::Left)) //kept this to allow tap-shooting.
 	{
-		Vector mouse_position = Vector(engMouseX(), engMouseY());
-		mouse_position = game->get_camera().screen_to_world(mouse_position);
-		Vector bullet_direction = mouse_position - position;
-		bullet_direction.normalize();
-		auto* bullet = game->spawn_actor<Bullet>(position);
-		bullet->set_direction(bullet_direction);
+		shoot(); //change: moved code to new function shoot(). 
 	}
 
-	if (engMouseButtonDown(Mouse_Button::Left)) {
-		bulletTimer.add_timer(0.3f, [this]() {
-			printf("start timer\n");
-			}, true);
-		bulletTimer.update();
+	if (engMouseButtonDown(Mouse_Button::Left)) //Add: engMouseButtonDown. Hold for automatic fire.
+	{
+		timeSinceLastBullet += engDeltaTime(); //update timeSinceLastBullet
+
+		if (timeSinceLastBullet > shootDelay) //shoot when this condition is met.
+		{ 
+			shoot();
+			timeSinceLastBullet = 0; //reset timeSinceLastBullet after shooting, allows for automatic fire since this if-statement will be checked again after updating timeSinceLastBullet.
+		}
+	}
+
+	if (engMouseButtonReleased(Mouse_Button::Left)) //Add: engMouseButtonReleased. 
+	{
+		timeSinceLastBullet = 0; //reset timeSinceLastBullet, so delay between shots when starting automatic fire again is consistent.
 	}
 
 
@@ -57,6 +79,15 @@ void Player::update()
 		{
 			pickupActor->destroy();
 			health++;
+		}
+	}
+
+	if (ammo < MAX_AMMO) { //Copy-Add: logic for replenishing ammo.
+		Actor* ammoPickUpActor = game->get_colliding_actor(this, Collision_Channel::PickUpAmmo); //change from health pick up logic: PickUpAmmo collision channel, ammoPickUpActor actor pointer.
+		if (ammoPickUpActor)
+		{
+			ammoPickUpActor->destroy();
+			ammo = MAX_AMMO; //when touching ammo pick up, replenish ammo to max amount.
 		}
 	}
 }
@@ -87,6 +118,16 @@ void Player::draw()
 			engSetDrawColor(0xFFFFFF55);
 
 		engFillRect(10 + 40 * i, 10, 32, 32);
+	}
+
+	for (int i = 0; i < MAX_AMMO; ++i) //Copy-Add: draw ammo UI, just like health UI.
+	{
+		if (i < ammo)
+			engSetDrawColor(COLOR_YELLOW); //change from health UI: Yellow instead of white.
+		else
+			engSetDrawColor(0xFFFFFF55);
+
+		engFillRect(130 + 20 * i, 10, 15, 15); //change from health UI: ammo ui is offset by 130 instead of 10 on x-axis, distance between bullets is 20 * i, and size of bullets is 15x15.
 	}
 
 	// Flash player when invincible

@@ -4,6 +4,7 @@
 #include "Enemy.h"
 #include "Tank.h" //Add: Include Tank.h
 #include "PickUp.h"
+#include "AmmoPickUp.h" //Add: Include AmmoPickUp.h
 #include "Math/AABB.h"
 #include "Math/Math.h"
 #include <cmath>
@@ -33,7 +34,7 @@ Game::Game()
 
 		if (Enemy::NUM_ENEMIES < 20)
 		{
-			spawn_actor<Tank>( //change: Tank instead of Enemy
+			spawn_actor<Tank>( //change from copy: Tank instead of Enemy
 				get_player()->position + Vector::random_point_on_circle(500.f)
 			);
 		}
@@ -47,6 +48,15 @@ Game::Game()
 			get_player()->position + Vector::random_point_on_circle(200.f)
 		);
 	}, true);
+
+	timers.add_timer(7.5f, [this]() { //Copy-Add: Timer for spawning ammo pick ups, every 7.5 seconds.
+		if (get_player() == nullptr)
+			return;
+
+		spawn_actor<AmmoPickUp>( //change from copy: AmmoPickUp instead of PickUp
+			get_player()->position + Vector::random_point_on_circle(200.f)
+		);
+		}, true);
 }
 
 void Game::update()

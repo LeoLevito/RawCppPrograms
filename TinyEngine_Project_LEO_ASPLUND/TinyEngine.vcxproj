@@ -88,6 +88,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Game\AmmoPickUp.cpp" />
     <ClCompile Include="src\Actor.cpp" />
     <ClCompile Include="src\Engine\TinyEngine.cpp" />
     <ClCompile Include="src\Game\Bullet.cpp" />
@@ -103,6 +104,7 @@
     <ClCompile Include="src\Game\Tank.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Game\AmmoPickUp.h" />
     <ClInclude Include="src\Actor.h" />
     <ClInclude Include="src\Config.h" />
     <ClInclude Include="src\Engine\Input.h" />

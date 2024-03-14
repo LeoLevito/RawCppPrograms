@@ -9,6 +9,7 @@ public:
 
 	void update() override;
 	void draw() override;
+	void shoot(); //Add: shoot function.
 
 	void hit(int damage) override
 	{
@@ -38,5 +39,12 @@ private:
 	int health = MAX_HEALTH;
 	float last_hit_time = -INVINCIBILITY_TIME;
 
-	Timer_System bulletTimer; //Add: Timer_System variable bulletTimer.
+	float timeSinceLastBullet = 0.f; // Add: timeSinceLastBullet variable
+
+	float shootDelay = 0.2f; // Add: shootDelay variable
+
+	static constexpr int MAX_AMMO = 20; // Add: MAX_AMMO variable;
+	int ammo = MAX_AMMO;// Add: ammo variable;
+
+	
 };

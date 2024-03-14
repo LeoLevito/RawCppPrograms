@@ -7,7 +7,8 @@ enum class Collision_Channel
 	None,
 	Player,
 	Enemy,
-	PickUp
+	PickUp,
+	PickUpAmmo //Add: PickUpAmmo collision channel.
 };
 
 class Actor
