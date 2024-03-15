@@ -23,7 +23,7 @@ public:
 	float speed = 50.f;
 
 protected: //Add: protected access modifier
-	int MAX_HEALTH = 100;//change: moved MAX_HEALTH to protected. Removed static constexpr. Now possible to access in deriving classes.
+	int MAX_HEALTH = 100; //change: moved MAX_HEALTH to protected. Removed static constexpr. Now possible to access in deriving classes.
 	int health = MAX_HEALTH; //change: moved to protected. Now possible to access in deriving classes.
 private:
 
