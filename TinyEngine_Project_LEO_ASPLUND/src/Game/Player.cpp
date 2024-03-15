@@ -80,7 +80,7 @@ void Player::update()
 		}
 	}
 
-	if (ammo < MAX_AMMO) { //Copy-Add: logic for replenishing ammo. Similar to health pickup logic above.
+	if (ammo < MAX_AMMO) { //Copy-Add: logic for replenishing ammo. Similar to health pick up logic above.
 		Actor* ammoPickUpActor = game->get_colliding_actor(this, Collision_Channel::PickUpAmmo); //change from health pick up logic: PickUpAmmo collision channel, ammoPickUpActor actor pointer.
 		if (ammoPickUpActor)
 		{
