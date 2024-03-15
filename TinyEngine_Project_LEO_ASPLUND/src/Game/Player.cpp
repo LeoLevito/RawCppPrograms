@@ -2,8 +2,6 @@
 #include "Game.h"
 #include "Enemy.h"
 #include "Bullet.h"
-#include <stdio.h> //include stdio for debugging
-#include <iostream> //include iostream for debugging
 
 Player::Player(Vector position)
 	: Actor(position, Vector(32), COLOR_WHITE)
