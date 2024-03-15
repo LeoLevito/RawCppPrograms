@@ -9,7 +9,7 @@ public:
 
 	void update() override;
 	void draw() override;
-	void shoot(); //Add: shoot function.
+	void shoot(); //Add: shoot function becuase I'm using the same behavior in different parts of the player.cpp file.
 
 	void hit(int damage) override
 	{
