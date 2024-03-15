@@ -1,0 +1,15 @@
+
+---Files Modified: 
+(See my comments inside these files to know what I changed or added to them) 
+Enemy.cpp
+Enemy.h
+Game.cpp
+Player.cpp
+Player.h
+Actor.h
+
+---Files Added:
+Tank.cpp (empty)
+Tank.h
+AmmoPickUp.cpp (empty)
+AmmoPickUp.h
