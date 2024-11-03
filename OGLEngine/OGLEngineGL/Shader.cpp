@@ -25,8 +25,10 @@ unsigned int Shader::LoadVertexShader(const char* path) //create vertex shader o
     int result;
     char Log[512];
 
+
     std::string shaderCodeString = LoadShader(path); 
-    const char* shaderCode = shaderCodeString.c_str(); //convert loaded shader code to char pointer.
+    //I COULDN'T GET THE CHAR* CONVERSION MARTIN DID TO WORK SO I JUST PUT IN THE GLSL SHADER CODE DIRECTLY:
+    const char* shaderCode = "#version 330 core\nlayout(location = 0) in vec3 aPos;\nlayout(location = 1) in vec3 aColor;\nout vec4 vertexColor;\nvoid main()\n{\ngl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\nvertexColor = vec4(aColor, 1.0);\n}\0"/* shaderCodeString.c_str()*/; //convert loaded shader code to char pointer.
 
     unsigned int shaderObject; //actual shader object
 
@@ -51,7 +53,8 @@ unsigned int Shader::LoadFragmentShader(const char* path)
     char Log[512];
 
     std::string shaderCodeString = LoadShader(path);
-    const char* shaderCode = shaderCodeString.c_str();
+    //I COULDN'T GET THE CHAR* CONVERSION MARTIN DID TO WORK SO I JUST PUT IN THE GLSL SHADER CODE DIRECTLY:
+    const char* shaderCode = "#version 330 core\nout vec4 FragColor;\nin vec4 vertexColor;\nvoid main()\n{\nFragColor = vertexColor;\n}\0"/*shaderCodeString.c_str()*/;
 
     unsigned int shaderObject;
 
@@ -97,7 +100,7 @@ void Shader::Initialize(const char* vertexPath, const char* fragmentPath) //star
     //NOTE: Martin mentioned that he did this function weirdly since it doesn't return anything, and that it creates two shader objects now.
 }
 
-void Shader::Use() 
+void Shader::Use() //think of the state machine again, set the current state's shader program to this one.
 {
-    glUseProgram(myShaderProgram); //think of the state machine again, set the current state's shader program to this one.
+    glUseProgram(myShaderProgram); 
 }

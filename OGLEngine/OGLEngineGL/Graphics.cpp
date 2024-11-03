@@ -1,6 +1,6 @@
 #include "Graphics.h"
 #include <iostream>
-#include <GLAD/glad.h> //bruh.
+//#include <GLAD/glad.h> //bruh.
 
 void Graphics::Initialize(int width, int height)
 {
@@ -30,6 +30,8 @@ void Graphics::Initialize(int width, int height)
 		std::cout << "failed to initialize GLAD" << std::endl;
 		return;
 	}
+	Cache();
+	myShader.Initialize("VertexShader.vert","FragmentShader.frag");
 }
 
 void Graphics::Render()
@@ -40,29 +42,24 @@ void Graphics::Render()
 	float vertices[] =
 	{
 		//normalized device coordinates, think x and y axis of your screen/window, from -1 to 1 on either axis.
-		-0.5f, -0.5f, 0.0f,
-		 0.5f, -0.5f, 0.0f,
-		 0.0f,  0.5f, 0.0f
+		-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
+		 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
+		 0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f
 	};
-	unsigned int VBO; //vertex buffer object, OpenGL objects are unsigned ints. We can put a bunch of vertices in this object and send it to the GPU.
-	glGenBuffers(1, &VBO); //GLAD helps us out here, creating our buffer object(s) with one function instead of doing a more complex setup in raw OpenGL.
-
-	//example of multiple buffer objects:
-			//unsigned int VBOs[5]; 
-			//glGenBuffers(5, &VBO);
-
-	unsigned int VAO;
-	glGenVertexArrays(1, &VAO);
 
 	glBindVertexArray(VAO); //important to bind vertex array object before vertex buffer object, otherwise OpenGL doesn't know what VAO should reference. (NOTE: Martin was a little confused about this explanation in the lecture.)
 	glBindBuffer(GL_ARRAY_BUFFER, VBO); //bind buffer, kinda like a state machine, this is the current object, i.e. the current state.
 	
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); //this actually puts our vertices into the buffer. GL_STATIC_DRAW: used for when data is only set once but will be used by the GPU many times, and won't be updated at any point during runtime.
 	
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0); //tell the GPU how to read our array of floats (vertices[]).
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0); //tell the GPU how to read our array of floats (vertices[]).
 	glEnableVertexAttribArray(0);
 
-	myShader->Use();
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float))); //read color part of vertices[].
+	glEnableVertexAttribArray(1);
+
+
+	myShader.Use();
 
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 	//we need to swap buffers
@@ -70,6 +67,12 @@ void Graphics::Render()
 
 	//new stuff
 	glfwPollEvents();
+}
+
+void Graphics::Cache()
+{
+	glGenBuffers(1, &VBO); //GLAD helps us out here, creating our buffer object(s) with one function instead of doing a more complex setup in raw OpenGL.
+	glGenVertexArrays(1, &VAO);
 }
 
 
