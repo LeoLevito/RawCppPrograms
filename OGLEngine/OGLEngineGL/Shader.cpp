@@ -104,3 +104,22 @@ void Shader::Use() //think of the state machine again, set the current state's s
 {
     glUseProgram(myShaderProgram); 
 }
+
+void Shader::SetMatrix4(glm::mat4 matrix, const std::string& name) //missing glm math library, need to download that.
+{
+    glUniformMatrix4fv(glGetUniformLocation(myShaderProgram, name.c_str()), 1, GL_FALSE, glm::value_ptr(matrix));
+}
+
+void ExampleCube() //put this in Graphics. Currently this is orthographic.
+{
+    for (glm::vec3 v : myCubePositions)
+    {
+        glm::mat4 trans = glm::mat4(1.0f);
+        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 1.0f));
+
+        trans = glm::translate(trans, v);
+        myShader->SetMatrix4(trans, "transform");
+
+        myCube->Draw(myShader);
+    }
+}

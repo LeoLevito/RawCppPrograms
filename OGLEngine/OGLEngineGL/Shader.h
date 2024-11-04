@@ -11,5 +11,6 @@ public:
 	unsigned int myShaderProgram;
 	void Initialize(const char* vertexPath, const char* fragmentPath);
 	void Use();
+	void SetMatrix4(glm::mat4 matrix, const std::string& name);
 };
 
