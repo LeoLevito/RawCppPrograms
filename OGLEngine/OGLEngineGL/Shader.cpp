@@ -25,10 +25,8 @@ unsigned int Shader::LoadVertexShader(const char* path) //create vertex shader o
     int result;
     char Log[512];
 
-
     std::string shaderCodeString = LoadShader(path); 
-    //I COULDN'T GET THE CHAR* CONVERSION MARTIN DID TO WORK SO I JUST PUT IN THE GLSL SHADER CODE DIRECTLY:
-    const char* shaderCode = "#version 330 core\nlayout(location = 0) in vec3 aPos;\nlayout(location = 1) in vec3 aColor;\nout vec4 vertexColor;\nvoid main()\n{\ngl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\nvertexColor = vec4(aColor, 1.0);\n}\0"/* shaderCodeString.c_str()*/; //convert loaded shader code to char pointer.
+    const char* shaderCode = shaderCodeString.c_str(); //convert loaded shader code to char pointer.
 
     unsigned int shaderObject; //actual shader object
 
@@ -53,8 +51,7 @@ unsigned int Shader::LoadFragmentShader(const char* path)
     char Log[512];
 
     std::string shaderCodeString = LoadShader(path);
-    //I COULDN'T GET THE CHAR* CONVERSION MARTIN DID TO WORK SO I JUST PUT IN THE GLSL SHADER CODE DIRECTLY:
-    const char* shaderCode = "#version 330 core\nout vec4 FragColor;\nin vec4 vertexColor;\nvoid main()\n{\nFragColor = vertexColor;\n}\0"/*shaderCodeString.c_str()*/;
+    const char* shaderCode = shaderCodeString.c_str();
 
     unsigned int shaderObject;
 
@@ -77,7 +74,7 @@ void Shader::Initialize(const char* vertexPath, const char* fragmentPath) //star
     int result;
     char Log[512];
 
-    unsigned int VertexShader = LoadVertexShader(vertexPath);
+    unsigned int VertexShader = LoadVertexShader(vertexPath); //NEED SHADER FILES TO BE INSIDE THE FOLDER, IN EXPLORER, WHERE THE CURRENT PROJECT RUNS. IN THIS CASE: INSIDE OGLENGINE FOLDER IN EXPLORER. https://github.com/JoeyDeVries/LearnOpenGL/issues/146#issuecomment-528748296
     unsigned int FragmentShader = LoadFragmentShader(fragmentPath);
 
     myShaderProgram = glCreateProgram();
@@ -105,21 +102,21 @@ void Shader::Use() //think of the state machine again, set the current state's s
     glUseProgram(myShaderProgram); 
 }
 
-void Shader::SetMatrix4(glm::mat4 matrix, const std::string& name) //missing glm math library, need to download that.
-{
-    glUniformMatrix4fv(glGetUniformLocation(myShaderProgram, name.c_str()), 1, GL_FALSE, glm::value_ptr(matrix));
-}
-
-void ExampleCube() //put this in Graphics. Currently this is orthographic.
-{
-    for (glm::vec3 v : myCubePositions)
-    {
-        glm::mat4 trans = glm::mat4(1.0f);
-        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 1.0f));
-
-        trans = glm::translate(trans, v);
-        myShader->SetMatrix4(trans, "transform");
-
-        myCube->Draw(myShader);
-    }
-}
+//void Shader::SetMatrix4(glm::mat4 matrix, const std::string& name) //missing glm math library, need to download that.
+//{
+//    glUniformMatrix4fv(glGetUniformLocation(myShaderProgram, name.c_str()), 1, GL_FALSE, glm::value_ptr(matrix));
+//}
+//
+//void ExampleCube() //put this in Graphics. Currently this is orthographic.
+//{
+//    for (glm::vec3 v : myCubePositions)
+//    {
+//        glm::mat4 trans = glm::mat4(1.0f);
+//        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 1.0f));
+//
+//        trans = glm::translate(trans, v);
+//        myShader->SetMatrix4(trans, "transform");
+//
+//        myCube->Draw(myShader);
+//    }
+//}

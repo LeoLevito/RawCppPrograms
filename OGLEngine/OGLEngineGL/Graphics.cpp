@@ -31,7 +31,7 @@ void Graphics::Initialize(int width, int height)
 		return;
 	}
 	Cache();
-	myShader.Initialize("VertexShader.vert","FragmentShader.frag");
+	myShader.Initialize("VertexShader.vertexs","FragmentShader.fragments");
 }
 
 void Graphics::Render()
