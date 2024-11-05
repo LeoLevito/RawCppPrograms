@@ -141,10 +141,6 @@
   <ItemGroup>
     <ClInclude Include="Engine.h" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="FragmentShader.fragments" />
-    <None Include="VertexShader.vertexs" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
