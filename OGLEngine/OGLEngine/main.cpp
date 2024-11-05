@@ -5,7 +5,6 @@
 #include <Shader.h>
 int main()
 {
-
 	Graphics graphics;
 	graphics.Initialize(640, 480);
 

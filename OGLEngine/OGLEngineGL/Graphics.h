@@ -2,7 +2,7 @@
 #include <GLAD/glad.h> //bruh.
 #include <glfw3.h>
 #include "Shader.h"
-#include "Mesh.h"
+#include "Triangle.h"
 
 class Graphics
 {
@@ -20,6 +20,6 @@ private:
 	unsigned int VAO;
 	GLFWwindow* window;
 	Shader* myShader;
-	Mesh* myTriangleMesh;
+	Triangle* myTriangle;
 };
 
