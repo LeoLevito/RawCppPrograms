@@ -8,4 +8,4 @@ static float vertices[] =
      0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f
 };
 
-Triangle::Triangle() : Mesh(vertices, sizeof(vertices)) { } //Ohhh, the triangle constructor runs its parent constructor with the vertices array as inputs. I think I've done something similar in the past in some unreal or c++ project.
+Triangle::Triangle() : Mesh(vertices, sizeof(vertices), nullptr, 0) { } //Ohhh, the triangle constructor runs its parent constructor with the vertices array as inputs. I think I've done something similar in the past in some unreal or c++ project.

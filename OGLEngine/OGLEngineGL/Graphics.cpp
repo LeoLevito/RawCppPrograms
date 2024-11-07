@@ -1,6 +1,7 @@
 #include "Graphics.h"
 #include <iostream>
 //#include <GLAD/glad.h> //bruh.
+#include <gtc/matrix_transform.hpp>
 
 void Graphics::Initialize(int width, int height)
 {
@@ -28,16 +29,30 @@ void Graphics::Initialize(int width, int height)
 		return;
 	}
 
+	
+
 	myShader = new Shader; //quick fix for the 0xCCCCCCCC write/read access violation.
 	myShader->Initialize("../Shaders/VertexShader.vertexs", "../Shaders/FragmentShader.fragments");
+	myTriangle = new Triangle(); //quick fix for the 0xCCCCCCCC write/read access violation. Probably need to remember to do this more.
+	myCube = new Cube();
+
+	//glEnable(GL_DEPTH_TEST); //enable depth testing, I guess this makes it so we don't use orthographic view.
+
+	for (size_t x = 0; x < 10; x++)
+	{
+		for (size_t y = 0; y < 10; y++)
+		{
+			myCubePositions.push_back(glm::vec3(x * 2, 0, y * 2));
+		}
+	}
 }
 
 void Graphics::Render()
 {
 	glClear(GL_COLOR_BUFFER_BIT); //used to clear various stuff, in this case we clear the color buffer bit first, every time the while loop loops, before writing a new color with the glClearColor function. I remember there being similar stuff needing to be done with Emil Ström's TinyEngine in order for us to render things and update them at runtime.
 
-	myTriangle = new Triangle(); //quick fix for the 0xCCCCCCCC write/read access violation. Probably need to remember to do this more.
-	myTriangle->Draw(myShader);
+	ExampleCube();
+	//myTriangle->Draw(myShader);
 
 	//we need to swap buffers
 	glfwSwapBuffers(window); //swap front and back buffers on the window. (Info: our framebuffer has two sides, the back buffer is what we add, the front buffer is what we see. Basically.). So we can see everything that was added before this function was called!
@@ -57,4 +72,19 @@ bool Graphics::ShouldClose()
 		return true;
 	}
 	return false;
+}
+
+void Graphics::ExampleCube() //put this in Graphics. Currently this is orthographic.
+{
+    for (glm::vec3 v : myCubePositions)
+    {
+        glm::mat4 trans = glm::mat4(1.0f);
+        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 1.0f));
+
+        trans = glm::translate(trans, v);
+		myShader->SetMatrix4(trans, "transform");
+
+        myCube->Draw(myShader);
+		myTriangle->Draw(myShader);
+    }
 }
