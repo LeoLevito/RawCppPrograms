@@ -3,6 +3,7 @@
 //#include <GLAD/glad.h> //bruh.
 #include <gtc/matrix_transform.hpp>
 
+
 void Graphics::Initialize(int width, int height)
 {
 	if (!glfwInit())	//we need to initialize glfw
@@ -35,8 +36,9 @@ void Graphics::Initialize(int width, int height)
 	myShader->Initialize("../Shaders/VertexShader.vertexs", "../Shaders/FragmentShader.fragments");
 	myTriangle = new Triangle(); //quick fix for the 0xCCCCCCCC write/read access violation. Probably need to remember to do this more.
 	myCube = new Cube();
+	myCamera = new Camera();
 
-	//glEnable(GL_DEPTH_TEST); //enable depth testing, I guess this makes it so we don't use orthographic view.
+	glEnable(GL_DEPTH_TEST); //enable depth testing, I guess this makes it so we don't use orthographic view.
 
 	for (size_t x = 0; x < 10; x++)
 	{
@@ -49,8 +51,9 @@ void Graphics::Initialize(int width, int height)
 
 void Graphics::Render()
 {
-	glClear(GL_COLOR_BUFFER_BIT); //used to clear various stuff, in this case we clear the color buffer bit first, every time the while loop loops, before writing a new color with the glClearColor function. I remember there being similar stuff needing to be done with Emil Ström's TinyEngine in order for us to render things and update them at runtime.
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //used to clear various stuff, in this case we clear the color buffer bit first, every time the while loop loops, before writing a new color with the glClearColor function. I remember there being similar stuff needing to be done with Emil Ström's TinyEngine in order for us to render things and update them at runtime.
 
+	projection = glm::perspective(glm::radians(45.0f), 640.0f / 480.0f, 0.1f, 100.0f);
 	ExampleCube();
 	//myTriangle->Draw(myShader);
 
@@ -82,7 +85,11 @@ void Graphics::ExampleCube() //put this in Graphics. Currently this is orthograp
         trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 1.0f));
 
         trans = glm::translate(trans, v);
+
+		//write to Vertex Shader
 		myShader->SetMatrix4(trans, "transform");
+		myShader->SetMatrix4(myCamera->myView, "view");
+		myShader->SetMatrix4(projection, "projection");
 
         myCube->Draw(myShader);
 		myTriangle->Draw(myShader);

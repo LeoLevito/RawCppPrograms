@@ -6,6 +6,7 @@
 #include "Cube.h"
 #include <glm.hpp>
 #include <vector>
+#include "Camera.h"
 
 class Graphics
 {
@@ -27,5 +28,7 @@ private:
 	Triangle* myTriangle;
 	Cube* myCube;
 	std::vector<glm::vec3> myCubePositions;
+	Camera* myCamera;
+	glm::mat4 projection;
 };
 
