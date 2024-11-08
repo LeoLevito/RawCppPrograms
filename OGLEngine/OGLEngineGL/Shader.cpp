@@ -10,16 +10,25 @@ std::string Shader::LoadShader(const char* path) //pretty standard way of loadin
 {
     std::string shaderCode;
     std::ifstream shaderFile;
+    shaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 
-    shaderFile.open(path);
+    try //how it's done on learnopengl.com/Getting-started/Shaders.
+    {
+        shaderFile.open(path);
 
-    std::stringstream shaderStream;
-    shaderStream << shaderFile.rdbuf();
+        std::stringstream shaderStream;
+        shaderStream << shaderFile.rdbuf();
 
-    shaderFile.close();
-    shaderCode = shaderStream.str();
+        shaderFile.close();
+        shaderCode = shaderStream.str();
 
-    return shaderCode;
+        return shaderCode;
+    }
+    catch (std::ifstream::failure e)
+    {
+        std::cout << "Failed to load shader file from path: " << path << "\n";
+        return "";
+    }
 }
 
 unsigned int Shader::LoadVertexShader(const char* path) //create vertex shader object.
@@ -104,7 +113,7 @@ void Shader::Use() //think of the state machine again, set the current state's s
     glUseProgram(myShaderProgram); 
 }
 
-void Shader::SetMatrix4(glm::mat4 matrix, const std::string& name) //missing glm math library, need to download that.
+void Shader::SetMatrix4(glm::mat4 matrix, const std::string& name) //Set Matrix 4 uniform variables inside vertex shader during runtime.
 {
     glUniformMatrix4fv(glGetUniformLocation(myShaderProgram, name.c_str()), 1, GL_FALSE, glm::value_ptr(matrix));
 }

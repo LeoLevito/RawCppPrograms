@@ -16,8 +16,11 @@ void Graphics::Initialize(int width, int height)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL); //create window.
+	window = glfwCreateWindow(width, height, "Hello World", NULL, NULL); //create window.
 	glfwMakeContextCurrent(window); //make window current context of OpenGL calling thread.
+
+	myWidth = width;
+	myHeight = height;
 
 	if (window == NULL)
 	{
@@ -40,11 +43,11 @@ void Graphics::Initialize(int width, int height)
 
 	glEnable(GL_DEPTH_TEST); //enable depth testing, I guess this makes it so we don't use orthographic view.
 
-	for (size_t x = 0; x < 10; x++)
+	for (size_t x = 0; x < 2; x++) //10x10 grid, is this how to make the 100 cubes Martin did? EDIT: It is!
 	{
-		for (size_t y = 0; y < 10; y++)
+		for (size_t y = 0; y < 2; y++)
 		{
-			myCubePositions.push_back(glm::vec3(x * 2, 0, y * 2));
+			myCubePositions.push_back(glm::vec3(x * 2.0f, 0.0f, y * 2.0f));
 		}
 	}
 }
@@ -53,12 +56,13 @@ void Graphics::Render()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //used to clear various stuff, in this case we clear the color buffer bit first, every time the while loop loops, before writing a new color with the glClearColor function. I remember there being similar stuff needing to be done with Emil Ström's TinyEngine in order for us to render things and update them at runtime.
 
-	projection = glm::perspective(glm::radians(45.0f), 640.0f / 480.0f, 0.1f, 100.0f);
+	projection = glm::perspective(glm::radians(45.0f), myWidth / myHeight, 0.1f, 100.0f);
 	ExampleCube();
 	//myTriangle->Draw(myShader);
 
 	//we need to swap buffers
 	glfwSwapBuffers(window); //swap front and back buffers on the window. (Info: our framebuffer has two sides, the back buffer is what we add, the front buffer is what we see. Basically.). So we can see everything that was added before this function was called!
+	EscapeToCloseWindow();
 	glfwPollEvents();
 }
 
@@ -82,16 +86,24 @@ void Graphics::ExampleCube() //put this in Graphics. Currently this is orthograp
     for (glm::vec3 v : myCubePositions)
     {
         glm::mat4 trans = glm::mat4(1.0f);
-        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 1.0f));
+        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
 
         trans = glm::translate(trans, v);
 
 		//write to Vertex Shader
-		myShader->SetMatrix4(trans, "transform");
+		myShader->SetMatrix4(trans, "transform"); //apperently there's a better way to do this compared to using a Uniform type variable inside the vertex shader, Shader Buffer Storage Object, something like that, where we can have even more variables inside the shader and update them.
 		myShader->SetMatrix4(myCamera->myView, "view");
 		myShader->SetMatrix4(projection, "projection");
 
         myCube->Draw(myShader);
-		myTriangle->Draw(myShader);
+		//myTriangle->Draw(myShader);
     }
+}
+
+void Graphics::EscapeToCloseWindow()
+{
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	{
+		glfwSetWindowShouldClose(window, true);
+	}
 }

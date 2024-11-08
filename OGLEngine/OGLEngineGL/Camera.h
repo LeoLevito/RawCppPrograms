@@ -5,6 +5,8 @@ class Camera
 public:
 	Camera();
 	void CameraUpdate();
+	void CameraMove(const glm::vec3& move);
+	void SetDirection(const glm::vec3& direction);
 	glm::mat4 myView;
 private:
 	glm::vec3 myDirection;
