@@ -43,11 +43,14 @@ void Graphics::Initialize(int width, int height)
 
 	glEnable(GL_DEPTH_TEST); //enable depth testing, I guess this makes it so we don't use orthographic view.
 
-	for (size_t x = 0; x < 2; x++) //10x10 grid, is this how to make the 100 cubes Martin did? EDIT: It is!
+	for (size_t x = 0; x < 10; x++) //10x10 grid, is this how to make the 100 cubes Martin did? EDIT: It is!
 	{
-		for (size_t y = 0; y < 2; y++)
+		for (size_t y = 0; y < 10; y++)
 		{
-			myCubePositions.push_back(glm::vec3(x * 2.0f, 0.0f, y * 2.0f));
+			for (size_t z = 0; z < 10; z++)
+			{
+				myCubePositions.push_back(glm::vec3(x * 2.0f, z * 2.0f, y * 2.0f));
+			}
 		}
 	}
 }
