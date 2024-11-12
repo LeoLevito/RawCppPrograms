@@ -40,6 +40,7 @@ void Graphics::Initialize(int width, int height)
 	myTriangle = new Triangle(); //quick fix for the 0xCCCCCCCC write/read access violation. Probably need to remember to do this more.
 	myCube = new Cube();
 	myCamera = new Camera();
+	myTexture = new Texture("../Textures/horror_misc_11-512x512.png");
 
 	glEnable(GL_DEPTH_TEST); //enable depth testing, I guess this makes it so we don't use orthographic view.
 
@@ -49,6 +50,8 @@ void Graphics::Initialize(int width, int height)
 		{
 			for (size_t z = 0; z < 10; z++)
 			{
+				//VirtualObject* b = new VIrtualObject(*myCube, *myTexture, *myShader);
+				//myObjects->puch.back();
 				myCubePositions.push_back(glm::vec3(x * 2.0f, z * 2.0f, y * 2.0f));
 			}
 		}
@@ -89,9 +92,8 @@ void Graphics::ExampleCube() //put this in Graphics. Currently this is orthograp
     for (glm::vec3 v : myCubePositions)
     {
         glm::mat4 trans = glm::mat4(1.0f);
+		trans = glm::translate(trans, v); //translate first so that each object rotates independently.
         trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
-
-        trans = glm::translate(trans, v);
 
 		//write to Vertex Shader
 		myShader->SetMatrix4(trans, "transform"); //apperently there's a better way to do this compared to using a Uniform type variable inside the vertex shader, Shader Buffer Storage Object, something like that, where we can have even more variables inside the shader and update them.

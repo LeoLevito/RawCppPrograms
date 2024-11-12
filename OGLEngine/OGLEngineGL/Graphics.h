@@ -7,6 +7,7 @@
 #include <glm.hpp>
 #include <vector>
 #include "Camera.h"
+#include "Texture.h"
 
 class Graphics
 {
@@ -34,5 +35,6 @@ private:
 	glm::mat4 projection;
 	float myWidth;
 	float myHeight;
+	Texture* myTexture;
 };
 

@@ -31,6 +31,6 @@ Texture::Texture(const char* path)
 		std::cout << "Failed to load texture" << std::endl; //if texture couldn't be loaded (load-function returned null), we output failure message to console.
 	}
 
-	stbi_image_free(data); //free up data when we're done.
 	glBindTexture(GL_TEXTURE, 0); //unbind when we're done with the setup.
+	stbi_image_free(data); //free up data when we're done.
 }
