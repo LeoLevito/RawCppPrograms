@@ -38,9 +38,9 @@ Mesh::~Mesh() //when mesh is deleted, also delete Vertex Array and Vertex Buffer
 
 void Mesh::Draw(Shader* shader) //Draw mesh;
 {
-	if (myTexture != NULL)
+	if (myTexture != NULL) 
 	{
-		glBindTexture(GL_TEXTURE_2D, myTexture->TextureObject);
+		glBindTexture(GL_TEXTURE_2D, myTexture->TextureObject); //so we have a new texture binding in Draw() because otherwise fragment shader would take the last binded texture, this allows us to use different textures for different objects (in the future).
 	}
 	shader->Use();
 	glBindVertexArray(VAO); //only bind VAO when drawing the mesh since it already has a VBO reference already.
@@ -54,11 +54,11 @@ void Mesh::Draw(Shader* shader) //Draw mesh;
 		//ERROR, this is giving error for NVIDIA driver, so this likely doesn't conform to the OpenGL specification.
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0); //note the 36, hard coded for a cube right now, we need to specify how many indices we use for it. In the future we will automate this.
 	}
-	glBindVertexArray(0); //unbind (sorta) after we're done with the setup. This will help us in the future if we want to render a different mesh with the same Vertex Array, I guess.
-	//		glBindTexture(GL_TEXTURE, 0); 
+	glBindVertexArray(0); //unbind vertex array after we're done drawing. This will help us in the future if we want to render a different mesh with the vertex array, I guess.
+	glBindTexture(GL_TEXTURE_2D, 0); //unbind texture after we're done drawing. This allows us to use different textures for different objects (in the future), since the fragment shader used for this specific mesh will use basically it's own binded texture, if I understand correctly.
 }
 
-void Mesh::ApplyTexture(Texture* texture) //call early please!
+void Mesh::ApplyTexture(Texture* texture) //Set Local myTexture so it can be used in the Draw() function.
 {
 	myTexture = texture;
 }

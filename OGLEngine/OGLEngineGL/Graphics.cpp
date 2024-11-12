@@ -40,9 +40,10 @@ void Graphics::Initialize(int width, int height)
 	myTriangle = new Triangle(); //quick fix for the 0xCCCCCCCC write/read access violation. Probably need to remember to do this more.
 	myCube = new Cube();
 	myCamera = new Camera();
-	myTexture = new Texture("../Textures/horror_misc_11-512x512.png");
+	myTexture = new Texture("../Textures/horror_misc_11-512x512.png"); //I remember Martin saying that the texture will load to fragment shader without having to set the uniform variable in it.
+	myCube->ApplyTexture(myTexture); 
 
-	glEnable(GL_DEPTH_TEST); //enable depth testing, I guess this makes it so we don't use orthographic view.
+	glEnable(GL_DEPTH_TEST); //enable depth testing, this makes it so objects in front occlude objects in back.
 
 	for (size_t x = 0; x < 10; x++) //10x10 grid, is this how to make the 100 cubes Martin did? EDIT: It is!
 	{

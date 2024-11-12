@@ -14,7 +14,7 @@ Texture::Texture(const char* path)
 	unsigned char* data = stbi_load(path, &Width, &Height, &Channels, 0); //load in texture from path using stb_image header.
 
 	glGenTextures(1, &TextureObject); //similar to what we do in Mesh constructor with the VBO and VAO, we have to generate the TextureObject and bind it.
-	glBindTexture(GL_TEXTURE, TextureObject);
+	glBindTexture(GL_TEXTURE_2D, TextureObject);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); //repeat texture in y direction
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); //repeat texture in x direction
@@ -31,6 +31,6 @@ Texture::Texture(const char* path)
 		std::cout << "Failed to load texture" << std::endl; //if texture couldn't be loaded (load-function returned null), we output failure message to console.
 	}
 
-	glBindTexture(GL_TEXTURE, 0); //unbind when we're done with the setup.
+	glBindTexture(GL_TEXTURE_2D, 0); //unbind when we're done with the setup.
 	stbi_image_free(data); //free up data when we're done.
 }
