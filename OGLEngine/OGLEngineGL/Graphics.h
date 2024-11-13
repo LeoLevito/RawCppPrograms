@@ -1,5 +1,5 @@
 #pragma once
-#include <GLAD/glad.h> //bruh.
+#include <GLAD/glad.h>
 #include <glfw3.h>
 #include "Shader.h"
 #include "Triangle.h"
@@ -21,20 +21,18 @@ public:
 	GLFWwindow* window;
 	Camera* myCamera;
 private:
-	unsigned int VBO; //vertex buffer object, OpenGL objects are unsigned ints. We can put a bunch of vertices in this object and send it to the GPU.
-	//example of multiple buffer objects:
-		//unsigned int VBOs[5]; 
-		//glGenBuffers(5, &VBO);
-	
+	unsigned int VBO; //vertex buffer object, OpenGL objects are unsigned ints. We can put a bunch of vertices in this object and send it to the GPU. You can have an array of VBOs.
 	unsigned int VAO;
 
 	Shader* myShader;
 	Triangle* myTriangle;
 	Cube* myCube;
+	Texture* myTexture;
+
 	std::vector<glm::vec3> myCubePositions;
 	glm::mat4 projection;
+
 	float myWidth;
 	float myHeight;
-	Texture* myTexture;
 };
 

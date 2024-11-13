@@ -1,6 +1,3 @@
-//#include <iostream>
-//#include <glfw3.h>
-//#include "Graphics.h"
 #include <Graphics.h>
 #include <Shader.h>
 #include <Engine.h>

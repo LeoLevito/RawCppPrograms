@@ -1,8 +1,6 @@
 #include "Graphics.h"
 #include <iostream>
-//#include <GLAD/glad.h> //bruh.
 #include <gtc/matrix_transform.hpp>
-
 
 void Graphics::Initialize(int width, int height)
 {
@@ -33,14 +31,12 @@ void Graphics::Initialize(int width, int height)
 		return;
 	}
 
-	
-
 	myShader = new Shader; //quick fix for the 0xCCCCCCCC write/read access violation.
 	myShader->Initialize("../Shaders/VertexShader.vertexs", "../Shaders/FragmentShader.fragments");
 	myTriangle = new Triangle(); //quick fix for the 0xCCCCCCCC write/read access violation. Probably need to remember to do this more.
 	myCube = new Cube();
 	myCamera = new Camera();
-	myTexture = new Texture("../Textures/horror_misc_11-512x512.png"); //I remember Martin saying that the texture will load to fragment shader without having to set the uniform variable in it.
+	myTexture = new Texture("../Textures/Bliss.jpg"); //I remember Martin saying that the texture will load to fragment shader without having to set the uniform variable in it.
 	myCube->ApplyTexture(myTexture); 
 
 	glEnable(GL_DEPTH_TEST); //enable depth testing, this makes it so objects in front occlude objects in back.
@@ -65,7 +61,6 @@ void Graphics::Render()
 
 	projection = glm::perspective(glm::radians(45.0f), myWidth / myHeight, 0.1f, 100.0f);
 	ExampleCube();
-	//myTriangle->Draw(myShader);
 
 	//we need to swap buffers
 	glfwSwapBuffers(window); //swap front and back buffers on the window. (Info: our framebuffer has two sides, the back buffer is what we add, the front buffer is what we see. Basically.). So we can see everything that was added before this function was called!

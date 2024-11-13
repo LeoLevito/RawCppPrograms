@@ -33,8 +33,6 @@ void FlyingCamera::Update()
 	lastX = xpos;
 	lastY = ypos;
 
-
-
 	xoffset *= Sensitivity;
 	yoffset *= Sensitivity;
 
@@ -51,5 +49,4 @@ void FlyingCamera::Update()
 	myCamera->CameraMove(velocity * MoveSpeed * myEngineTime->DeltaTime());
 	myCamera->SetDirection(direction);
 	myCamera->CameraUpdate();
-
 }

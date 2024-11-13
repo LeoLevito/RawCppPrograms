@@ -1,5 +1,5 @@
 #include "Mesh.h"
-#include <GLAD/glad.h> //bruh.
+#include <GLAD/glad.h>
 #include "Shader.h"
 
 Mesh::Mesh(float* vertices, size_t vertexSize, unsigned int* indices, size_t indexSize)
@@ -42,6 +42,7 @@ void Mesh::Draw(Shader* shader) //Draw mesh;
 	{
 		glBindTexture(GL_TEXTURE_2D, myTexture->TextureObject); //so we have a new texture binding in Draw() because otherwise fragment shader would take the last binded texture, this allows us to use different textures for different objects (in the future).
 	}
+
 	shader->Use();
 	glBindVertexArray(VAO); //only bind VAO when drawing the mesh since it already has a VBO reference already.
 	
