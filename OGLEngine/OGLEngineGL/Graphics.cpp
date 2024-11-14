@@ -63,9 +63,9 @@ void Graphics::Render()
 	ExampleCube();
 
 	//we need to swap buffers
-	glfwSwapBuffers(window); //swap front and back buffers on the window. (Info: our framebuffer has two sides, the back buffer is what we add, the front buffer is what we see. Basically.). So we can see everything that was added before this function was called!
+	//glfwSwapBuffers(window); //swap front and back buffers on the window. (Info: our framebuffer has two sides, the back buffer is what we add, the front buffer is what we see. Basically.). So we can see everything that was added before this function was called!
 	EscapeToCloseWindow();
-	glfwPollEvents();
+	//glfwPollEvents();
 }
 
 void Graphics::Cache()

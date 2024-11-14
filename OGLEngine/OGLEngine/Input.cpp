@@ -1,5 +1,5 @@
 #include "Input.h"
-#include <glfw3.h>
+#include <GLFW/glfw3.h>
 #include <unordered_map>
 std::unordered_map<int, bool> myKeyStates; //this will get bigger and bigger as we press more (different) keys, as I understood it.
 float lastX;
