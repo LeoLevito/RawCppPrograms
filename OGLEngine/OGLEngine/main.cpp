@@ -47,8 +47,8 @@ int main()
 		ImGui::NewFrame();
 		ImGui::ShowDemoWindow(); // Show demo window! :)
 
-		graphics->Render();
 		engine->Update(deltaTime);
+		graphics->Render();
 
 		// Rendering
 		// (Your code clears your framebuffer, renders your other stuff etc.)

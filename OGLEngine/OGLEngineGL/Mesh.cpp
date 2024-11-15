@@ -4,6 +4,15 @@
 
 Mesh::Mesh(float* vertices, size_t vertexSize, unsigned int* indices, size_t indexSize)
 {
+
+
+
+
+//set IndicesSize to 0 here, in this constructor we want to be 0.
+
+
+
+
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO); //important to bind vertex array object before vertex buffer object, otherwise OpenGL doesn't know what VAO should reference. (NOTE: Martin was a little confused about this explanation in the lecture.)
 
@@ -30,10 +39,29 @@ Mesh::Mesh(float* vertices, size_t vertexSize, unsigned int* indices, size_t ind
 
 }
 
+
+
+
+
+//Create new constructor here for preparing .obj meshes for DRAW()
+
+
+
+
+
 Mesh::~Mesh() //when mesh is deleted, also delete Vertex Array and Vertex Buffer objects.
 {
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
+
+
+
+
+//insert EBO buffer deletion here
+
+
+
+
 }
 
 void Mesh::Draw(Shader* shader) //Draw mesh;
@@ -46,6 +74,18 @@ void Mesh::Draw(Shader* shader) //Draw mesh;
 	shader->Use();
 	glBindVertexArray(VAO); //only bind VAO when drawing the mesh since it already has a VBO reference already.
 	
+
+
+
+
+
+//insert new mesh loading code here checking for indices
+
+
+
+
+
+
 	if (EBO == 0)
 	{
 		glDrawArrays(GL_TRIANGLES, 0, 3);
