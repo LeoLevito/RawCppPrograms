@@ -1,7 +1,7 @@
 #include "Texture.h"
 #include "stb_image.h"
 #include <GLAD/glad.h>
-#include <glfw3.h> //GLAD ALWAYS COMES BEFORE GLFW!!!
+#include <GLFW/glfw3.h> //GLAD ALWAYS COMES BEFORE GLFW!!!
 #include <iostream>
 
 
