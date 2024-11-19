@@ -8,8 +8,12 @@ public:
 	static void MouseCallBack(GLFWwindow* window, double xPos, double yPos);
 	float GetCursorX();
 	float GetCursorY();
+	void SetCursorX(float x);
+	void SetCursorY(float y);
+	void SetCursorXY(float x, float y);
 	bool IsKeyPressed(const int& key);
 	bool IsKeyDown(const int& key);
+	bool IsMouseButtonDown(const int& button);
 private:
 	GLFWwindow* myWindow;
 };

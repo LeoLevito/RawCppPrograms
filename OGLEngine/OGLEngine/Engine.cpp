@@ -4,12 +4,32 @@ void Engine::Initialize(GLFWwindow* window, Camera* camera)
 {
 	myInput = new Input(window);
 	myEngineTime = new EngineTime();
-	myFlyingCamera = new FlyingCamera(camera, myInput, myEngineTime);
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); //Lock the cursor to the center of the window.
+	myFlyingCamera = new FlyingCamera(camera, myInput, myEngineTime, window);
+	myFlyingCamera->RotateCamera(true);
+	
+	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); //Lock the cursor to the center of the window.
 }
 
-void Engine::Update(float deltaTime)
+void Engine::Update(GLFWwindow* window, float deltaTime)
 {
+	if (myInput->IsMouseButtonDown(GLFW_MOUSE_BUTTON_2))
+	{
+		if (DoOnce == false)
+		{
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+			DoOnce = true;
+			myFlyingCamera->SetNewCursorPosition();
+		}	
+
+	}
+	else 
+	{
+		if (DoOnce == true)
+		{
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+			DoOnce = false;
+		}
+	}
 	myFlyingCamera->Update();
 	myEngineTime->UpdateDeltaTime(deltaTime);
 }

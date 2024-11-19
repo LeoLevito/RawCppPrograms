@@ -27,7 +27,7 @@ int main()
 
 		editorGUI->StartImGuiFrame();
 
-		engine->Update(deltaTime);
+		engine->Update(graphics->window,deltaTime);
 		graphics->Render();
 
 		editorGUI->RenderImGui();

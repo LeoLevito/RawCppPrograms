@@ -1,21 +1,40 @@
 #include "FlyingCamera.h"
 #include <glm.hpp>
+#include <iostream>
 
 const float Sensitivity = 0.5f;
 const float MoveSpeed = 10.0f;
 
-FlyingCamera::FlyingCamera(Camera* camera, Input* input, EngineTime* engineTime)
+FlyingCamera::FlyingCamera(Camera* camera, Input* input, EngineTime* engineTime, GLFWwindow* window)
 {
 	myCamera = camera;
 	myInput = input;
 	myEngineTime = engineTime;
+	myWindow = window;
 }
 
-void FlyingCamera::Update()
+void FlyingCamera::Update() //maybe this entire update should be run only if the right mouse button is down. 
+{
+	if (myInput->IsMouseButtonDown(GLFW_MOUSE_BUTTON_2))
+	{
+		MoveCamera();
+		RotateCamera(false);
+	}
+	myCamera->CameraUpdate();
+}
+
+void FlyingCamera::SetNewCursorPosition()
+{
+	myInput->SetCursorXY(lastX, lastY);
+	myInput->SetCursorX(lastX);
+	myInput->SetCursorX(lastY);
+	std::cout << "SET NEW CURSOR POSITION TO: " << lastX << " - XPOS || " << lastY << " - YPOS" << std::endl;
+}
+
+void FlyingCamera::MoveCamera()
 {
 	glm::vec3 velocity = glm::vec3(0.0f, 0.0f, 0.0f);
-	glm::vec3 direction = glm::vec3(0.0f, 0.0f, 0.0f);
-
+	//move camera
 	if (myInput->IsKeyDown(GLFW_KEY_W)) velocity.z = 1;
 	if (myInput->IsKeyDown(GLFW_KEY_A)) velocity.x = -1; //super low numbers overriding up down forward backward
 	if (myInput->IsKeyDown(GLFW_KEY_S)) velocity.z = -1;
@@ -24,9 +43,38 @@ void FlyingCamera::Update()
 	if (myInput->IsKeyDown(GLFW_KEY_E)) velocity.y = 1;
 	if (myInput->IsKeyDown(GLFW_KEY_Q)) velocity.y = -1;
 
-	float xpos, ypos;
-	xpos = myInput->GetCursorX();
-	ypos = myInput->GetCursorY();
+	myCamera->CameraMove(velocity * MoveSpeed * myEngineTime->DeltaTime());
+}
+
+void FlyingCamera::RotateCamera(bool firstTimeRun)
+{
+	glm::vec3 direction = glm::vec3(0.0f, 0.0f, 0.0f);
+	//if holding right click
+	//youre able to rotate the camera, mouse cursor disappears. CHECK
+	//of you release right click, mouse cursor will reappear where you started holding down right click. CHECK
+	//rotation of camera should be set relative to where you start holding right click, not be immediately set to where the mouse cursor is. CHECK
+
+
+	//rotate camera
+	double* myX = new double;
+	double* myY = new double;
+
+	float xpos = 0;
+	float ypos = 0; //new variables
+
+	//myInput->SetCursorXY(lastX, lastY); //only want to set this once when starting to hold and not all the time
+
+	if (!firstTimeRun) //special condition for straightening the camera at start.
+	{
+		glfwGetCursorPos(myWindow, myX, myY);
+		//xpos = myInput->GetCursorX(); //get position of mouse cursor on window, (0,0) top left, (1280,720) bottom right.
+		//ypos = myInput->GetCursorY(); //we shouldn't depend on these since they are direct fed mouse positions.
+		std::cout << xpos << " - XPOS || " << ypos << " - YPOS" << std::endl;
+
+		xpos = *myX;
+		ypos = *myY;
+	}
+
 
 	float xoffset = xpos - lastX;
 	float yoffset = lastY - ypos; // reversed since y-coordinates range from bottom to top
@@ -46,7 +94,5 @@ void FlyingCamera::Update()
 	direction.y = sin(glm::radians(pitch));
 	direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
 
-	myCamera->CameraMove(velocity * MoveSpeed * myEngineTime->DeltaTime());
 	myCamera->SetDirection(direction);
-	myCamera->CameraUpdate();
 }

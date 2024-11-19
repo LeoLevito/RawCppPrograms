@@ -2,11 +2,15 @@
 #include "Camera.h"
 #include "Input.h"
 #include "EngineTime.h"
+
 class FlyingCamera
 {
 public:
-	FlyingCamera(Camera* camera, Input* input, EngineTime* engineTime);
+	FlyingCamera(Camera* camera, Input* input, EngineTime* engineTime, GLFWwindow* window);
 	void Update();
+	void SetNewCursorPosition();
+	void MoveCamera();
+	void RotateCamera(bool firstTimeRun);
 private:
 	Camera* myCamera;
 	Input* myInput;
@@ -15,5 +19,7 @@ private:
 	float yaw, pitch;
 
 	double lastX, lastY;
+
+	GLFWwindow* myWindow;
 };
 

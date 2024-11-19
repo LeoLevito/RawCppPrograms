@@ -8,12 +8,16 @@ class Engine
 
 public:
 	void Initialize(GLFWwindow* window, Camera* camera);
-	void Update(float deltaTime);
+	void Update(GLFWwindow* window, float deltaTime);
+	float lastX;
+	float lastY;
 private:
 	Graphics* graphics;
 	Engine* engine;
 	Input* myInput;
 	FlyingCamera* myFlyingCamera;
 	EngineTime* myEngineTime;
+	bool DoOnce = false;
+
 };
 
