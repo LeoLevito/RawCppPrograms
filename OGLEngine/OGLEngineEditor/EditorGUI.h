@@ -5,9 +5,11 @@ class EditorGUI
 {
 public:
 	void Initialize(GLFWwindow* window);
-	void StartImGuiFrame();
+	void StartImGuiFrame(float deltaTime);
 	void RenderImGui();
 	void CloseImGui();
+
+	void FrameRateWindow(float deltaTime);
 private:
 };
 

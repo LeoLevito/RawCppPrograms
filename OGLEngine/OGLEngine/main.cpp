@@ -17,15 +17,19 @@ int main()
 	float currentTime = 0;
 	float deltaTime = 0;
 
+	//glfwSwapInterval(0); VSYNC disable
+
 	while (!graphics->ShouldClose())
 	{
 		currentTime = glfwGetTime(); //May or may not be super accurate at the moment.
 		deltaTime = currentTime - lastTime;
 		lastTime = currentTime;
 
+
+
 		glfwPollEvents(); //moved from Graphics::Render().
 
-		editorGUI->StartImGuiFrame();
+		editorGUI->StartImGuiFrame(deltaTime);
 
 		engine->Update(graphics->window,deltaTime);
 		graphics->Render();

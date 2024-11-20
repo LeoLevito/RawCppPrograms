@@ -2,6 +2,7 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#include <string>
 
 void EditorGUI::Initialize(GLFWwindow* window)
 {
@@ -19,7 +20,7 @@ void EditorGUI::Initialize(GLFWwindow* window)
 	ImGui_ImplOpenGL3_Init();
 }
 
-void EditorGUI::StartImGuiFrame()
+void EditorGUI::StartImGuiFrame(float deltaTime)
 {
 	// (Your code calls glfwPollEvents())
 	// ...
@@ -32,7 +33,8 @@ void EditorGUI::StartImGuiFrame()
 
 
 	//CHANGE THIS TO WHATEVER I WANT / NEED!
-	ImGui::ShowDemoWindow(); // Show demo window! :)
+	//ImGui::ShowDemoWindow(); // Show demo window! :)
+	FrameRateWindow(deltaTime);
 }
 
 void EditorGUI::RenderImGui()
@@ -49,4 +51,16 @@ void EditorGUI::CloseImGui() //When shutting down program, make sure ImGui is sh
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
+}
+
+void EditorGUI::FrameRateWindow(float deltaTime)
+{
+	float fps = 1.f / deltaTime;
+
+	ImGui::Begin("Current frame rate:"); //start rendering new ImGui window
+
+	ImGui::Text("FPS = %f", fps);
+	ImGui::Text("frame time = %f", deltaTime);
+
+	ImGui::End(); //stop rendering new ImGui window
 }
