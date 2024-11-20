@@ -53,6 +53,7 @@ void Graphics::Initialize(int width, int height)
 			}
 		}
 	}
+	myCubePositions[0].x -= 5.5f; //test to move a single cube.
 }
 
 void Graphics::Render()

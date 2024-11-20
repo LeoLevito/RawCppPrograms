@@ -62,5 +62,10 @@ void EditorGUI::FrameRateWindow(float deltaTime)
 	ImGui::Text("FPS = %f", fps);
 	ImGui::Text("frame time = %f", deltaTime);
 
+	if (ImGui::Button("TestButton")) 
+	{
+
+	}
+
 	ImGui::End(); //stop rendering new ImGui window
 }
