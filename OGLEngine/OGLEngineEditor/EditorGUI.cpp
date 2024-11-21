@@ -4,7 +4,8 @@
 #include "imgui_impl_opengl3.h"
 #include <string>
 
-void EditorGUI::Initialize(GLFWwindow* window)
+
+void EditorGUI::Initialize(GLFWwindow* window, Graphics* graphics)
 {
 	//Initialize ImGui, check https://github.com/ocornut/imgui/wiki/Getting-Started#example-if-you-are-using-glfw--openglwebgl, and cross-reference with Martin's project as well.
 	// Setup Dear ImGui context
@@ -18,6 +19,8 @@ void EditorGUI::Initialize(GLFWwindow* window)
 	// Setup Platform/Renderer backends
 	ImGui_ImplGlfw_InitForOpenGL(window, true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
 	ImGui_ImplOpenGL3_Init();
+
+	myGraphics = graphics;
 }
 
 void EditorGUI::StartImGuiFrame(float deltaTime)
@@ -35,6 +38,7 @@ void EditorGUI::StartImGuiFrame(float deltaTime)
 	//CHANGE THIS TO WHATEVER I WANT / NEED!
 	//ImGui::ShowDemoWindow(); // Show demo window! :)
 	FrameRateWindow(deltaTime);
+	HierarchyWindow();
 }
 
 void EditorGUI::RenderImGui()
@@ -62,10 +66,40 @@ void EditorGUI::FrameRateWindow(float deltaTime)
 	ImGui::Text("FPS = %f", fps);
 	ImGui::Text("frame time = %f", deltaTime);
 
-	if (ImGui::Button("TestButton")) 
+	if (ImGui::Button("Add Game Object")) 
 	{
+		//add game object to all-objects list/vector.
+		//this updates the Hierarchy window which I will create.
 
 	}
 
+	ImGui::End(); //stop rendering new ImGui window
+}
+
+void EditorGUI::HierarchyWindow()
+{
+	ImGui::Begin("Hierarchy"); //start rendering new ImGui window
+
+	int objectIndex = 0;
+	for (auto var : myGraphics->myCubePositions) //for each loop.
+	{
+		ImGui::PushID(objectIndex); //ID system is required for items in an ImGui windows that will be named the same.
+		std::string str1 = "myCubePositions"; //should be able to rename objects in editor in the future. Maybe have a name variable in the GameObject class.
+		std::string str2 = std::to_string(objectIndex);
+		str1.append(str2);
+
+		if (ImGui::CollapsingHeader(str1.c_str())) 
+		{
+			if (ImGui::TreeNode("Psuedo Transform Component")) //treenode shall be named after the components attached to the specified game object!
+			{
+				//ImGui::InputFloat3("transform", &myGraphics->myCubePositions[objectIndex].x); //wait, why does this just work? How does Martin do it?
+				ImGui::DragFloat3("Position", &myGraphics->myCubePositions[objectIndex].x,.01f); //wait, why does this just work?
+				ImGui::TreePop();
+			}
+		}
+
+		objectIndex++;
+		ImGui::PopID();
+	}
 	ImGui::End(); //stop rendering new ImGui window
 }

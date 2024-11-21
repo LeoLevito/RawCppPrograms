@@ -11,7 +11,7 @@ int main()
 	engine->Initialize(graphics->window, graphics->myCamera);
 
 	EditorGUI* editorGUI = new EditorGUI;
-	editorGUI->Initialize(graphics->window);
+	editorGUI->Initialize(graphics->window, graphics);
 
 	float lastTime = 0;
 	float currentTime = 0;

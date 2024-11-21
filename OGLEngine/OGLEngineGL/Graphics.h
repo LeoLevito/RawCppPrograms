@@ -20,6 +20,8 @@ public:
 	void EscapeToCloseWindow();
 	GLFWwindow* window;
 	Camera* myCamera;
+
+	std::vector<glm::vec3> myCubePositions;
 private:
 	unsigned int VBO; //vertex buffer object, OpenGL objects are unsigned ints. We can put a bunch of vertices in this object and send it to the GPU. You can have an array of VBOs.
 	unsigned int VAO;
@@ -29,7 +31,7 @@ private:
 	Cube* myCube;
 	Texture* myTexture;
 
-	std::vector<glm::vec3> myCubePositions;
+
 	glm::mat4 projection;
 
 	float myWidth;

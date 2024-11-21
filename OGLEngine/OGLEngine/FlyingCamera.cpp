@@ -28,7 +28,6 @@ void FlyingCamera::SetNewCursorPosition()
 	myInput->SetCursorXY(lastX, lastY);
 	myInput->SetCursorX(lastX);
 	myInput->SetCursorX(lastY);
-	std::cout << "SET NEW CURSOR POSITION TO: " << lastX << " - XPOS || " << lastY << " - YPOS" << std::endl;
 }
 
 void FlyingCamera::MoveCamera()
@@ -62,14 +61,9 @@ void FlyingCamera::RotateCamera(bool firstTimeRun)
 	float xpos = 0;
 	float ypos = 0; //new variables
 
-	//myInput->SetCursorXY(lastX, lastY); //only want to set this once when starting to hold and not all the time
-
 	if (!firstTimeRun) //special condition for straightening the camera at start.
 	{
 		glfwGetCursorPos(myWindow, myX, myY);
-		//xpos = myInput->GetCursorX(); //get position of mouse cursor on window, (0,0) top left, (1280,720) bottom right.
-		//ypos = myInput->GetCursorY(); //we shouldn't depend on these since they are direct fed mouse positions.
-		std::cout << xpos << " - XPOS || " << ypos << " - YPOS" << std::endl;
 
 		xpos = *myX;
 		ypos = *myY;

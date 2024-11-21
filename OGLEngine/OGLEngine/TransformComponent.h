@@ -1,6 +1,7 @@
 #pragma once
 #include "glm.hpp"
-class TransformComponent
+#include "Component.h"
+class TransformComponent : public Component
 {
 public:
 	glm::vec3 position;

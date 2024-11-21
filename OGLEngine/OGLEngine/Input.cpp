@@ -40,8 +40,6 @@ void Input::MouseCallBack(GLFWwindow* window, double xPos, double yPos)
 {
 	lastX = xPos;
 	lastY = yPos;
-	std::cout << " MOVED MOUSE !!! " << std::endl;
-	std::cout << lastX << " - XPOS || " << lastY << " - YPOS" << std::endl;
 }
 
 float Input::GetCursorX()
