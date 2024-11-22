@@ -7,7 +7,9 @@ public:
 	GameObjectTest();
 	//void BeginPlay() override;
 	//void Tick(float deltaTime) override;
-private:
 	TransformComponent* transformComponent;
+	TransformComponent* transformComponent2;
+private:
+
 };
 

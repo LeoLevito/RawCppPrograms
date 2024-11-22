@@ -1,9 +1,11 @@
 #include <Graphics.h>
 #include <Engine.h>
 #include <EditorGUI.h>
+#include <Game.h>
 
 int main()
 {
+	Game* game = new Game;
 	Graphics* graphics = new Graphics;
 	graphics->Initialize(1280, 720);
 
@@ -11,7 +13,7 @@ int main()
 	engine->Initialize(graphics->window, graphics->myCamera);
 
 	EditorGUI* editorGUI = new EditorGUI;
-	editorGUI->Initialize(graphics->window, graphics);
+	editorGUI->Initialize(graphics->window, graphics, game);
 
 	float lastTime = 0;
 	float currentTime = 0;

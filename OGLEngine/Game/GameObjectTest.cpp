@@ -3,8 +3,16 @@
 
 GameObjectTest::GameObjectTest() //constructor
 {
+	name = "GameObjectTest";
+
 	transformComponent = new TransformComponent;
-	transformComponent->position = glm::vec3(1, 1, 1);
+	transformComponent->name = "Transform Component";
+	AddComponent(transformComponent);
+
+	transformComponent2 = new TransformComponent;
+	transformComponent2->name = "Transform Component nomero dos";
+	AddComponent(transformComponent2);
+
 	//transformComponent = AddComponent(TransformComponent);
 	//meshComponent = AddComponent(MeshComponent);
 
