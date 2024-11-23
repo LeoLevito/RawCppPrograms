@@ -1,6 +1,7 @@
 #pragma once
 #include "glm.hpp"
 #include "Component.h"
+#include "Camera.h"
 class TransformComponent : public Component
 {
 public:
@@ -9,6 +10,6 @@ public:
 	glm::vec3 rotation;
 	glm::vec3 scale;
 
-	void DrawComponentSpecificImGuiHierarchyAdjustables() override;
+	void DrawComponentSpecificImGuiHierarchyAdjustables(Camera& camera, glm::mat4& projection, Shader& shader) override;
 };
 

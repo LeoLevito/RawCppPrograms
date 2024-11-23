@@ -7,10 +7,10 @@ TransformComponent::TransformComponent()
 {
 	position = glm::vec3(0, 0, 0);
 	rotation = glm::vec3(0, 0, 0);
-	scale = glm::vec3(0, 0, 0);
+	scale = glm::vec3(1, 1, 1);
 }
 
-void TransformComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
+void TransformComponent::DrawComponentSpecificImGuiHierarchyAdjustables(Camera& camera, glm::mat4& projection, Shader& shader)
 {
 	ImGui::DragFloat3("Position", &position.x, .01f);
 	ImGui::DragFloat3("Rotation", &rotation.x, .01f);

@@ -11,6 +11,7 @@ public:
 	void AddComponent(Component* component);
 	std::vector<Component*> componentVector;
 	std::string name;
+	virtual void Update();
 private:
 
 };

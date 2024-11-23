@@ -38,29 +38,31 @@ void Graphics::Initialize(int width, int height)
 	myCamera = new Camera();
 	myTexture = new Texture("../Textures/Bliss.jpg"); //I remember Martin saying that the texture will load to fragment shader without having to set the uniform variable in it.
 	myCube->ApplyTexture(myTexture); 
+	myCubePositions.push_back(glm::vec3(0.0f,0.0f,0.0f));
 
 	glEnable(GL_DEPTH_TEST); //enable depth testing, this makes it so objects in front occlude objects in back.
 
-	for (size_t x = 0; x < 10; x++) //10x10 grid, is this how to make the 100 cubes Martin did? EDIT: It is!
-	{
-		for (size_t y = 0; y < 10; y++)
-		{
-			for (size_t z = 0; z < 10; z++)
-			{
-				//VirtualObject* b = new VIrtualObject(*myCube, *myTexture, *myShader);
-				//myObjects->puch.back();
-				myCubePositions.push_back(glm::vec3(x * 2.0f, z * 2.0f, y * 2.0f));
-			}
-		}
-	}
-	myCubePositions[0].x -= 5.5f; //test to move a single cube.
+	//for (size_t x = 0; x < 10; x++) //10x10 grid, is this how to make the 100 cubes Martin did? EDIT: It is!
+	//{
+	//	for (size_t y = 0; y < 10; y++)
+	//	{
+	//		for (size_t z = 0; z < 10; z++)
+	//		{
+	//			//VirtualObject* b = new VIrtualObject(*myCube, *myTexture, *myShader);
+	//			//myObjects->puch.back();
+	//			myCubePositions.push_back(glm::vec3(x * 2.0f, z * 2.0f, y * 2.0f));
+	//		}
+	//	}
+	//}
+	//myCubePositions[0].x -= 5.5f; //test to move a single cube.
+	projection = glm::perspective(glm::radians(45.0f), myWidth / myHeight, 0.1f, 100.0f);
 }
 
 void Graphics::Render()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //used to clear various stuff, in this case we clear the color buffer bit first, every time the while loop loops, before writing a new color with the glClearColor function. I remember there being similar stuff needing to be done with Emil Ström's TinyEngine in order for us to render things and update them at runtime.
 
-	projection = glm::perspective(glm::radians(45.0f), myWidth / myHeight, 0.1f, 100.0f);
+
 	ExampleCube();
 
 	//we need to swap buffers

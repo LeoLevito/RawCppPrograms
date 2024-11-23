@@ -13,6 +13,10 @@ GameObjectTest::GameObjectTest() //constructor
 	transformComponent2->name = "Transform Component nomero dos";
 	AddComponent(transformComponent2);
 
+	meshComponent = new MeshComponent;
+	meshComponent->name = "Mesh Component";
+	AddComponent(meshComponent);
+
 	//transformComponent = AddComponent(TransformComponent);
 	//meshComponent = AddComponent(MeshComponent);
 
@@ -22,6 +26,13 @@ GameObjectTest::GameObjectTest() //constructor
 	//transformComponent->scale = new Vector3(1,1,1) 
 	
 	//meshComponent->mesh = targetMesh;
+}
+
+void GameObjectTest::Update()
+{
+	meshComponent->position = transformComponent->position;
+	meshComponent->rotation = transformComponent->rotation;
+	meshComponent->scale = transformComponent->scale;
 }
 
 //void GameObjectTest::BeginPlay()

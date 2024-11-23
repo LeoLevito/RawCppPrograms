@@ -5,7 +5,7 @@
 #include <string>
 #include <GameObjectTest.h>
 
-void EditorGUI::Initialize(GLFWwindow* window, Graphics* graphics, Game* game)
+void EditorGUI::Initialize(GLFWwindow* window, Graphics* graphics, Game* game, Camera& camera, Shader& shader)
 {
 	//Initialize ImGui, check https://github.com/ocornut/imgui/wiki/Getting-Started#example-if-you-are-using-glfw--openglwebgl, and cross-reference with Martin's project as well.
 	// Setup Dear ImGui context
@@ -22,6 +22,8 @@ void EditorGUI::Initialize(GLFWwindow* window, Graphics* graphics, Game* game)
 
 	myGraphics = graphics;
 	myGame = game;
+	myCamera = camera;
+	myShader = shader;
 }
 
 void EditorGUI::StartImGuiFrame(float deltaTime)
@@ -39,15 +41,17 @@ void EditorGUI::StartImGuiFrame(float deltaTime)
 	//CHANGE THIS TO WHATEVER I WANT / NEED!
 	//ImGui::ShowDemoWindow(); // Show demo window! :)
 	FrameRateWindow(deltaTime);
-	HierarchyWindow();
+	//HierarchyWindow(myCamera, myProjection, myShader);
 }
 
-void EditorGUI::RenderImGui()
+void EditorGUI::RenderImGui(glm::mat4& projection)
 {
 	// Rendering
 	// (Your code clears your framebuffer, renders your other stuff etc.)
+
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	myProjection = projection;
 	// (Your code calls glfwSwapBuffers() etc.)
 }
 
@@ -70,7 +74,7 @@ void EditorGUI::FrameRateWindow(float deltaTime)
 	ImGui::End(); //stop rendering new ImGui window
 }
 
-void EditorGUI::HierarchyWindow()
+void EditorGUI::HierarchyWindow(Camera& camera, glm::mat4& projection, Shader& shader)
 {
 	ImGui::Begin("Hierarchy"); //start rendering new ImGui window
 
@@ -98,8 +102,10 @@ void EditorGUI::HierarchyWindow()
 					//std::string str5 = myGame->gameObjectVector[objectIndex]->componentVector[0]->name;
 
 					ImGui::Text("You can see the name of this component above this text!");
-					myGame->gameObjectVector[objectIndex]->componentVector[componentIndex]->DrawComponentSpecificImGuiHierarchyAdjustables();
+					myGame->gameObjectVector[objectIndex]->componentVector[componentIndex]->DrawComponentSpecificImGuiHierarchyAdjustables(camera, projection, shader);
 					//maybe the component itself should authorize what to draw in this tree node and we just call its DrawImGui() function here?
+					
+					myGame->gameObjectVector[objectIndex]->Update();
 					ImGui::TreePop();
 				}
 				componentIndex++;

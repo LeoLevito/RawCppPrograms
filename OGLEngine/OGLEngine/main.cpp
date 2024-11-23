@@ -13,7 +13,7 @@ int main()
 	engine->Initialize(graphics->window, graphics->myCamera);
 
 	EditorGUI* editorGUI = new EditorGUI;
-	editorGUI->Initialize(graphics->window, graphics, game);
+	editorGUI->Initialize(graphics->window, graphics, game, *graphics->myCamera, *graphics->myShader);
 
 	float lastTime = 0;
 	float currentTime = 0;
@@ -35,8 +35,9 @@ int main()
 
 		engine->Update(graphics->window,deltaTime);
 		graphics->Render();
+		editorGUI->HierarchyWindow(*graphics->myCamera, graphics->projection, *graphics->myShader);
 
-		editorGUI->RenderImGui();
+		editorGUI->RenderImGui(graphics->projection);
 
 		glfwSwapBuffers(graphics->window); //moved from Graphics::Render().
 	}
