@@ -35,6 +35,7 @@ int main()
 
 		engine->Update(graphics->window,deltaTime);
 		graphics->Render();
+		//could do so Game.gameObjectVector calls Update() on every game object implementing Update() and that Update() can call Update() in every component implementing Update().
 		editorGUI->HierarchyWindow(*graphics->myCamera, graphics->projection, *graphics->myShader);
 
 		editorGUI->RenderImGui(graphics->projection);

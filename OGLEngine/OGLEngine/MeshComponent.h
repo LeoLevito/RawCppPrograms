@@ -11,6 +11,7 @@ public:
 	Mesh* mesh;
 	Texture* myTexture;
 	Shader* myShader;
+	char* textureFileName;
 
 	void DrawComponentSpecificImGuiHierarchyAdjustables(Camera& camera, glm::mat4& projection, Shader& shader) override;
 

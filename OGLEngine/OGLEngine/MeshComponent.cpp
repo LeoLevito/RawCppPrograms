@@ -4,6 +4,12 @@
 #include <GLFW/glfw3.h>
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+#include <string>
+#include <iostream>
+
 
 MeshComponent::MeshComponent()
 {
@@ -13,6 +19,8 @@ MeshComponent::MeshComponent()
 	mesh = new Cube;
 	mesh->ApplyTexture(myTexture);
 
+	textureFileName = new char;
+
 	position = glm::vec3(0, 0, 0);
 	rotation = glm::vec3(0, 0, 0);
 	scale = glm::vec3(1, 1, 1);
@@ -21,6 +29,16 @@ MeshComponent::MeshComponent()
 void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables(Camera& camera, glm::mat4& projection, Shader& shader)
 {
 	DrawMesh(camera, projection, shader); //should ideally call this at some other point.
+
+	//Change texture of cube using ImGui. Would ideally improve this by beingAble to choose available texture from a drop down menu for example.
+	ImGui::InputText("Texture name", textureFileName, 64);
+	if (ImGui::Button("Change Texture"))
+	{
+		std::string path = "../Textures/";
+		path.append(textureFileName);
+		myTexture = new Texture(path.c_str());
+		mesh->ApplyTexture(myTexture);
+	}
 }
 
 void MeshComponent::DrawMesh(Camera& camera, glm::mat4& projection, Shader& shader)
