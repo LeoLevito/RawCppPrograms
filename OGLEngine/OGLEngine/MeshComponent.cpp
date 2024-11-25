@@ -7,7 +7,6 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
-#include <string>
 #include <iostream>
 
 
@@ -19,11 +18,17 @@ MeshComponent::MeshComponent()
 	mesh = new Cube;
 	mesh->ApplyTexture(myTexture);
 
-	textureFileName = new char;
-
 	position = glm::vec3(0, 0, 0);
 	rotation = glm::vec3(0, 0, 0);
 	scale = glm::vec3(1, 1, 1);
+}
+
+MeshComponent::~MeshComponent()
+{
+	std::cout << "CURRENTLY DELETING MESH COMPONENT" << std::endl;
+	delete myShader;
+	delete myTexture;
+	delete mesh;
 }
 
 void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables(Camera& camera, glm::mat4& projection, Shader& shader)
@@ -31,11 +36,15 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables(Camera& camer
 	DrawMesh(camera, projection, shader); //should ideally call this at some other point.
 
 	//Change texture of cube using ImGui. Would ideally improve this by beingAble to choose available texture from a drop down menu for example.
-	ImGui::InputText("Texture name", textureFileName, 64);
+	static char str0[128] = "Bliss2.jpg"; //how it's done in the demo, tho it is replicated across all objects now...
+	ImGui::InputText("Texture name", str0, IM_ARRAYSIZE(str0)); //Yeah, I gotta change this to a dropdown or something.
 	if (ImGui::Button("Change Texture"))
 	{
 		std::string path = "../Textures/";
-		path.append(textureFileName);
+		path.append(str0);
+
+		std::cout << path << std::endl;
+
 		myTexture = new Texture(path.c_str());
 		mesh->ApplyTexture(myTexture);
 	}

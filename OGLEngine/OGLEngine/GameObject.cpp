@@ -12,6 +12,11 @@ GameObject::GameObject()
 {
 }
 
+GameObject::~GameObject()
+{
+
+}
+
 void GameObject::AddComponent(Component* component)
 {
 	componentVector.push_back(component);

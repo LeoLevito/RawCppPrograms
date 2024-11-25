@@ -4,14 +4,16 @@
 #include "Texture.h"
 #include "Shader.h"
 #include "Camera.h"
+#include <string>
+
 class MeshComponent : public Component
 {
 public:
 	MeshComponent();
+	~MeshComponent();
 	Mesh* mesh;
 	Texture* myTexture;
 	Shader* myShader;
-	char* textureFileName;
 
 	void DrawComponentSpecificImGuiHierarchyAdjustables(Camera& camera, glm::mat4& projection, Shader& shader) override;
 

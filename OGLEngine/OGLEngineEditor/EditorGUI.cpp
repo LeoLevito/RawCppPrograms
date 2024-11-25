@@ -4,6 +4,7 @@
 #include "imgui_impl_opengl3.h"
 #include <string>
 #include <GameObjectTest.h>
+#include <iostream>
 
 void EditorGUI::Initialize(GLFWwindow* window, Graphics* graphics, Game* game, Camera& camera, Shader& shader)
 {
@@ -39,7 +40,7 @@ void EditorGUI::StartImGuiFrame(float deltaTime)
 
 
 	//CHANGE THIS TO WHATEVER I WANT / NEED!
-	//ImGui::ShowDemoWindow(); // Show demo window! :)
+	ImGui::ShowDemoWindow(); // Show demo window! :)
 	FrameRateWindow(deltaTime);
 	//HierarchyWindow(myCamera, myProjection, myShader);
 }
@@ -83,6 +84,16 @@ void EditorGUI::HierarchyWindow(Camera& camera, glm::mat4& projection, Shader& s
 	{
 		GameObjectTest* test = new GameObjectTest;
 		myGame->gameObjectVector.push_back(test);
+	}
+
+	if (ImGui::Button("Remove Game Object"))
+	{
+		std::cout << "Num objects in vector: " << myGame->gameObjectVector.size() << std::endl;
+		if (myGame->gameObjectVector.size() > 0)
+		{
+			delete myGame->gameObjectVector[myGame->gameObjectVector.size() - 1];
+			myGame->gameObjectVector.pop_back(); //need to make this specific to game objects. Also need to free up memory taken up by these objects instead of just popping the list.
+		}
 	}
 
 	int objectIndex = 0;

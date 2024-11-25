@@ -6,10 +6,13 @@ class GameObjectTest : public GameObject
 {
 public:
 	GameObjectTest();
+	~GameObjectTest();
+	//MAKE DESTRUCTOR SO WE CAN DELETE IT.
+
+
 	//void BeginPlay() override;
 	//void Tick(float deltaTime) override;
 	TransformComponent* transformComponent;
-	TransformComponent* transformComponent2;
 
 	MeshComponent* meshComponent;
 

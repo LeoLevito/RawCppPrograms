@@ -1,17 +1,15 @@
 #include "GameObjectTest.h"
 #include <glm.hpp>
+#include <iostream>
 
 GameObjectTest::GameObjectTest() //constructor
 {
+	std::cout << "CURRENTLY CREATING GAMEOBJECTTEST" << std::endl;
 	name = "GameObjectTest";
 
 	transformComponent = new TransformComponent;
 	transformComponent->name = "Transform Component";
 	AddComponent(transformComponent);
-
-	transformComponent2 = new TransformComponent;
-	transformComponent2->name = "Transform Component nomero dos";
-	AddComponent(transformComponent2);
 
 	meshComponent = new MeshComponent;
 	meshComponent->name = "Mesh Component";
@@ -26,6 +24,13 @@ GameObjectTest::GameObjectTest() //constructor
 	//transformComponent->scale = new Vector3(1,1,1) 
 	
 	//meshComponent->mesh = targetMesh;
+}
+
+GameObjectTest::~GameObjectTest() //need to delete any objects/pointers that was created with the 'new' keyword;
+{
+	std::cout << "CURRENTLY DELETING GAMEOBJECTTEST" << std::endl;
+	delete transformComponent; //does this call the destructor? Only one way to find out.
+	delete meshComponent;
 }
 
 void GameObjectTest::Update()

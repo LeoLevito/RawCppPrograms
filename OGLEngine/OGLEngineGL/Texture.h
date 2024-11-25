@@ -3,7 +3,6 @@ class Texture
 {
 public:
 	Texture(const char* path);
-
 	int Width;
 	int Height;
 	
