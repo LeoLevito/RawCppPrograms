@@ -69,7 +69,7 @@ void MeshComponent::DrawMesh(Camera& camera, glm::mat4& projection, Shader& shad
 	mesh->Draw(&shader);
 }
 
-void MeshComponent::Update()
+void MeshComponent::Update(Shader* shader)
 {
-	DrawMesh(*myCamera, *myProjection, *myShader); //Shader is scuffed right now.
+	DrawMesh(*myCamera, *myProjection, *shader); //Shader is scuffed right now.
 }

@@ -23,12 +23,13 @@ void GameObject::AddComponent(Component* component)
 	componentVector.push_back(component);
 }
 
-void GameObject::Update() 
+void GameObject::Update(Shader* shader) 
 {
-	for (int i = 0; i < componentVector.size(); i++)
-	{
-		componentVector[i]->Update();
-	}
+	//for (int i = 0; i < componentVector.size(); i++)
+	//{
+	//	componentVector[i]->Update();
+	//}
+	componentVector[1]->Update(shader);
 }
 
 void GameObject::DrawObjectSpecificImGuiHierarchyAdjustables(std::vector<GameObject*>& vec)

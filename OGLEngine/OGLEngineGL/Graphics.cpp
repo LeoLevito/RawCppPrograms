@@ -63,11 +63,12 @@ void Graphics::Render()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //used to clear various stuff, in this case we clear the color buffer bit first, every time the while loop loops, before writing a new color with the glClearColor function. I remember there being similar stuff needing to be done with Emil Ström's TinyEngine in order for us to render things and update them at runtime.
 
+	//ExampleCube();
 	for (int i = 0; i < myGame->gameObjectVector.size(); i++)
 	{
-		myGame->gameObjectVector[i]->Update();
+		myGame->gameObjectVector[i]->Update(myShader);
 	}
-	ExampleCube();
+
 
 	//we need to swap buffers
 	//glfwSwapBuffers(window); //swap front and back buffers on the window. (Info: our framebuffer has two sides, the back buffer is what we add, the front buffer is what we see. Basically.). So we can see everything that was added before this function was called!

@@ -4,6 +4,6 @@ void Component::DrawComponentSpecificImGuiHierarchyAdjustables(Camera& camera, g
 {
 }
 
-void Component::Update()
+void Component::Update(Shader* shader)
 {
 }

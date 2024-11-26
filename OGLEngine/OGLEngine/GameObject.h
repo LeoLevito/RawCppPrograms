@@ -12,7 +12,7 @@ public:
 	void AddComponent(Component* component);
 	std::vector<Component*> componentVector;
 	std::string name;
-	virtual void Update();
+	virtual void Update(Shader* shader);
 	virtual void DrawObjectSpecificImGuiHierarchyAdjustables(std::vector<GameObject*>& vec);
 	int index;
 

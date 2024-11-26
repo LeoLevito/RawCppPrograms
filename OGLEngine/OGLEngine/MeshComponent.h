@@ -23,7 +23,7 @@ public:
 	glm::vec3 rotation;
 	glm::vec3 scale;
 
-	void Update() override;
+	void Update(Shader* shader) override;
 private:
 };
 
