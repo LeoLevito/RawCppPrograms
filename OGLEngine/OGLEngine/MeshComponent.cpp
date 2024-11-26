@@ -12,9 +12,10 @@
 
 MeshComponent::MeshComponent()
 {
+
+	myTexture = new Texture("../Textures/Bliss2.jpg");
 	myShader = new Shader;
 	myShader->Initialize("../Shaders/VertexShader.vertexs", "../Shaders/FragmentShader.fragments");
-	myTexture = new Texture("../Textures/Bliss2.jpg");
 	mesh = new Cube;
 	mesh->ApplyTexture(myTexture);
 
@@ -31,9 +32,9 @@ MeshComponent::~MeshComponent()
 	delete mesh;
 }
 
-void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables(Camera& camera, glm::mat4& projection, Shader& shader)
+void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables(Camera& camera, glm::mat4& projection)
 {
-	DrawMesh(camera, projection, shader); //should ideally call this at some other point.
+	//DrawMesh(camera, projection, shader); //should ideally call this at some other point.
 
 	//Change texture of cube using ImGui. Would ideally improve this by beingAble to choose available texture from a drop down menu for example.
 	static char str0[128] = "Bliss2.jpg"; //how it's done in the demo, tho it is replicated across all objects now...
@@ -66,4 +67,9 @@ void MeshComponent::DrawMesh(Camera& camera, glm::mat4& projection, Shader& shad
 	shader.SetMatrix4(camera.myView, "view");
 	shader.SetMatrix4(projection, "projection");
 	mesh->Draw(&shader);
+}
+
+void MeshComponent::Update()
+{
+	DrawMesh(*myCamera, *myProjection, *myShader); //Shader is scuffed right now.
 }

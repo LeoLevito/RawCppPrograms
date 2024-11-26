@@ -8,11 +8,12 @@
 #include <vector>
 #include "Camera.h"
 #include "Texture.h"
+#include "Game.h"
 
 class Graphics
 {
 public:
-	void Initialize(int width, int height);
+	void Initialize(int width, int height, Game* game);
 	void Render();
 	void Cache();
 	bool ShouldClose();
@@ -34,7 +35,7 @@ private:
 	Texture* myTexture;
 
 
-
+	Game* myGame;
 
 	float myWidth;
 	float myHeight;

@@ -88,7 +88,7 @@ void Shader::Initialize(const char* vertexPath, const char* fragmentPath) //star
     unsigned int VertexShader = LoadVertexShader(vertexPath); //NEED SHADER FILES TO BE INSIDE THE FOLDER, IN EXPLORER, WHERE THE CURRENT PROJECT RUNS. IN THIS CASE: INSIDE OGLENGINE FOLDER IN EXPLORER. https://github.com/JoeyDeVries/LearnOpenGL/issues/146#issuecomment-528748296
     unsigned int FragmentShader = LoadFragmentShader(fragmentPath);
 
-    myShaderProgram = glCreateProgram(); //why is this not working again?
+    myShaderProgram = glCreateProgram(); //we are not deleting any shader programs when deleting objects, so that's something to keep in mind.
     glAttachShader(myShaderProgram, VertexShader);
     glAttachShader(myShaderProgram, FragmentShader);
     glLinkProgram(myShaderProgram); //might get conflicts here if vertex and fragment shaders have different input and outputs, or whatever. This function creates an executable that will be run on the programmable vertex processor if any shader objects here are of type GL_VERTEX_SHADER.

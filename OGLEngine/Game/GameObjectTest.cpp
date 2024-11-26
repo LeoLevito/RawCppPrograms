@@ -1,6 +1,9 @@
 #include "GameObjectTest.h"
 #include <glm.hpp>
 #include <iostream>
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 
 GameObjectTest::GameObjectTest() //constructor
 {
@@ -14,16 +17,6 @@ GameObjectTest::GameObjectTest() //constructor
 	meshComponent = new MeshComponent;
 	meshComponent->name = "Mesh Component";
 	AddComponent(meshComponent);
-
-	//transformComponent = AddComponent(TransformComponent);
-	//meshComponent = AddComponent(MeshComponent);
-
-	//should probably have these position, rotation and scale have default values in the component class.
-	//transformComponent->position = new Vector3(0, 0, 0); //could probably use GLM::vec3 function here.
-	//transformComponent->rotation = new Vector3(0,0,0) //maybe vector3 isn't the best for rotations. //could probably use GLM functions.
-	//transformComponent->scale = new Vector3(1,1,1) 
-	
-	//meshComponent->mesh = targetMesh;
 }
 
 GameObjectTest::~GameObjectTest() //need to delete any objects/pointers that was created with the 'new' keyword;
@@ -33,11 +26,13 @@ GameObjectTest::~GameObjectTest() //need to delete any objects/pointers that was
 	delete meshComponent;
 }
 
-void GameObjectTest::Update()
+void GameObjectTest::DrawObjectSpecificImGuiHierarchyAdjustables(std::vector<GameObject*>& vec)
 {
-	meshComponent->position = transformComponent->position;
-	meshComponent->rotation = transformComponent->rotation;
-	meshComponent->scale = transformComponent->scale;
+	if (ImGui::Button("Remove Game Object"))
+	{
+		vec.erase(std::remove(vec.begin(), vec.end(), this)); //i'm just trying to remove one thing from the vector bruh.
+		delete this;
+	}
 }
 
 //void GameObjectTest::BeginPlay()

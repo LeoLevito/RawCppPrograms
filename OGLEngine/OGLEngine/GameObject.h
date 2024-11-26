@@ -13,6 +13,13 @@ public:
 	std::vector<Component*> componentVector;
 	std::string name;
 	virtual void Update();
+	virtual void DrawObjectSpecificImGuiHierarchyAdjustables(std::vector<GameObject*>& vec);
+	int index;
+
+	Camera* myCamera;
+	glm::mat4* myProjection;
+
+	void LateSetComponentVariables();
 private:
 
 };

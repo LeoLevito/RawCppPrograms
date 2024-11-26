@@ -15,13 +15,15 @@ public:
 	Texture* myTexture;
 	Shader* myShader;
 
-	void DrawComponentSpecificImGuiHierarchyAdjustables(Camera& camera, glm::mat4& projection, Shader& shader) override;
+	void DrawComponentSpecificImGuiHierarchyAdjustables(Camera& camera, glm::mat4& projection) override;
 
 	void DrawMesh(Camera& camera, glm::mat4& projection, Shader& shader);
 
 	glm::vec3 position;
 	glm::vec3 rotation;
 	glm::vec3 scale;
+
+	void Update() override;
 private:
 };
 

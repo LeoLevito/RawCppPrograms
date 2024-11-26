@@ -7,7 +7,7 @@ int main()
 {
 	Game* game = new Game;
 	Graphics* graphics = new Graphics;
-	graphics->Initialize(1280, 720);
+	graphics->Initialize(1280, 720, game);
 
 	Engine* engine = new Engine;
 	engine->Initialize(graphics->window, graphics->myCamera);
@@ -19,7 +19,7 @@ int main()
 	float currentTime = 0;
 	float deltaTime = 0;
 
-	//glfwSwapInterval(0); VSYNC disable
+	glfwSwapInterval(15); //VSYNC disable / set max framerate, thing (1/50) * 50 for 1 fps
 
 	while (!graphics->ShouldClose())
 	{
@@ -31,10 +31,16 @@ int main()
 
 		glfwPollEvents(); //moved from Graphics::Render().
 
+
 		editorGUI->StartImGuiFrame(deltaTime);
 
 		engine->Update(graphics->window,deltaTime);
 		graphics->Render();
+		//for (int i = 0; i < game->gameObjectVector.size(); i++)
+		//{
+		//	game->gameObjectVector[i]->Update();
+		//}
+
 		//could do so Game.gameObjectVector calls Update() on every game object implementing Update() and that Update() can call Update() in every component implementing Update().
 		editorGUI->HierarchyWindow(*graphics->myCamera, graphics->projection, *graphics->myShader);
 

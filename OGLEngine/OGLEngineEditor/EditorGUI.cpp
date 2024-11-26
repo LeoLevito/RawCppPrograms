@@ -24,7 +24,11 @@ void EditorGUI::Initialize(GLFWwindow* window, Graphics* graphics, Game* game, C
 	myGraphics = graphics;
 	myGame = game;
 	myCamera = camera;
-	myShader = shader;
+
+
+	currentTime = 0; //May or may not be super accurate at the moment.
+	deltaTime = 0;
+	lastTime = 0;
 }
 
 void EditorGUI::StartImGuiFrame(float deltaTime)
@@ -40,7 +44,7 @@ void EditorGUI::StartImGuiFrame(float deltaTime)
 
 
 	//CHANGE THIS TO WHATEVER I WANT / NEED!
-	ImGui::ShowDemoWindow(); // Show demo window! :)
+	//ImGui::ShowDemoWindow(); // Show demo window! :)
 	FrameRateWindow(deltaTime);
 	//HierarchyWindow(myCamera, myProjection, myShader);
 }
@@ -84,68 +88,46 @@ void EditorGUI::HierarchyWindow(Camera& camera, glm::mat4& projection, Shader& s
 	{
 		GameObjectTest* test = new GameObjectTest;
 		myGame->gameObjectVector.push_back(test);
-	}
-
-	if (ImGui::Button("Remove Game Object"))
-	{
-		std::cout << "Num objects in vector: " << myGame->gameObjectVector.size() << std::endl;
-		if (myGame->gameObjectVector.size() > 0)
-		{
-			delete myGame->gameObjectVector[myGame->gameObjectVector.size() - 1];
-			myGame->gameObjectVector.pop_back(); //need to make this specific to game objects. Also need to free up memory taken up by these objects instead of just popping the list.
-		}
+		test->index = myGame->gameObjectVector.size() - 1;
+		test->myCamera = &camera;
+		test->myProjection = &projection;
+		test->LateSetComponentVariables();
 	}
 
 	int objectIndex = 0;
-	for (auto var : myGame->gameObjectVector) //for every game object
+	for (GameObject* var : myGame->gameObjectVector) //for every game object
 	{
+		int vectorSize = myGame->gameObjectVector.size();
+		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //I DON'T KNOW WHAT THE HELL IS GOING ON, CLEARING THIS RIGHT BEFORE UPDATING GAME OBJECTS AND THEIR COMPONENTS RESULTS IN ONLY ONE CUBE BEING ABLE TO RENDER. Oh, and this clear won't run if there are no game objects to loop through.
+		//myGame->gameObjectVector[objectIndex]->Update(); 
+
 		ImGui::PushID(objectIndex); //ID system is required for items in an ImGui windows that will be named the same.
 
-		if (ImGui::CollapsingHeader(myGame->gameObjectVector[objectIndex]->name.c_str()))
+		if (ImGui::CollapsingHeader(myGame->gameObjectVector.at(objectIndex)->name.c_str())) 
 		{
 			int componentIndex = 0;
-			for (auto var : myGame->gameObjectVector[objectIndex]->componentVector)//for every component on the current index game object
+			for (Component* var : myGame->gameObjectVector.at(objectIndex)->componentVector) //for every component on the current index game object
 			{
-				if (ImGui::TreeNode(myGame->gameObjectVector[objectIndex]->componentVector[componentIndex]->name.c_str())) //treenode shall be named after the components attached to the specified game object!
+				if (ImGui::TreeNode(myGame->gameObjectVector.at(objectIndex)->componentVector.at(componentIndex)->name.c_str())) //treenode shall be named after the components attached to the specified game object!
 				{
-					//ImGui::InputFloat3("transform", &myGraphics->myCubePositions[objectIndex].x); //wait, why does this just work? How does Martin do it?
-					//ImGui::DragFloat3("Position", &myGraphics->myCubePositions[objectIndex].x, .01f); //wait, why does this just work? EDIT: looks like pos.x is the way to do it properly: https://github.com/ocornut/imgui/blob/master/docs/FAQ.md#qa-usage
-					//std::string str5 = myGame->gameObjectVector[objectIndex]->componentVector[0]->name;
-
-					ImGui::Text("You can see the name of this component above this text!");
-					myGame->gameObjectVector[objectIndex]->componentVector[componentIndex]->DrawComponentSpecificImGuiHierarchyAdjustables(camera, projection, shader);
-					//maybe the component itself should authorize what to draw in this tree node and we just call its DrawImGui() function here?
-					
-					myGame->gameObjectVector[objectIndex]->Update();
+					myGame->gameObjectVector.at(objectIndex)->componentVector.at(componentIndex)->DrawComponentSpecificImGuiHierarchyAdjustables(camera, projection);
 					ImGui::TreePop();
 				}
 				componentIndex++;
 			}
+			myGame->gameObjectVector.at(objectIndex)->DrawObjectSpecificImGuiHierarchyAdjustables(myGame->gameObjectVector); //allows deletion of game object
 		}
 
-		objectIndex++;
+		if (myGame->gameObjectVector.size() == vectorSize)//check if vector has changed size, e.g. if we've deleted a game object. If the size hasn't changed we increase the iterator as per usual.
+		{
+			objectIndex++;
+		}
 		ImGui::PopID();
+
+		currentTime = glfwGetTime(); //trying to debug why the first cube renders faster than every other cube. This gives correct values I believe, so nothing's wrong here in my mind.
+		deltaTime = currentTime - lastTime;
+		lastTime = currentTime;
+		std::cout << "deltatime between component update" << deltaTime << std::endl;
 	}
-
-	//for (auto var : myGraphics->myCubePositions) //for each loop.
-	//{
-	//	ImGui::PushID(objectIndex); //ID system is required for items in an ImGui windows that will be named the same.
-	//	std::string str1 = "myCubePositions"; //should be able to rename objects in editor in the future. Maybe have a name variable in the GameObject class.
-	//	std::string str2 = std::to_string(objectIndex);
-	//	str1.append(str2);
-
-	//	if (ImGui::CollapsingHeader(str1.c_str()))
-	//	{
-	//		if (ImGui::TreeNode("Psuedo Transform Component")) //treenode shall be named after the components attached to the specified game object!
-	//		{
-	//			//ImGui::InputFloat3("transform", &myGraphics->myCubePositions[objectIndex].x); //wait, why does this just work? How does Martin do it?
-	//			ImGui::DragFloat3("Position", &myGraphics->myCubePositions[objectIndex].x, .01f); //wait, why does this just work? EDIT: looks like pos.x is the way to do it properly: https://github.com/ocornut/imgui/blob/master/docs/FAQ.md#qa-usage
-	//			ImGui::TreePop();
-	//		}
-	//	}
-
-	//	objectIndex++;
-	//	ImGui::PopID();
-	//}
 	ImGui::End(); //stop rendering new ImGui window
 }

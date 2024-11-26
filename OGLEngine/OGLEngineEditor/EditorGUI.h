@@ -20,6 +20,8 @@ private:
 	Game* myGame;
 	Camera myCamera;
 	glm::mat4 myProjection;
-	Shader myShader;
+	float currentTime; //May or may not be super accurate at the moment.
+	float deltaTime;
+	float lastTime;
 };
 

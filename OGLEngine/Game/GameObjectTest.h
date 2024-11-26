@@ -16,7 +16,15 @@ public:
 
 	MeshComponent* meshComponent;
 
-	void Update() override;
+	void Update() override 
+	{
+		meshComponent->position = transformComponent->position;
+		meshComponent->rotation = transformComponent->rotation;
+		meshComponent->scale = transformComponent->scale;
+		GameObject::Update(); 
+	}
+
+	void DrawObjectSpecificImGuiHierarchyAdjustables(std::vector<GameObject*>& vec) override;
 private:
 
 };
