@@ -4,15 +4,8 @@
 
 Mesh::Mesh(float* vertices, size_t vertexSize, unsigned int* indices, size_t indexSize)
 {
-
-
-
-
 //set IndicesSize to 0 here, in this constructor we want to be 0.
-
-
-
-
+	IndicesSize = 0;
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO); //important to bind vertex array object before vertex buffer object, otherwise OpenGL doesn't know what VAO should reference. (NOTE: Martin was a little confused about this explanation in the lecture.)
 
@@ -39,6 +32,56 @@ Mesh::Mesh(float* vertices, size_t vertexSize, unsigned int* indices, size_t ind
 
 }
 
+Mesh::Mesh(ObjReader::ObjData objdata) //HERE IS WHERE I NEED TO FIX FOR .obj FILES TO DRAW CORRECTLY.
+{
+    std::vector<glm::vec3> out_vertices;
+    for (size_t i = 0; i < objdata.vertexIndices.size(); i++)
+    {
+        unsigned int vertexIndex = objdata.vertexIndices[i];
+        glm::vec3 vertex = objdata.vertices[vertexIndex - 1];
+        out_vertices.push_back(vertex);
+    }
+    std::vector<glm::vec2> out_uvs;
+    for (size_t i = 0; i < objdata.uvIndices.size(); ++i)
+    {
+        unsigned int uvIndex = objdata.uvIndices[i];
+        glm::vec2 uv = objdata.vertexTexCoords[uvIndex - 1];
+        out_uvs.push_back(uv);
+    }
+    std::vector<glm::vec2> out_normals;
+    for (size_t i = 0; i < objdata.normalIndices.size(); ++i)
+    {
+        unsigned int normalIndex = objdata.normalIndices[i];
+        glm::vec3 normal = objdata.vertexNormals[normalIndex - 1];
+        out_normals.push_back(normal);
+    }
+
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
+
+    glGenBuffers(1, &VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, out_vertices.size() * sizeof(glm::vec3), &out_vertices[0], GL_STATIC_DRAW); //example, here. 
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0); //these are probably not right, need to modify to read correctly.
+    glEnableVertexAttribArray(0); //example, here. Doesn't this have to do with which of the shaders to be used? I don't remember.
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
+	//Element buffer object, this will contain all our indices.
+    glGenBuffers(1, &EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, objdata.vertexIndices.size() * sizeof(unsigned int), objdata.vertexIndices.data(), GL_STATIC_DRAW);
+
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0); //right? this wasn't in martin's obj contructor.
+    glBindVertexArray(0);
+
+    IndicesSize = objdata.vertexIndices.size(); //to be used in Draw();
+}
+
 
 
 
@@ -53,15 +96,7 @@ Mesh::~Mesh() //when mesh is deleted, also delete Vertex Array and Vertex Buffer
 {
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
-
-
-
-
-//insert EBO buffer deletion here
-
-
-
-
+	glDeleteBuffers(1, &EBO);
 }
 
 void Mesh::Draw(Shader* shader) //Draw mesh;
@@ -76,7 +111,15 @@ void Mesh::Draw(Shader* shader) //Draw mesh;
 	
 
 
-
+	if (IndicesSize > 0) //Draw loaded obj model. Hopefully.
+	{
+		glDrawElements(GL_TRIANGLES, IndicesSize, GL_UNSIGNED_INT, (void*)0);
+	}
+	else //Draw Cube
+	{
+		//ERROR, this is giving error for NVIDIA driver, so this likely doesn't conform to the OpenGL specification.
+		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0); //note the 36, hard coded for a cube right now, we need to specify how many indices we use for it. In the future we will automate this.
+	}
 
 
 //insert new mesh loading code here checking for indices
@@ -86,15 +129,11 @@ void Mesh::Draw(Shader* shader) //Draw mesh;
 
 
 
-	if (EBO == 0)
+	if (EBO == 0) //Draw Triangle
 	{
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 	}
-	else
-	{
-		//ERROR, this is giving error for NVIDIA driver, so this likely doesn't conform to the OpenGL specification.
-		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0); //note the 36, hard coded for a cube right now, we need to specify how many indices we use for it. In the future we will automate this.
-	}
+	
 	glBindVertexArray(0); //unbind vertex array after we're done drawing. This will help us in the future if we want to render a different mesh with the vertex array, I guess.
 	glBindTexture(GL_TEXTURE_2D, 0); //unbind texture after we're done drawing. This allows us to use different textures for different objects (in the future), since the fragment shader used for this specific mesh will use basically it's own binded texture, if I understand correctly.
 }

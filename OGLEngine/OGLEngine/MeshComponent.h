@@ -6,6 +6,8 @@
 #include "Camera.h"
 #include <string>
 
+class ObjReader;
+
 class MeshComponent : public Component
 {
 public:

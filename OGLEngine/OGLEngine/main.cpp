@@ -19,7 +19,7 @@ int main()
 	float currentTime = 0;
 	float deltaTime = 0;
 
-	glfwSwapInterval(15); //VSYNC disable / set max framerate, thing (1/50) * 50 for 1 fps
+	glfwSwapInterval(1); //VSYNC disable / set max framerate, think (1/50) * 50 for 1 fps at 50hz
 
 	while (!graphics->ShouldClose())
 	{

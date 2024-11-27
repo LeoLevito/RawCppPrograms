@@ -98,8 +98,6 @@ void EditorGUI::HierarchyWindow(Camera& camera, glm::mat4& projection, Shader& s
 	for (GameObject* var : myGame->gameObjectVector) //for every game object
 	{
 		int vectorSize = myGame->gameObjectVector.size();
-		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //I DON'T KNOW WHAT THE HELL IS GOING ON, CLEARING THIS RIGHT BEFORE UPDATING GAME OBJECTS AND THEIR COMPONENTS RESULTS IN ONLY ONE CUBE BEING ABLE TO RENDER. Oh, and this clear won't run if there are no game objects to loop through.
-		//myGame->gameObjectVector[objectIndex]->Update(); 
 
 		ImGui::PushID(objectIndex); //ID system is required for items in an ImGui windows that will be named the same.
 
@@ -123,11 +121,6 @@ void EditorGUI::HierarchyWindow(Camera& camera, glm::mat4& projection, Shader& s
 			objectIndex++;
 		}
 		ImGui::PopID();
-
-		currentTime = glfwGetTime(); //trying to debug why the first cube renders faster than every other cube. This gives correct values I believe, so nothing's wrong here in my mind.
-		deltaTime = currentTime - lastTime;
-		lastTime = currentTime;
-		std::cout << "deltatime between component update" << deltaTime << std::endl;
 	}
 	ImGui::End(); //stop rendering new ImGui window
 }

@@ -8,15 +8,22 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include <iostream>
+#include "ObjReader.h"
 
 
 MeshComponent::MeshComponent()
 {
 
-	myTexture = new Texture("../Textures/Bliss2.jpg");
+	myTexture = new Texture("../Textures/Bliss.jpg");
 	myShader = new Shader;
 	myShader->Initialize("../Shaders/VertexShader.vertexs", "../Shaders/FragmentShader.fragments");
-	mesh = new Cube;
+
+	ObjReader* objReader = new ObjReader;
+	mesh = objReader->LoadObjMesh("../Models/TreeTrunk.obj");
+
+
+	//mesh = new Cube;
+	
 	mesh->ApplyTexture(myTexture);
 
 	position = glm::vec3(0, 0, 0);
