@@ -32,54 +32,78 @@ Mesh::Mesh(float* vertices, size_t vertexSize, unsigned int* indices, size_t ind
 
 }
 
-Mesh::Mesh(ObjReader::ObjData objdata) //HERE IS WHERE I NEED TO FIX FOR .obj FILES TO DRAW CORRECTLY.
+Mesh::Mesh(ObjReader* objreader, vboindexer* VBOindexer) //HERE IS WHERE I NEED TO FIX FOR .obj FILES TO DRAW CORRECTLY.
 {
-    std::vector<glm::vec3> out_vertices;
-    for (size_t i = 0; i < objdata.vertexIndices.size(); i++)
-    {
-        unsigned int vertexIndex = objdata.vertexIndices[i];
-        glm::vec3 vertex = objdata.vertices[vertexIndex - 1];
-        out_vertices.push_back(vertex);
-    }
-    std::vector<glm::vec2> out_uvs;
-    for (size_t i = 0; i < objdata.uvIndices.size(); ++i)
-    {
-        unsigned int uvIndex = objdata.uvIndices[i];
-        glm::vec2 uv = objdata.vertexTexCoords[uvIndex - 1];
-        out_uvs.push_back(uv);
-    }
-    std::vector<glm::vec2> out_normals;
-    for (size_t i = 0; i < objdata.normalIndices.size(); ++i)
-    {
-        unsigned int normalIndex = objdata.normalIndices[i];
-        glm::vec3 normal = objdata.vertexNormals[normalIndex - 1];
-        out_normals.push_back(normal);
-    }
+	//https://github.com/opengl-tutorials/ogl/blob/master/tutorial07_model_loading/tutorial07.cpp
+	//https://github.com/opengl-tutorials/ogl/blob/master/tutorial09_vbo_indexing/tutorial09.cpp
+
+    std::vector<glm::vec3> vertices;
+	std::vector<glm::vec2> uvs;
+	std::vector<glm::vec3> normals;
+
+	bool res = objreader->parseOBJ("../Models/CubeSubDividedTriangulated.obj", vertices, uvs, normals);
+
+	std::vector<unsigned short> indices;
+	std::vector<glm::vec3> indexed_vertices;
+	std::vector<glm::vec2> indexed_uvs;
+	std::vector<glm::vec3> indexed_normals;
+	VBOindexer->indexVBO(vertices, uvs, normals, indices, indexed_vertices, indexed_uvs, indexed_normals);
+
+	//std::vector<float> out_vertices2;
+
+	/*{
+		std::vector<Vertex> out_vertices3;
+		Vertex vert;
+
+		for (size_t i = 0; i < out_vertices.size(); i++)
+		{
+
+		}
+
+		vert.Position;
+		vert.Normal;
+		vert.TexCoords;
+
+		out_vertices3.push_back(vert);
+	}*/
 
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
 
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, out_vertices.size() * sizeof(glm::vec3), &out_vertices[0], GL_STATIC_DRAW); //example, here. 
+    glBufferData(GL_ARRAY_BUFFER, indexed_vertices.size() * sizeof(glm::vec3), &indexed_vertices[0], GL_STATIC_DRAW); //example, here. 
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0); //these are probably not right, need to modify to read correctly.
-    glEnableVertexAttribArray(0); //example, here. Doesn't this have to do with which of the shaders to be used? I don't remember.
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
-    glEnableVertexAttribArray(2);
+	//glGenBuffers(1, &NBO);
+	//glBindBuffer(GL_ARRAY_BUFFER, NBO);
+	//glBufferData(GL_ARRAY_BUFFER, objdata.vertexNormals.size() * sizeof(glm::vec3), &objdata.vertexNormals[0], GL_STATIC_DRAW); //example, here. 
+
+	//glGenBuffers(1, &UVBO);
+	//glBindBuffer(GL_ARRAY_BUFFER, UVBO);
+	//glBufferData(GL_ARRAY_BUFFER, objdata.vertexTexCoords.size() * sizeof(glm::vec2), &objdata.vertexTexCoords[0], GL_STATIC_DRAW); //example, here. 
 
 	//Element buffer object, this will contain all our indices.
-    glGenBuffers(1, &EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, objdata.vertexIndices.size() * sizeof(unsigned int), objdata.vertexIndices.data(), GL_STATIC_DRAW);
+	glGenBuffers(1, &EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), &indices[0], GL_STATIC_DRAW);
 
+	//vertex positions
+	glEnableVertexAttribArray(0); //example, here. Doesn't this have to do with which of the shaders to be used? I don't remember.
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0); //these are probably not right, need to modify to read correctly.
+	//vertex color
+	glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	////vertex normals
+	//glEnableVertexAttribArray(2);
+	//glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	////vertex texture coords
+	//glEnableVertexAttribArray(3);
+	//glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(objdata.vertices), (void*)offsetof(Vertex, TexCoords));
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0); //right? this wasn't in martin's obj contructor.
     glBindVertexArray(0);
 
-    IndicesSize = objdata.vertexIndices.size(); //to be used in Draw();
+    IndicesSize = indices.size(); //to be used in Draw();
 }
 
 
@@ -113,7 +137,7 @@ void Mesh::Draw(Shader* shader) //Draw mesh;
 
 	if (IndicesSize > 0) //Draw loaded obj model. Hopefully.
 	{
-		glDrawElements(GL_TRIANGLES, IndicesSize, GL_UNSIGNED_INT, (void*)0);
+		glDrawElements(GL_TRIANGLES, IndicesSize, GL_UNSIGNED_SHORT, (void*)0);
 	}
 	else //Draw Cube
 	{

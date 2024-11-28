@@ -11,15 +11,15 @@ class ObjReader
 {
 public:
 
-	struct ObjData
-	{
-		std::vector<glm::vec3> vertices;
-		std::vector<glm::vec3> vertexNormals;
-		std::vector<glm::vec2> vertexTexCoords;
-		std::vector<unsigned int> vertexIndices, uvIndices, normalIndices; //f stands for face in .obj file. It handles indices.
-	};
-	ObjData parseOBJ(const std::string& filename);
-	Mesh* LoadObjMesh(const std::string& filename);
+	//struct ObjData
+	//{
+	//	std::vector<glm::vec3> vertices;
+	//	std::vector<glm::vec3> vertexNormals;
+	//	std::vector<glm::vec2> vertexTexCoords;
+	//	std::vector<unsigned int> vertexIndices, uvIndices, normalIndices; //f stands for face in .obj file. It handles indices.
+	//};
+	bool parseOBJ(const std::string& filename, std::vector<glm::vec3>& out_vertices, std::vector<glm::vec2>& out_uvs, std::vector<glm::vec3>& out_normals);
+	Mesh* LoadObjMesh(const std::string& filename, std::vector<glm::vec3>& out_vertices, std::vector<glm::vec2>& out_uvs, std::vector<glm::vec3>& out_normals);
 
 	bool Hello();
 private:

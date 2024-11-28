@@ -9,7 +9,7 @@
 #include "imgui_impl_opengl3.h"
 #include <iostream>
 #include "ObjReader.h"
-
+#include "vboindexer.h"
 
 MeshComponent::MeshComponent()
 {
@@ -19,8 +19,9 @@ MeshComponent::MeshComponent()
 	myShader->Initialize("../Shaders/VertexShader.vertexs", "../Shaders/FragmentShader.fragments");
 
 	ObjReader* objReader = new ObjReader;
-	mesh = objReader->LoadObjMesh("../Models/TreeTrunk.obj");
-
+	vboindexer* VBOindexer = new vboindexer;
+	//mesh = objReader->LoadObjMesh("../Models/CubeSubDividedTriangulated.obj");
+	mesh = new Mesh(objReader, VBOindexer);
 
 	//mesh = new Cube;
 	
