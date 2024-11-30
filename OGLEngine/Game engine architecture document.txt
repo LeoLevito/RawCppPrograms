@@ -1,6 +1,6 @@
 Game engine architecture document
 
-What managers would be relevant to my game engine?
+What managers would be relevant to my game engine? (see lecture or powerpoint from lecture for inspiration)
 
 Threading?
 How would I set up threads and messaging architecutre? Or just do it on one thread and ensure all procedures are prompt and responsive? (re-write all my loading code to make sure it doesn't hang the program until it's done loading.)

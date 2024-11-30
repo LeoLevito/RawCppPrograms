@@ -8,8 +8,6 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include <iostream>
-#include "ObjReader.h"
-#include "vboindexer.h"
 
 MeshComponent::MeshComponent()
 {
@@ -18,10 +16,10 @@ MeshComponent::MeshComponent()
 	myShader = new Shader;
 	myShader->Initialize("../Shaders/VertexShader.vertexs", "../Shaders/FragmentShader.fragments");
 
-	ObjReader* objReader = new ObjReader;
-	vboindexer* VBOindexer = new vboindexer;
+	myObjReader = new ObjReader;
+	myVBOindexer = new vboindexer;
 	//mesh = objReader->LoadObjMesh("../Models/CubeSubDividedTriangulated.obj");
-	mesh = new Mesh(objReader, VBOindexer);
+	mesh = new Mesh(myObjReader, myVBOindexer, "../Models/TreeTrunk.obj");
 
 	//mesh = new Cube;
 	
@@ -42,10 +40,8 @@ MeshComponent::~MeshComponent()
 
 void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables(Camera& camera, glm::mat4& projection)
 {
-	//DrawMesh(camera, projection, shader); //should ideally call this at some other point.
-
-	//Change texture of cube using ImGui. Would ideally improve this by beingAble to choose available texture from a drop down menu for example.
-	static char str0[128] = "Bliss2.jpg"; //how it's done in the demo, tho it is replicated across all objects now...
+	//Change texture of mesh using ImGui. Would ideally improve this by being able to choose available textures from a drop down menu for example.
+	static char str0[128] = "Bliss2.jpg"; //how it's done in the ImGui demo, tho it is replicated across all objects now...
 	ImGui::InputText("Texture name", str0, IM_ARRAYSIZE(str0)); //Yeah, I gotta change this to a dropdown or something.
 	if (ImGui::Button("Change Texture"))
 	{
@@ -55,6 +51,21 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables(Camera& camer
 		std::cout << path << std::endl;
 
 		myTexture = new Texture(path.c_str());
+		mesh->ApplyTexture(myTexture);
+	}
+
+	//Change mesh of mesh using ImGui. Would ideally improve this by being able to choose available meshes from a drop down menu for example.
+	static char str1[128] = "TreeTrunk.obj"; //how it's done in the ImGui demo, tho it is replicated across all objects now...
+	ImGui::InputText("Mesh name", str1, IM_ARRAYSIZE(str1)); //Yeah, I gotta change this to a dropdown or something.
+	if (ImGui::Button("Change Mesh"))
+	{
+		std::string path = "../Models/";
+		path.append(str1);
+
+		std::cout << path << std::endl;
+
+		mesh = new Mesh(myObjReader, myVBOindexer, path.c_str());
+		//should do like an ImGui warning popup saying that the mesh couldn't load in case the parse fails.
 		mesh->ApplyTexture(myTexture);
 	}
 }

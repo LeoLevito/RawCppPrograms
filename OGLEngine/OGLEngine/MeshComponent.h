@@ -5,6 +5,8 @@
 #include "Shader.h"
 #include "Camera.h"
 #include <string>
+#include "ObjReader.h"
+#include "vboindexer.h"
 
 class ObjReader;
 
@@ -16,6 +18,8 @@ public:
 	Mesh* mesh;
 	Texture* myTexture;
 	Shader* myShader;
+	ObjReader* myObjReader;
+	vboindexer* myVBOindexer;
 
 	void DrawComponentSpecificImGuiHierarchyAdjustables(Camera& camera, glm::mat4& projection) override;
 

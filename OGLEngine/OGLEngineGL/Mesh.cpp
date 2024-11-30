@@ -1,6 +1,7 @@
 #include "Mesh.h"
 #include <GLAD/glad.h>
 #include "Shader.h"
+#include <iostream>
 
 Mesh::Mesh(float* vertices, size_t vertexSize, unsigned int* indices, size_t indexSize)
 {
@@ -32,7 +33,7 @@ Mesh::Mesh(float* vertices, size_t vertexSize, unsigned int* indices, size_t ind
 
 }
 
-Mesh::Mesh(ObjReader* objreader, vboindexer* VBOindexer) //HERE IS WHERE I NEED TO FIX FOR .obj FILES TO DRAW CORRECTLY.
+Mesh::Mesh(ObjReader* objreader, vboindexer* VBOindexer, const char* modelPath) //HERE IS WHERE I NEED TO FIX FOR .obj FILES TO DRAW CORRECTLY.
 {
 	//https://github.com/opengl-tutorials/ogl/blob/master/tutorial07_model_loading/tutorial07.cpp
 	//https://github.com/opengl-tutorials/ogl/blob/master/tutorial09_vbo_indexing/tutorial09.cpp
@@ -41,7 +42,12 @@ Mesh::Mesh(ObjReader* objreader, vboindexer* VBOindexer) //HERE IS WHERE I NEED 
 	std::vector<glm::vec2> uvs;
 	std::vector<glm::vec3> normals;
 
-	bool res = objreader->parseOBJ("../Models/CubeSubDividedTriangulated.obj", vertices, uvs, normals);
+	bool res = objreader->parseOBJ(modelPath, vertices, uvs, normals);
+
+	if (!res) 
+	{
+		return;
+	}
 
 	std::vector<unsigned short> indices;
 	std::vector<glm::vec3> indexed_vertices;
