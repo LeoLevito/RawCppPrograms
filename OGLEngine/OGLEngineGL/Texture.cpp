@@ -34,3 +34,8 @@ Texture::Texture(const char* path)
 	glBindTexture(GL_TEXTURE_2D, 0); //unbind when we're done with the setup.
 	stbi_image_free(data); //free up data when we're done.
 }
+
+Texture::~Texture()
+{
+	glDeleteTextures(1, &TextureObject);
+}

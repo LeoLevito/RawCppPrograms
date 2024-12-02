@@ -30,6 +30,8 @@ public:
 	glm::vec3 scale;
 
 	void Update(Shader* shader) override;
+
+	void printMemoryStatus();
 private:
 };
 

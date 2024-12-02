@@ -9,6 +9,8 @@
 #include "imgui_impl_opengl3.h"
 #include <iostream>
 
+#include <windows.h>
+
 MeshComponent::MeshComponent()
 {
 
@@ -50,7 +52,10 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables(Camera& camer
 
 		std::cout << path << std::endl;
 
+		printMemoryStatus();
+		delete myTexture;
 		myTexture = new Texture(path.c_str());
+		printMemoryStatus();
 		mesh->ApplyTexture(myTexture);
 	}
 
@@ -64,8 +69,21 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables(Camera& camer
 
 		std::cout << path << std::endl;
 
-		mesh = new Mesh(myObjReader, myVBOindexer, path.c_str());
-		//should do like an ImGui warning popup saying that the mesh couldn't load in case the parse fails.
+		printMemoryStatus();
+		//should probably delete mesh before assigning a new one so as to clear memory.
+		delete mesh;
+		mesh = new (std::nothrow) Mesh(myObjReader, myVBOindexer, path.c_str());
+		if (mesh)
+		{
+			std::cout << "memory allocated successfully" << std::endl;
+		}
+		else
+		{
+			std::cout << "memory allocation failed" << std::endl;
+		}
+		printMemoryStatus();
+		//should do like an ImGui warning popup saying that the mesh couldn't load in case the parse fails. 
+		//maybe ImGui::IsPopupOpen()?)
 		mesh->ApplyTexture(myTexture);
 	}
 }
@@ -91,4 +109,13 @@ void MeshComponent::DrawMesh(Camera& camera, glm::mat4& projection, Shader& shad
 void MeshComponent::Update(Shader* shader)
 {
 	DrawMesh(*myCamera, *myProjection, *shader); //Shader is scuffed right now.
+}
+
+void MeshComponent::printMemoryStatus()
+{
+	MEMORYSTATUSEX statex;
+	statex.dwLength = sizeof(statex);
+	GlobalMemoryStatusEx(&statex);
+	std::cout << "There is " << statex.ullAvailPhys / (1024 * 1024) << " MB of physical memory available." << std::endl;
+	std::cout << "There is " << statex.ullAvailVirtual / (1024 * 1024) << " MB of virtual memory available." << std::endl;
 }

@@ -55,6 +55,11 @@ Mesh::Mesh(ObjReader* objreader, vboindexer* VBOindexer, const char* modelPath) 
 	std::vector<glm::vec3> indexed_normals;
 	VBOindexer->indexVBO(vertices, uvs, normals, indices, indexed_vertices, indexed_uvs, indexed_normals);
 
+//IMPLEMENT TRIANGLULATION FOR .OBJ FILES BUILT OUT OF QUADS.
+
+
+
+
 	//std::vector<float> out_vertices2;
 
 	/*{

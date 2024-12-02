@@ -19,7 +19,7 @@ int main()
 	float currentTime = 0;
 	float deltaTime = 0;
 
-	glfwSwapInterval(1); //VSYNC disable / set max framerate, think (1/50) * 50 for 1 fps at 50hz
+	glfwSwapInterval(1); //set max framerate, think (1/50) * 50 for 1 fps at 50hz, this doesn't function like a VSYNC toggle it seems to my eyes.
 
 	while (!graphics->ShouldClose())
 	{
@@ -27,29 +27,17 @@ int main()
 		deltaTime = currentTime - lastTime;
 		lastTime = currentTime;
 
-
-
 		glfwPollEvents(); //moved from Graphics::Render().
-
-
 		editorGUI->StartImGuiFrame(deltaTime);
 
 		engine->Update(graphics->window,deltaTime);
 		graphics->Render();
-		//for (int i = 0; i < game->gameObjectVector.size(); i++)
-		//{
-		//	game->gameObjectVector[i]->Update();
-		//}
-
-		//could do so Game.gameObjectVector calls Update() on every game object implementing Update() and that Update() can call Update() in every component implementing Update().
 		editorGUI->HierarchyWindow(*graphics->myCamera, graphics->projection, *graphics->myShader);
 
 		editorGUI->RenderImGui(graphics->projection);
-
 		glfwSwapBuffers(graphics->window); //moved from Graphics::Render().
 	}
 
 	editorGUI->CloseImGui();
-
 	return 0;
 }

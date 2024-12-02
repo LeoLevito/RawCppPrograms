@@ -20,7 +20,7 @@ bool ObjReader::parseOBJ(const std::string& filename, std::vector<glm::vec3>& ou
 	if (!file.is_open())
 	{
 		std::cerr << "Failed to open .obj file: " << filename << std::endl;
-		return false; //diff
+		return false;
 	}
 
 	while (std::getline(file, line))
@@ -33,21 +33,18 @@ bool ObjReader::parseOBJ(const std::string& filename, std::vector<glm::vec3>& ou
 		{
 			glm::vec3 vertex;
 			iss >> vertex.x >> vertex.y >> vertex.z;
-			//std::cout << "v: " << vertex.x << " " << vertex.y << " " << vertex.z << std::endl;
 			temp_vertices.push_back(vertex);
 		}
 		else if (prefix == "vn")
 		{
 			glm::vec3 vertexNormal;
 			iss >> vertexNormal.x >> vertexNormal.y >> vertexNormal.z;
-			//std::cout << "vn: " << vertexNormal.x << " " << vertexNormal.y << " " << vertexNormal.z << std::endl;
 			temp_normals.push_back(vertexNormal);
 		}
 		else if (prefix == "vt")
 		{
 			glm::vec2 texCoord;
 			iss >> texCoord.x >> texCoord.y;
-			//std::cout << "v: " << texCoord.x << " " << texCoord.y << std::endl;
 			temp_uvs.push_back(texCoord);
 		}
 		else if (prefix == "f")
@@ -62,7 +59,7 @@ bool ObjReader::parseOBJ(const std::string& filename, std::vector<glm::vec3>& ou
 			{
 				std::cout << "Your .obj file can't be read by our simple parser!" << std::endl << "Please try re-exporting it from your 3D-program with other export settings!" << std::endl; //doing a check here to make it work similarly to link at the top of this page with the iss as per top answer at https://stackoverflow.com/questions/7868936/read-file-line-by-line-using-ifstream-in-c
 				file.close();
-				return false; //diff
+				return false; 
 			};
 			vertexIndices.push_back(vertexIndex[0]);
 			vertexIndices.push_back(vertexIndex[1]);
@@ -82,28 +79,14 @@ bool ObjReader::parseOBJ(const std::string& filename, std::vector<glm::vec3>& ou
 		unsigned int normalIndex = normalIndices[i]; //gotta check if normalIndex is null
 
 		glm::vec3 vertex = temp_vertices[vertexIndex - 1];
+		glm::vec2 uv = temp_uvs[uvIndex - 1];
 		glm::vec3 normal = temp_normals[normalIndex - 1]; //gotta check if normalIndex is null
 
 		out_vertices.push_back(vertex);
+		out_uvs.push_back(uv);
 		out_normals.push_back(normal);
-
-		if (temp_uvs.size() > 0)
-		{
-			glm::vec2 uv = temp_uvs[uvIndex - 1];
-			out_uvs.push_back(uv);
-		}
 	}
 
 	file.close();
-	return true; //diff
-}
-
-//Mesh* ObjReader::LoadObjMesh(const std::string& filename, std::vector<glm::vec3>& out_vertices, std::vector<glm::vec2>& out_uvs, std::vector<glm::vec3>& out_normals)
-//{
-//	return new Mesh(parseOBJ(filename,out_vertices, out_uvs, out_normals));
-//}
-
-bool ObjReader::Hello()
-{
-	return false;
+	return true;
 }
