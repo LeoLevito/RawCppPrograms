@@ -5,7 +5,7 @@
 
 glm::vec3 WorldUp = glm::vec3(0.0f, 1.0f, 0.0f); //like is this allowed in C++?
 
-Camera* Camera::instance = nullptr;
+Camera* Camera::instance = nullptr; //it's supposedly possible to avoid this, see https://youtu.be/PPup1yeU45I?t=888
 
 Camera::Camera()
 {
