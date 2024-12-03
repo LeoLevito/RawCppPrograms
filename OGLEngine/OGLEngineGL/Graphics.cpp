@@ -35,7 +35,6 @@ void Graphics::Initialize(int width, int height, GameObjectManager* gameObjectMa
 	myShader->Initialize("../Shaders/VertexShader.vertexs", "../Shaders/FragmentShader.fragments");
 	//myTriangle = new Triangle(); //quick fix for the 0xCCCCCCCC write/read access violation. Probably need to remember to do this more.
 	myCube = new Cube();
-	myCamera = new Camera();
 	myTexture = new Texture("../Textures/Bliss.jpg"); //I remember Martin saying that the texture will load to fragment shader without having to set the uniform variable in it.
 	myCube->ApplyTexture(myTexture); 
 	//myCubePositions.push_back(glm::vec3(0.0f,0.0f,0.0f));
@@ -101,7 +100,7 @@ void Graphics::ExampleCube() //put this in Graphics. Currently this is orthograp
 
 		//write to Vertex Shader
 		myShader->SetMatrix4(trans, "transform"); //apperently there's a better way to do this compared to using a Uniform type variable inside the vertex shader, Shader Buffer Storage Object, something like that, where we can have even more variables inside the shader and update them.
-		myShader->SetMatrix4(myCamera->myView, "view");
+		myShader->SetMatrix4(Camera::Get().myView, "view");
 		myShader->SetMatrix4(projection, "projection");
 
         myCube->Draw(myShader);

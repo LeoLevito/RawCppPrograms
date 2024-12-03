@@ -6,14 +6,15 @@
 int main()
 {
 	GameObjectManager* gameObjectManager = new GameObjectManager;
+	Camera::Allocate();
 	Graphics* graphics = new Graphics;
 	graphics->Initialize(1280, 720, gameObjectManager);
 
 	Engine* engine = new Engine;
-	engine->Initialize(graphics->window, graphics->myCamera);
+	engine->Initialize(graphics->window, &Camera::Get());
 
 	EditorGUI* editorGUI = new EditorGUI;
-	editorGUI->Initialize(graphics->window, graphics, gameObjectManager, *graphics->myCamera, *graphics->myShader);
+	editorGUI->Initialize(graphics->window, graphics, gameObjectManager, Camera::Get(), *graphics->myShader);
 
 	float lastTime = 0;
 	float currentTime = 0;
@@ -32,7 +33,7 @@ int main()
 
 		engine->Update(graphics->window,deltaTime);
 		graphics->Render();
-		editorGUI->HierarchyWindow(*graphics->myCamera, graphics->projection, *graphics->myShader);
+		editorGUI->HierarchyWindow(Camera::Get(), graphics->projection, *graphics->myShader);
 
 		editorGUI->RenderImGui(graphics->projection);
 		glfwSwapBuffers(graphics->window); //moved from Graphics::Render().

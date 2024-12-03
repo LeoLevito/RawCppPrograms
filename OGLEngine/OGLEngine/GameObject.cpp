@@ -49,7 +49,7 @@ void GameObject::LateSetComponentVariables()
 	int componentIndex = 0;
 	for (auto var : componentVector)
 	{
-		componentVector[componentIndex]->myCamera = myCamera;
+		componentVector[componentIndex]->myCamera = &Camera::Get();
 		componentVector[componentIndex]->myProjection = myProjection;
 		componentIndex++;
 	}

@@ -14,7 +14,6 @@ public:
 	std::string name;
 	virtual void Update(Shader* shader);
 	virtual void DrawObjectSpecificImGuiHierarchyAdjustables(std::vector<GameObject*>& vec);
-	int index;
 
 	Camera* myCamera;
 	glm::mat4* myProjection;

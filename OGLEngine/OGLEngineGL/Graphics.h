@@ -20,7 +20,6 @@ public:
 	void ExampleCube();
 	void EscapeToCloseWindow();
 	GLFWwindow* window;
-	Camera* myCamera;
 
 	std::vector<glm::vec3> myCubePositions;
 	glm::mat4 projection;

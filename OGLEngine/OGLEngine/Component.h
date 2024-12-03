@@ -8,7 +8,7 @@ class Component
 {
 public:
 	std::string name;
-	virtual void DrawComponentSpecificImGuiHierarchyAdjustables(Camera& camera, glm::mat4& projection);
+	virtual void DrawComponentSpecificImGuiHierarchyAdjustables(glm::mat4& projection);
 	virtual void Update(Shader* shader);
 
 	Camera* myCamera;

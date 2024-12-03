@@ -10,6 +10,6 @@ public:
 	glm::vec3 rotation;
 	glm::vec3 scale;
 
-	void DrawComponentSpecificImGuiHierarchyAdjustables(Camera& camera, glm::mat4& projection) override;
+	void DrawComponentSpecificImGuiHierarchyAdjustables(glm::mat4& projection) override;
 };
 

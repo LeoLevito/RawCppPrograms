@@ -40,7 +40,7 @@ MeshComponent::~MeshComponent()
 	delete mesh;
 }
 
-void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables(Camera& camera, glm::mat4& projection)
+void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables(glm::mat4& projection)
 {
 	//Change texture of mesh using ImGui. Would ideally improve this by being able to choose available textures from a drop down menu for example.
 	static char str0[128] = "Bliss2.jpg"; //how it's done in the ImGui demo, tho it is replicated across all objects now...
@@ -88,7 +88,7 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables(Camera& camer
 	}
 }
 
-void MeshComponent::DrawMesh(Camera& camera, glm::mat4& projection, Shader& shader)
+void MeshComponent::DrawMesh(glm::mat4& projection, Shader& shader)
 {
 	glm::mat4 trans = glm::mat4(1.0f);
 
@@ -101,14 +101,14 @@ void MeshComponent::DrawMesh(Camera& camera, glm::mat4& projection, Shader& shad
 
 	//write to Vertex Shader
 	shader.SetMatrix4(trans, "transform"); //apperently there's a better way to do this compared to using a Uniform type variable inside the vertex shader, Shader Buffer Storage Object, something like that, where we can have even more variables inside the shader and update them.
-	shader.SetMatrix4(camera.myView, "view");
+	shader.SetMatrix4(Camera::Get().myView, "view");
 	shader.SetMatrix4(projection, "projection");
 	mesh->Draw(&shader);
 }
 
 void MeshComponent::Update(Shader* shader)
 {
-	DrawMesh(*myCamera, *myProjection, *shader); //Shader is scuffed right now.
+	DrawMesh(*myProjection, *shader); //Shader is scuffed right now.
 }
 
 void MeshComponent::printMemoryStatus()

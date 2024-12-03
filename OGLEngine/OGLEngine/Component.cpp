@@ -1,6 +1,6 @@
 #include "Component.h"
 
-void Component::DrawComponentSpecificImGuiHierarchyAdjustables(Camera& camera, glm::mat4& projection)
+void Component::DrawComponentSpecificImGuiHierarchyAdjustables(glm::mat4& projection)
 {
 }
 

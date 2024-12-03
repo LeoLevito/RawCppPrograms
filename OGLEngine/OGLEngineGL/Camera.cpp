@@ -1,8 +1,11 @@
 #include "Camera.h"
 #include <gtc/matrix_transform.hpp>
 #include <iostream>
+#include <mutex>
 
 glm::vec3 WorldUp = glm::vec3(0.0f, 1.0f, 0.0f); //like is this allowed in C++?
+
+Camera* Camera::instance = nullptr;
 
 Camera::Camera()
 {
@@ -31,6 +34,20 @@ void Camera::SetDirection(const glm::vec3& direction)
 {
 	myDirection = glm::normalize(direction);
 	//std::cout << "CAMERA ROTATION(?) NORMALIZED: " << myDirection.x << " " << myDirection.y << " " << myDirection.z << "\n";
+}
+
+
+
+Camera& Camera::Get()
+{
+	return *instance;
+}
+
+void Camera::Allocate()
+{
+	//we only want one instance so we do an assert.
+	assert(instance == nullptr); //assert will terminate the program if its argument is false. Common to use when debugging to make the program fail more obviously if an unexpected condition occurs. So basically this is a nullptr check that will terminate the program if false, if I understand correctly.
+	instance = new Camera();
 }
 
 //projection matrix is something our objects will be transformed with. The projection matrix calculations happen when we multiply the rest of our matrices (in the vertex shader)

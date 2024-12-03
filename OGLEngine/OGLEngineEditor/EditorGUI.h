@@ -18,7 +18,7 @@ public:
 private:
 	Graphics* myGraphics;
 	GameObjectManager* myGameObjectManager;
-	Camera myCamera;
+	//Camera myCamera;
 	glm::mat4 myProjection;
 	float currentTime; //May or may not be super accurate at the moment.
 	float deltaTime;

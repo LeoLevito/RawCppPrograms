@@ -23,7 +23,7 @@ void EditorGUI::Initialize(GLFWwindow* window, Graphics* graphics, GameObjectMan
 
 	myGraphics = graphics;
 	myGameObjectManager = gameObjectManager;
-	myCamera = camera;
+	//myCamera = camera;
 
 
 	currentTime = 0; //May or may not be super accurate at the moment.
@@ -86,9 +86,10 @@ void EditorGUI::HierarchyWindow(Camera& camera, glm::mat4& projection, Shader& s
 
 	if (ImGui::Button("Add Game Object")) //replace code here with GameObjectManager AddGameObject() or similar.
 	{
+		myGameObjectManager->CreateGameObject(); //create an empty game object.
+
 		GameObjectTest* test = new GameObjectTest;
 		myGameObjectManager->gameObjects.push_back(test);
-		test->index = myGameObjectManager->gameObjects.size() - 1;
 		test->myCamera = &camera;
 		test->myProjection = &projection;
 		test->LateSetComponentVariables();
@@ -108,7 +109,7 @@ void EditorGUI::HierarchyWindow(Camera& camera, glm::mat4& projection, Shader& s
 			{
 				if (ImGui::TreeNode(myGameObjectManager->gameObjects.at(objectIndex)->componentVector.at(componentIndex)->name.c_str())) //treenode shall be named after the components attached to the specified game object!
 				{
-					myGameObjectManager->gameObjects.at(objectIndex)->componentVector.at(componentIndex)->DrawComponentSpecificImGuiHierarchyAdjustables(camera, projection);
+					myGameObjectManager->gameObjects.at(objectIndex)->componentVector.at(componentIndex)->DrawComponentSpecificImGuiHierarchyAdjustables(projection);
 					ImGui::TreePop();
 				}
 				componentIndex++;
