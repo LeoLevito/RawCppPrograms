@@ -4,7 +4,10 @@
 class GameObjectManager
 {
 public:
-	std::vector<GameObject*> gameObjectVector;
+	GameObject* CreateGameObject();
+	void DeleteGameObject(GameObject* gameObject);
+
+	std::vector<GameObject*> gameObjects;
 private:
 };
 

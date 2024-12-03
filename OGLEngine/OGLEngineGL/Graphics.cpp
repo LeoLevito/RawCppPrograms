@@ -63,9 +63,9 @@ void Graphics::Render()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //used to clear various stuff, in this case we clear the color buffer bit first, every time the while loop loops, before writing a new color with the glClearColor function. I remember there being similar stuff needing to be done with Emil Ström's TinyEngine in order for us to render things and update them at runtime.
 
-	for (int i = 0; i < myGameObjectManager->gameObjectVector.size(); i++) //Game.gameObjectVector calls Update() on every game object implementing Update() and that Update() can call Update() in every component implementing Update().
+	for (int i = 0; i < myGameObjectManager->gameObjects.size(); i++) //Game.gameObjectVector calls Update() on every game object implementing Update() and that Update() can call Update() in every component implementing Update().
 	{
-		myGameObjectManager->gameObjectVector[i]->Update(myShader);
+		myGameObjectManager->gameObjects[i]->Update(myShader);
 	}
 
 	//ExampleCube();

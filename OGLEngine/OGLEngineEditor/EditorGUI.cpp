@@ -87,36 +87,36 @@ void EditorGUI::HierarchyWindow(Camera& camera, glm::mat4& projection, Shader& s
 	if (ImGui::Button("Add Game Object")) //replace code here with GameObjectManager AddGameObject() or similar.
 	{
 		GameObjectTest* test = new GameObjectTest;
-		myGameObjectManager->gameObjectVector.push_back(test);
-		test->index = myGameObjectManager->gameObjectVector.size() - 1;
+		myGameObjectManager->gameObjects.push_back(test);
+		test->index = myGameObjectManager->gameObjects.size() - 1;
 		test->myCamera = &camera;
 		test->myProjection = &projection;
 		test->LateSetComponentVariables();
 	}
 
 	int objectIndex = 0;
-	for (GameObject* var : myGameObjectManager->gameObjectVector) //for every game object
+	for (GameObject* var : myGameObjectManager->gameObjects) //for every game object
 	{
-		int vectorSize = myGameObjectManager->gameObjectVector.size();
+		int vectorSize = myGameObjectManager->gameObjects.size();
 
 		ImGui::PushID(objectIndex); //ID system is required for items in an ImGui windows that will be named the same.
 
-		if (ImGui::CollapsingHeader(myGameObjectManager->gameObjectVector.at(objectIndex)->name.c_str()))
+		if (ImGui::CollapsingHeader(myGameObjectManager->gameObjects.at(objectIndex)->name.c_str()))
 		{
 			int componentIndex = 0;
-			for (Component* var : myGameObjectManager->gameObjectVector.at(objectIndex)->componentVector) //for every component on the current index game object
+			for (Component* var : myGameObjectManager->gameObjects.at(objectIndex)->componentVector) //for every component on the current index game object
 			{
-				if (ImGui::TreeNode(myGameObjectManager->gameObjectVector.at(objectIndex)->componentVector.at(componentIndex)->name.c_str())) //treenode shall be named after the components attached to the specified game object!
+				if (ImGui::TreeNode(myGameObjectManager->gameObjects.at(objectIndex)->componentVector.at(componentIndex)->name.c_str())) //treenode shall be named after the components attached to the specified game object!
 				{
-					myGameObjectManager->gameObjectVector.at(objectIndex)->componentVector.at(componentIndex)->DrawComponentSpecificImGuiHierarchyAdjustables(camera, projection);
+					myGameObjectManager->gameObjects.at(objectIndex)->componentVector.at(componentIndex)->DrawComponentSpecificImGuiHierarchyAdjustables(camera, projection);
 					ImGui::TreePop();
 				}
 				componentIndex++;
 			}
-			myGameObjectManager->gameObjectVector.at(objectIndex)->DrawObjectSpecificImGuiHierarchyAdjustables(myGameObjectManager->gameObjectVector); //allows deletion of game object without code above complaining about component being missing. I should probably stream line this a little bit.
+			myGameObjectManager->gameObjects.at(objectIndex)->DrawObjectSpecificImGuiHierarchyAdjustables(myGameObjectManager->gameObjects); //allows deletion of game object without code above complaining about component being missing. I should probably stream line this a little bit.
 		}
 
-		if (myGameObjectManager->gameObjectVector.size() == vectorSize)//check if vector has changed size, e.g. if we've deleted a game object. If the size hasn't changed we increase the iterator as per usual.
+		if (myGameObjectManager->gameObjects.size() == vectorSize)//check if vector has changed size, e.g. if we've deleted a game object. If the size hasn't changed we increase the iterator as per usual.
 		{
 			objectIndex++;
 		}
