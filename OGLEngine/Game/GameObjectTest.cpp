@@ -28,6 +28,7 @@ GameObjectTest::~GameObjectTest() //need to delete any objects/pointers that was
 
 void GameObjectTest::DrawObjectSpecificImGuiHierarchyAdjustables(std::vector<GameObject*>& vec)
 {
+	GameObject::DrawObjectSpecificImGuiHierarchyAdjustables(vec);
 	if (ImGui::Button("Remove Game Object"))
 	{
 		vec.erase(std::remove(vec.begin(), vec.end(), this)); //i'm just trying to remove one thing from the vector bruh.

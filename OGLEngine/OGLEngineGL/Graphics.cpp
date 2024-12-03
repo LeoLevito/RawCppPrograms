@@ -2,7 +2,7 @@
 #include <iostream>
 #include <gtc/matrix_transform.hpp>
 
-void Graphics::Initialize(int width, int height, Game* game)
+void Graphics::Initialize(int width, int height, GameObjectManager* gameObjectManager)
 {
 	if (!glfwInit())	//we need to initialize glfw
 	{
@@ -56,16 +56,16 @@ void Graphics::Initialize(int width, int height, Game* game)
 	}
 	myCubePositions[0].x -= 5.5f; //test to move a single cube.
 	projection = glm::perspective(glm::radians(45.0f), myWidth / myHeight, 0.1f, 100.0f);
-	myGame = game;
+	myGameObjectManager = gameObjectManager;
 }
 
 void Graphics::Render()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //used to clear various stuff, in this case we clear the color buffer bit first, every time the while loop loops, before writing a new color with the glClearColor function. I remember there being similar stuff needing to be done with Emil Ström's TinyEngine in order for us to render things and update them at runtime.
 
-	for (int i = 0; i < myGame->gameObjectVector.size(); i++) //Game.gameObjectVector calls Update() on every game object implementing Update() and that Update() can call Update() in every component implementing Update().
+	for (int i = 0; i < myGameObjectManager->gameObjectVector.size(); i++) //Game.gameObjectVector calls Update() on every game object implementing Update() and that Update() can call Update() in every component implementing Update().
 	{
-		myGame->gameObjectVector[i]->Update(myShader);
+		myGameObjectManager->gameObjectVector[i]->Update(myShader);
 	}
 
 	//ExampleCube();

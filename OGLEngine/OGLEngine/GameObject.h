@@ -2,7 +2,7 @@
 #include "Component.h"
 #include <vector>
 #include <string>
-class GameObject
+class GameObject //equivalent of entity class
 {
 public:
 	GameObject();

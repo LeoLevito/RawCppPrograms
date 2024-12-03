@@ -6,7 +6,7 @@
 #include <GameObjectTest.h>
 #include <iostream>
 
-void EditorGUI::Initialize(GLFWwindow* window, Graphics* graphics, Game* game, Camera& camera, Shader& shader)
+void EditorGUI::Initialize(GLFWwindow* window, Graphics* graphics, GameObjectManager* gameObjectManager, Camera& camera, Shader& shader)
 {
 	//Initialize ImGui, check https://github.com/ocornut/imgui/wiki/Getting-Started#example-if-you-are-using-glfw--openglwebgl, and cross-reference with Martin's project as well.
 	// Setup Dear ImGui context
@@ -22,7 +22,7 @@ void EditorGUI::Initialize(GLFWwindow* window, Graphics* graphics, Game* game, C
 	ImGui_ImplOpenGL3_Init();
 
 	myGraphics = graphics;
-	myGame = game;
+	myGameObjectManager = gameObjectManager;
 	myCamera = camera;
 
 
@@ -84,39 +84,39 @@ void EditorGUI::HierarchyWindow(Camera& camera, glm::mat4& projection, Shader& s
 	ImGui::Begin("Hierarchy"); //start rendering new ImGui window
 
 
-	if (ImGui::Button("Add Game Object"))
+	if (ImGui::Button("Add Game Object")) //replace code here with GameObjectManager AddGameObject() or similar.
 	{
 		GameObjectTest* test = new GameObjectTest;
-		myGame->gameObjectVector.push_back(test);
-		test->index = myGame->gameObjectVector.size() - 1;
+		myGameObjectManager->gameObjectVector.push_back(test);
+		test->index = myGameObjectManager->gameObjectVector.size() - 1;
 		test->myCamera = &camera;
 		test->myProjection = &projection;
 		test->LateSetComponentVariables();
 	}
 
 	int objectIndex = 0;
-	for (GameObject* var : myGame->gameObjectVector) //for every game object
+	for (GameObject* var : myGameObjectManager->gameObjectVector) //for every game object
 	{
-		int vectorSize = myGame->gameObjectVector.size();
+		int vectorSize = myGameObjectManager->gameObjectVector.size();
 
 		ImGui::PushID(objectIndex); //ID system is required for items in an ImGui windows that will be named the same.
 
-		if (ImGui::CollapsingHeader(myGame->gameObjectVector.at(objectIndex)->name.c_str())) 
+		if (ImGui::CollapsingHeader(myGameObjectManager->gameObjectVector.at(objectIndex)->name.c_str()))
 		{
 			int componentIndex = 0;
-			for (Component* var : myGame->gameObjectVector.at(objectIndex)->componentVector) //for every component on the current index game object
+			for (Component* var : myGameObjectManager->gameObjectVector.at(objectIndex)->componentVector) //for every component on the current index game object
 			{
-				if (ImGui::TreeNode(myGame->gameObjectVector.at(objectIndex)->componentVector.at(componentIndex)->name.c_str())) //treenode shall be named after the components attached to the specified game object!
+				if (ImGui::TreeNode(myGameObjectManager->gameObjectVector.at(objectIndex)->componentVector.at(componentIndex)->name.c_str())) //treenode shall be named after the components attached to the specified game object!
 				{
-					myGame->gameObjectVector.at(objectIndex)->componentVector.at(componentIndex)->DrawComponentSpecificImGuiHierarchyAdjustables(camera, projection);
+					myGameObjectManager->gameObjectVector.at(objectIndex)->componentVector.at(componentIndex)->DrawComponentSpecificImGuiHierarchyAdjustables(camera, projection);
 					ImGui::TreePop();
 				}
 				componentIndex++;
 			}
-			myGame->gameObjectVector.at(objectIndex)->DrawObjectSpecificImGuiHierarchyAdjustables(myGame->gameObjectVector); //allows deletion of game object
+			myGameObjectManager->gameObjectVector.at(objectIndex)->DrawObjectSpecificImGuiHierarchyAdjustables(myGameObjectManager->gameObjectVector); //allows deletion of game object without code above complaining about component being missing. I should probably stream line this a little bit.
 		}
 
-		if (myGame->gameObjectVector.size() == vectorSize)//check if vector has changed size, e.g. if we've deleted a game object. If the size hasn't changed we increase the iterator as per usual.
+		if (myGameObjectManager->gameObjectVector.size() == vectorSize)//check if vector has changed size, e.g. if we've deleted a game object. If the size hasn't changed we increase the iterator as per usual.
 		{
 			objectIndex++;
 		}

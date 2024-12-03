@@ -1,19 +1,19 @@
 #include <Graphics.h>
 #include <Engine.h>
 #include <EditorGUI.h>
-#include <Game.h>
+#include <GameObjectManager.h>
 
 int main()
 {
-	Game* game = new Game;
+	GameObjectManager* gameObjectManager = new GameObjectManager;
 	Graphics* graphics = new Graphics;
-	graphics->Initialize(1280, 720, game);
+	graphics->Initialize(1280, 720, gameObjectManager);
 
 	Engine* engine = new Engine;
 	engine->Initialize(graphics->window, graphics->myCamera);
 
 	EditorGUI* editorGUI = new EditorGUI;
-	editorGUI->Initialize(graphics->window, graphics, game, *graphics->myCamera, *graphics->myShader);
+	editorGUI->Initialize(graphics->window, graphics, gameObjectManager, *graphics->myCamera, *graphics->myShader);
 
 	float lastTime = 0;
 	float currentTime = 0;

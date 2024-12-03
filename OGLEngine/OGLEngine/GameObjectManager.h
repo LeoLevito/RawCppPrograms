@@ -1,7 +1,7 @@
 #pragma once
 #include "GameObject.h"
 #include <vector>
-class Game
+class GameObjectManager
 {
 public:
 	std::vector<GameObject*> gameObjectVector;
