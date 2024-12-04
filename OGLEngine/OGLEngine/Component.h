@@ -3,16 +3,19 @@
 #include "Camera.h"
 #include "glm.hpp"
 #include "Shader.h"
+//#include "GameObject.h"
+
+class GameObject;
 
 class Component
 {
 public:
+	Component();
+	virtual ~Component();
 	std::string name;
-	virtual void DrawComponentSpecificImGuiHierarchyAdjustables(glm::mat4& projection);
+	virtual void DrawComponentSpecificImGuiHierarchyAdjustables();
 	virtual void Update(Shader* shader);
-
-	Camera* myCamera;
-	glm::mat4* myProjection;
+	GameObject* owner;
 private:
 };
 

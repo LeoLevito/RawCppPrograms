@@ -2,6 +2,7 @@
 #include "Component.h"
 #include <vector>
 #include <string>
+
 class GameObject //equivalent of entity class
 {
 public:
@@ -10,16 +11,17 @@ public:
 	//virtual void BeginPlay();
 	//virtual void Tick(float deltaTime);
 	void AddComponent(Component* component); //should look into having a choice between components in the ImGui window. And a button to add components like in Unity.
-	//make a RemoveComponent function here.
-	std::vector<Component*> componentVector;
+
+	
+
+//make a RemoveComponent function here.
+
+
+
+	std::vector<Component*> components;
 	std::string name;
 	virtual void Update(Shader* shader);
 	virtual void DrawObjectSpecificImGuiHierarchyAdjustables(std::vector<GameObject*>& vec);
-
-	Camera* myCamera;
-	glm::mat4* myProjection;
-
-	void LateSetComponentVariables();
 private:
 
 };

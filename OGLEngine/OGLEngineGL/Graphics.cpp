@@ -54,7 +54,6 @@ void Graphics::Initialize(int width, int height, GameObjectManager* gameObjectMa
 		}
 	}
 	myCubePositions[0].x -= 5.5f; //test to move a single cube.
-	projection = glm::perspective(glm::radians(45.0f), myWidth / myHeight, 0.1f, 100.0f);
 	myGameObjectManager = gameObjectManager;
 }
 
@@ -101,7 +100,7 @@ void Graphics::ExampleCube() //put this in Graphics. Currently this is orthograp
 		//write to Vertex Shader
 		myShader->SetMatrix4(trans, "transform"); //apperently there's a better way to do this compared to using a Uniform type variable inside the vertex shader, Shader Buffer Storage Object, something like that, where we can have even more variables inside the shader and update them.
 		myShader->SetMatrix4(Camera::Get().myView, "view");
-		myShader->SetMatrix4(projection, "projection");
+		myShader->SetMatrix4(Camera::Get().projection, "projection");
 
         myCube->Draw(myShader);
 		//myTriangle->Draw(myShader);

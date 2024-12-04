@@ -21,9 +21,9 @@ public:
 	ObjReader* myObjReader;
 	vboindexer* myVBOindexer;
 
-	void DrawComponentSpecificImGuiHierarchyAdjustables(glm::mat4& projection) override;
+	void DrawComponentSpecificImGuiHierarchyAdjustables() override;
 
-	void DrawMesh(glm::mat4& projection, Shader& shader);
+	void DrawMesh(Shader& shader);
 
 	glm::vec3 position;
 	glm::vec3 rotation;

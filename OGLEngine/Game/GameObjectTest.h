@@ -16,13 +16,7 @@ public:
 
 	MeshComponent* meshComponent;
 
-	void Update(Shader* shader) override
-	{
-		meshComponent->position = transformComponent->position;
-		meshComponent->rotation = transformComponent->rotation;
-		meshComponent->scale = transformComponent->scale;
-		GameObject::Update(shader);
-	}
+	void Update(Shader* shader) override; //why am I doing this in the header file?
 
 	void DrawObjectSpecificImGuiHierarchyAdjustables(std::vector<GameObject*>& vec) override;
 private:

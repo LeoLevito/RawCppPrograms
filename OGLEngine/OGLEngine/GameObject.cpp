@@ -4,6 +4,9 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#include "TransformComponent.h"
+#include "MeshComponent.h"
+
 //void GameObject::BeginPlay()
 //{
 //}
@@ -14,23 +17,33 @@
 
 GameObject::GameObject()
 {
+	name = "Game object";
 }
 
 GameObject::~GameObject()
 {
+	std::cout << "Initiating deletion of Game Object." << std::endl;
+	std::cout << "Deleting components of Game Object." << std::endl;
 
+	for (int i = 0; i < components.size(); i++)
+	{
+		delete components[i];
+	}
+	std::cout << "Deletion of Game Object's components completed." << std::endl;
+	std::cout << "-->Deleting Game Object." << std::endl;
 }
 
 void GameObject::AddComponent(Component* component)
 {
-	componentVector.push_back(component);
+	component->owner = this;
+	components.push_back(component);
 }
 
 void GameObject::Update(Shader* shader) 
 {
-	for (int i = 0; i < componentVector.size(); i++)
+	for (int i = 0; i < components.size(); i++)
 	{
-		componentVector[i]->Update(shader);
+		components[i]->Update(shader);
 	}
 }
 
@@ -42,15 +55,40 @@ void GameObject::DrawObjectSpecificImGuiHierarchyAdjustables(std::vector<GameObj
 	{
 		name = str0;
 	}
-}
 
-void GameObject::LateSetComponentVariables()
-{
-	int componentIndex = 0;
-	for (auto var : componentVector)
+	static int selectedComponent = -1;
+	const char* componentNames[] = { "Transform component", "Mesh component" };
+	if (ImGui::Button("Add component"))
 	{
-		componentVector[componentIndex]->myCamera = &Camera::Get();
-		componentVector[componentIndex]->myProjection = myProjection;
-		componentIndex++;
+		ImGui::OpenPopup("Component popup");
+	}
+	//ImGui::SameLine();
+	if (ImGui::BeginPopup("Component popup"))
+	{
+		ImGui::SeparatorText("Components:");
+		for (int i = 0; i < IM_ARRAYSIZE(componentNames); i++)
+		{
+			if (ImGui::Selectable(componentNames[i])) 
+			{
+				selectedComponent = i;
+				if (i == 0) // need to streamline this.
+				{
+					AddComponent(new TransformComponent);
+				}
+				else if (i == 1) 
+				{
+					AddComponent(new MeshComponent);
+				}
+			}
+		}
+		ImGui::EndPopup();
+	}
+
+
+	if (ImGui::Button("Remove Game Object"))
+	{
+		vec.erase(std::remove(vec.begin(), vec.end(), this)); 
+		delete this;
+		std::cout << "Deletion of Game Object completed." << std::endl;
 	}
 }

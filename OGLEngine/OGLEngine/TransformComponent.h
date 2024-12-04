@@ -6,10 +6,11 @@ class TransformComponent : public Component
 {
 public:
 	TransformComponent();
+	~TransformComponent();
 	glm::vec3 position;
 	glm::vec3 rotation;
 	glm::vec3 scale;
 
-	void DrawComponentSpecificImGuiHierarchyAdjustables(glm::mat4& projection) override;
+	void DrawComponentSpecificImGuiHierarchyAdjustables() override;
 };
 

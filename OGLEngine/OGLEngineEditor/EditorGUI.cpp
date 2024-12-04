@@ -44,7 +44,7 @@ void EditorGUI::StartImGuiFrame(float deltaTime)
 
 
 	//CHANGE THIS TO WHATEVER I WANT / NEED!
-	//ImGui::ShowDemoWindow(); // Show demo window! :)
+	ImGui::ShowDemoWindow(); // Show demo window! :)
 	FrameRateWindow(deltaTime);
 	//HierarchyWindow(myCamera, myProjection, myShader);
 }
@@ -87,12 +87,6 @@ void EditorGUI::HierarchyWindow(Camera& camera, glm::mat4& projection, Shader& s
 	if (ImGui::Button("Add Game Object")) //replace code here with GameObjectManager AddGameObject() or similar.
 	{
 		myGameObjectManager->CreateGameObject(); //create an empty game object.
-
-		GameObjectTest* test = new GameObjectTest;
-		myGameObjectManager->gameObjects.push_back(test);
-		test->myCamera = &camera;
-		test->myProjection = &projection;
-		test->LateSetComponentVariables();
 	}
 
 	int objectIndex = 0;
@@ -105,11 +99,11 @@ void EditorGUI::HierarchyWindow(Camera& camera, glm::mat4& projection, Shader& s
 		if (ImGui::CollapsingHeader(myGameObjectManager->gameObjects.at(objectIndex)->name.c_str()))
 		{
 			int componentIndex = 0;
-			for (Component* var : myGameObjectManager->gameObjects.at(objectIndex)->componentVector) //for every component on the current index game object
+			for (Component* var : myGameObjectManager->gameObjects.at(objectIndex)->components) //for every component on the current index game object
 			{
-				if (ImGui::TreeNode(myGameObjectManager->gameObjects.at(objectIndex)->componentVector.at(componentIndex)->name.c_str())) //treenode shall be named after the components attached to the specified game object!
+				if (ImGui::TreeNode(myGameObjectManager->gameObjects.at(objectIndex)->components.at(componentIndex)->name.c_str())) //treenode shall be named after the components attached to the specified game object!
 				{
-					myGameObjectManager->gameObjects.at(objectIndex)->componentVector.at(componentIndex)->DrawComponentSpecificImGuiHierarchyAdjustables(projection);
+					myGameObjectManager->gameObjects.at(objectIndex)->components.at(componentIndex)->DrawComponentSpecificImGuiHierarchyAdjustables();
 					ImGui::TreePop();
 				}
 				componentIndex++;

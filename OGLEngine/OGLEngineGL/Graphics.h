@@ -22,7 +22,6 @@ public:
 	GLFWwindow* window;
 
 	std::vector<glm::vec3> myCubePositions;
-	glm::mat4 projection;
 	Shader* myShader;
 private:
 	unsigned int VBO; //vertex buffer object, OpenGL objects are unsigned ints. We can put a bunch of vertices in this object and send it to the GPU. You can have an array of VBOs.

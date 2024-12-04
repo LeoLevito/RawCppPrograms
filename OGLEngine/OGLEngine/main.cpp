@@ -2,11 +2,19 @@
 #include <Engine.h>
 #include <EditorGUI.h>
 #include <GameObjectManager.h>
+#include <gtc/matrix_transform.hpp>
 
+
+//float myWidth = 1280;
+//float myHeight = 720;
+//static glm::mat4* GLOBALprojection = &glm::perspective(glm::radians(45.0f), myWidth / myHeight, 0.1f, 100.0f);
 int main()
 {
+	
 	GameObjectManager* gameObjectManager = new GameObjectManager;
 	Camera::Allocate();
+
+	
 	Graphics* graphics = new Graphics;
 	graphics->Initialize(1280, 720, gameObjectManager);
 
@@ -33,9 +41,9 @@ int main()
 
 		engine->Update(graphics->window,deltaTime);
 		graphics->Render();
-		editorGUI->HierarchyWindow(Camera::Get(), graphics->projection, *graphics->myShader);
+		editorGUI->HierarchyWindow(Camera::Get(), Camera::Get().projection, *graphics->myShader);
 
-		editorGUI->RenderImGui(graphics->projection);
+		editorGUI->RenderImGui(Camera::Get().projection);
 		glfwSwapBuffers(graphics->window); //moved from Graphics::Render().
 	}
 

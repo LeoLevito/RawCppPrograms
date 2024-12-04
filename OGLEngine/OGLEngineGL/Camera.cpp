@@ -9,6 +9,8 @@ Camera* Camera::instance = nullptr; //it's supposedly possible to avoid this, se
 
 Camera::Camera()
 {
+	projection = glm::perspective(glm::radians(45.0f), 1280.f / 720.f, 0.1f, 100.0f); //should make variables out of 1280 / 720.
+
 	myDirection = glm::vec3(0.0f, 0.0f, -1.0f);
 	myPosition = glm::vec3(0.0f, 0.0f, 3.0f);
 	myUp = glm::vec3(0.0f, 1.0f, 0.0f);
