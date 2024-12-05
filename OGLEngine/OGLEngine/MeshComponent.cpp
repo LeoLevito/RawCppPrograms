@@ -59,6 +59,7 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 	}
 
 	//Change mesh of mesh using ImGui. Would ideally improve this by being able to choose available meshes from a drop down menu for example.
+	//EDIT: WOAH, just saw that it's possible to open file explorer with ImGui to choose .obj files from a specified directory, that's a possibility!.
 	static char str1[128] = "TreeTrunk.obj"; //how it's done in the ImGui demo, tho it is replicated across all objects now...
 	ImGui::InputText("Mesh name", str1, IM_ARRAYSIZE(str1)); //Yeah, I gotta change this to a dropdown or something.
 	if (ImGui::Button("Change Mesh"))
@@ -110,7 +111,7 @@ void MeshComponent::Update(Shader* shader)
 	{
 		if (dynamic_cast<TransformComponent*>(owner->components[i])) //checking if owner has a component of type TransformComponent. Is of-type correct word-use in this case?
 		{
-			//multiple casts, in UPDATE()? not sure how efficient this is.
+			//multiple casts, in UPDATE()? not sure how efficient this is. EDIT 5 dec 2024, apparently this dynamic_cast is better than other types of casts, even Emil has used them multiple times.
 			position = dynamic_cast<TransformComponent*>(owner->components[i])->position; //need to get a reference to the transform component if there is one.
 			rotation = dynamic_cast<TransformComponent*>(owner->components[i])->rotation;
 			scale = dynamic_cast<TransformComponent*>(owner->components[i])->scale;

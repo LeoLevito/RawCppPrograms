@@ -1,6 +1,7 @@
 #include "Graphics.h"
 #include <iostream>
 #include <gtc/matrix_transform.hpp>
+#include<thread>
 
 void Graphics::Initialize(int width, int height, GameObjectManager* gameObjectManager)
 {

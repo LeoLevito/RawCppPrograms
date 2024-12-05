@@ -71,6 +71,9 @@ bool ObjReader::parseOBJ(const std::string& filename, std::vector<glm::vec3>& ou
 			normalIndices.push_back(normalIndex[1]);
 			normalIndices.push_back(normalIndex[2]);
 		}
+
+		//IMPLEMENT TRIANGLULATION FOR .OBJ FILES BUILT OUT OF QUADS.
+		//check 5 dec 2024 second recording, Zongying had a solution for checking and rendering quads!
 	}
 	for (size_t i = 0; i < vertexIndices.size(); i++)
 	{
@@ -87,6 +90,107 @@ bool ObjReader::parseOBJ(const std::string& filename, std::vector<glm::vec3>& ou
 		out_normals.push_back(normal);
 	}
 
+	//might want to move the vboindexer call in Mesh into here.
+	
+
+	//Okay so the basic principle of today's first task (5 dec 2024) is to parse a .obj file once, 
+	//write the results to a file, and then read the file when we want to load a mesh. 
+	//Doesn't Unity have a meta file system that might be doing a similar thing with meshes? 
+	//Or maybe meta-files are used for something else.
+	//Anyways, I don't think I will do it completely like Emil has it in his powerpoint, 
+	//since the code for WriteTo and ReadFrom had no examples,				//EDIT: Emil said WriteTo and ReadFrom is just an encapsulation of the .write and .read functions. So we could just do .write and .read in the for loops.
+	//or maybe those were the examples before the header showcase?
+	//His code must be generalized to some extent.
+	//I know what the basic concept is, give me time and I'll figure out how to write to a new file, write the results of the parse, and possibly even the vboindexer, and then read from it when I want to load a mesh. Could even connect ImGui to read those files names.
+	//The point is also to write and read from a binary file, so instead of using << / >> to write and read from a text file, we use .write and .read for binary files.
+	
+
+
+
 	file.close();
+
+	//here: write to file the results of the parse after file has been closed.
+
 	return true;
+}
+
+bool ObjReader::ReadFrom(std::iostream& file)
+{
+	return false;
+}
+
+bool ObjReader::WriteTo(std::iostream& file) const
+{
+
+	return false;
+}
+
+void ObjReader::Serialization()
+{
+	std::fstream file;
+
+	//file.open(optimizedFilePath.c_str(), std::ios_base::out | std::ios_base::binary); //binary files require the use of 
+	////write meta-data first, if you want
+	//if (file.is_open())
+	//{
+	//	//write sizes of vectors
+	//	file.write((char*)&Vertices.size(), sizeof(int));
+	//	file.write((char*)&UVs.size(), sizeof(int));
+	//	file.write((char*)&Normals.size(), sizeof(int));
+	//	file.write((char*)&Faces.size(), sizeof(int));
+
+	//	for (int i = 0; i < Vertices; i++) //might be possible to use Vertices.data() instead of for looping through every element. Google how to write and read a c++ vector from a binary file.
+	//	{
+	//		vertices[i].WriteTo(file);
+	//	}
+	//	for (int i = 0; i < UVs; i++)
+	//	{
+	//		uvs[i].WriteTo(file);
+	//	}
+	//	for (int i = 0; i < Normals; i++)
+	//	{
+	//		normals[i].WriteTo(file);
+	//	}
+	//	for (int i = 0; i < Faces; i++)
+	//	{
+	//		faces[i].WriteTo(file);
+	//	}
+	//}
+	//file.close();
+}
+
+void ObjReader::Deserialization()
+{
+	//file.open(optimizedFilePath.c_str(), std::ios_base::in | std::ios_base::binary);
+	////read meta-data if you wrote that.
+	//if (file.is_open())
+	//{
+	//	//read sizes of vectors;
+	//	file.read((char*)&Vertices.size(), sizeof(int));
+	//	file.read((char*)&UVs.size(), sizeof(int));
+	//	file.read((char*)&Normals.size(), sizeof(int));
+	//	file.read((char*)&Faces.size(), sizeof(int));
+	//	//allocate arrays for all data to be read, based on the numbers above.
+	//	AllocateArrays();
+
+	//	//read all the data
+	//	for (int i = 0; i < Vertices; i++)
+	//	{
+	//		vertices[i].ReadFrom(file);
+	//	}
+	//	for (int i = 0; i < UVs; i++)
+	//	{
+	//		uvs[i].ReadFrom(file);
+	//	}
+	//	for (int i = 0; i < Normals; i++)
+	//	{
+	//		normals[i].ReadFrom(file);
+	//	}
+	//	for (int i = 0; i < Faces; i++)
+	//	{
+	//		faces[i].ReadFrom(file);
+	//	}
+	//}
+	//
+	//file.close();
 }

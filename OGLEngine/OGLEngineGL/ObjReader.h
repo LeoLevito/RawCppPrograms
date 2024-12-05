@@ -11,6 +11,14 @@ class ObjReader
 {
 public:
 	bool parseOBJ(const std::string& filename, std::vector<glm::vec3>& out_vertices, std::vector<glm::vec2>& out_uvs, std::vector<glm::vec3>& out_normals);
+
+	bool ReadFrom(std::iostream& file);
+
+	bool WriteTo(std::iostream& file) const;
+
+	void Serialization();
+
+	void Deserialization();
 private:
 };
 

@@ -55,6 +55,10 @@ Mesh::Mesh(ObjReader* objreader, vboindexer* VBOindexer, const char* modelPath) 
 	std::vector<glm::vec3> indexed_normals;
 	VBOindexer->indexVBO(vertices, uvs, normals, indices, indexed_vertices, indexed_uvs, indexed_normals);
 
+
+	//5 dec 2024, Emil suggested just saving any variables used for rendering the mesh, like vertices and faces, into a file.
+	//so maybe the fast way of getting this working is to write all vectors here into a file right here.
+
 //IMPLEMENT TRIANGLULATION FOR .OBJ FILES BUILT OUT OF QUADS.
 
 
