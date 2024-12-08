@@ -63,7 +63,7 @@ static float vertices[] = {
 		0.5f, -0.5f,  0.5f,  1.0f, 0.0f
 };
 
-static unsigned int indices[] = {
+static unsigned int myIndices[] = {
 	// Front face
 	0, 2, 1, 2, 0, 3,
 	// Back face
@@ -78,4 +78,4 @@ static unsigned int indices[] = {
 	20, 22, 21, 22, 20, 23
 };
 
-Cube::Cube() : Mesh(vertices, sizeof(vertices), indices, sizeof(indices)) {};
+Cube::Cube() : Mesh(vertices, sizeof(vertices), myIndices, sizeof(myIndices)) {};

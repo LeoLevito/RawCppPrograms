@@ -13,6 +13,12 @@ public:
 	~Mesh(); //destructor
 	void Draw(Shader* shader);
 	void ApplyTexture(Texture* texture);
+
+	std::vector<unsigned short> indices;
+	std::vector<glm::vec3> indexed_vertices;
+	std::vector<glm::vec2> indexed_uvs;
+	std::vector<glm::vec3> indexed_normals;
+
 protected:
 	unsigned int VBO, VAO, EBO;
 	unsigned int NBO, UVBO, CBO;

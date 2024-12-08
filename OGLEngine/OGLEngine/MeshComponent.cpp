@@ -22,7 +22,7 @@ MeshComponent::MeshComponent()
 
 	myObjReader = new ObjReader;
 	myVBOindexer = new vboindexer;
-	mesh = new Mesh(myObjReader, myVBOindexer, "../Models/TreeTrunk.obj");
+	mesh = new Mesh(myObjReader, myVBOindexer, "../Models/TreeTrunk");
 	
 	mesh->ApplyTexture(myTexture);
 
@@ -60,7 +60,7 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 
 	//Change mesh of mesh using ImGui. Would ideally improve this by being able to choose available meshes from a drop down menu for example.
 	//EDIT: WOAH, just saw that it's possible to open file explorer with ImGui to choose .obj files from a specified directory, that's a possibility!.
-	static char str1[128] = "TreeTrunk.obj"; //how it's done in the ImGui demo, tho it is replicated across all objects now...
+	static char str1[128] = "TreeTrunk"; //how it's done in the ImGui demo, tho it is replicated across all objects now...
 	ImGui::InputText("Mesh name", str1, IM_ARRAYSIZE(str1)); //Yeah, I gotta change this to a dropdown or something.
 	if (ImGui::Button("Change Mesh"))
 	{

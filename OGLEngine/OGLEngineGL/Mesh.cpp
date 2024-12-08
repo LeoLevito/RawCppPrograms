@@ -38,22 +38,24 @@ Mesh::Mesh(ObjReader* objreader, vboindexer* VBOindexer, const char* modelPath) 
 	//https://github.com/opengl-tutorials/ogl/blob/master/tutorial07_model_loading/tutorial07.cpp
 	//https://github.com/opengl-tutorials/ogl/blob/master/tutorial09_vbo_indexing/tutorial09.cpp
 
-    std::vector<glm::vec3> vertices;
-	std::vector<glm::vec2> uvs;
-	std::vector<glm::vec3> normals;
+ //   std::vector<glm::vec3> vertices;
+	//std::vector<glm::vec2> uvs;
+	//std::vector<glm::vec3> normals;
 
-	bool res = objreader->parseOBJ(modelPath, vertices, uvs, normals);
+	//may not even need to do this since right now we delete the mesh when swapping in the mesh component.
+	//indices.clear();
+	//indexed_vertices.clear();
+	//indexed_uvs.clear();
+	//indexed_normals.clear();
 
-	if (!res) 
+	bool res = objreader->parseOBJ(modelPath, indices, indexed_vertices, indexed_uvs, indexed_normals);
+
+	if (!res) //can just call parse obj in an if statement instead of doing this after calling it.
 	{
 		return;
 	}
 
-	std::vector<unsigned short> indices;
-	std::vector<glm::vec3> indexed_vertices;
-	std::vector<glm::vec2> indexed_uvs;
-	std::vector<glm::vec3> indexed_normals;
-	VBOindexer->indexVBO(vertices, uvs, normals, indices, indexed_vertices, indexed_uvs, indexed_normals);
+	//VBOindexer->indexVBO(vertices, uvs, normals, indices, indexed_vertices, indexed_uvs, indexed_normals);
 
 
 	//5 dec 2024, Emil suggested just saving any variables used for rendering the mesh, like vertices and faces, into a file.
