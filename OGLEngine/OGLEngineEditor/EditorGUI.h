@@ -15,6 +15,7 @@ public:
 
 	void FrameRateWindow(float deltaTime);
 	void HierarchyWindow(Camera& camera, glm::mat4& projection, Shader& shader);
+	void CameraWindow();
 private:
 	Graphics* myGraphics;
 	GameObjectManager* myGameObjectManager;

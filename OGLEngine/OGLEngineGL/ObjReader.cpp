@@ -2,8 +2,6 @@
 #include <iostream>
 #include "Mesh.h"
 
-
-
 //https://github.com/opengl-tutorials/ogl/blob/master/common/objloader.cpp
 
 ObjReader::ObjReader()
@@ -32,10 +30,10 @@ bool ObjReader::parseOBJ(const std::string& filename, std::vector<unsigned short
 		indexed_uvs = myIndexed_uvs;
 		indexed_normals = myIndexed_normals;
 	}
-	else {
+	else 
+	{
 		std::string filename3 = filename;
 		filename3.append(".obj");
-
 
 		std::vector<unsigned int> vertexIndices, uvIndices, normalIndices; //f stands for face in .obj file. It handles indices.
 		std::vector<glm::vec3> temp_vertices;
@@ -55,7 +53,7 @@ bool ObjReader::parseOBJ(const std::string& filename, std::vector<unsigned short
 		{
 			std::istringstream iss(line);
 			std::string prefix;
-			iss >> prefix; //what this do?
+			iss >> prefix;
 
 			if (prefix == "v")
 			{
@@ -116,15 +114,9 @@ bool ObjReader::parseOBJ(const std::string& filename, std::vector<unsigned short
 			vertices.push_back(vertex);
 			uvs.push_back(uv);
 			normals.push_back(normal);
-			
-			//out_vertices.push_back(vertex);
-			//out_uvs.push_back(uv);
-			//out_normals.push_back(normal);
 		}
 
 		file.close();
-
-
 
 		myVBOindexer->indexVBO(vertices, uvs, normals, indices, indexed_vertices, indexed_uvs, indexed_normals);
 		
@@ -137,47 +129,7 @@ bool ObjReader::parseOBJ(const std::string& filename, std::vector<unsigned short
 		Serialization(filename2);
 	}
 
-
-
-	//moved these from mesh for vboindex call below, though maybe these should still be in mesh since they are used there...
-
-
-
-
-
-	//might want to move the vboindexer call in Mesh into here.
-
-
-	//Okay so the basic principle of today's first task (5 dec 2024) is to parse a .obj file once, 
-	//write the results to a file, and then read the file when we want to load a mesh. 
-	//Doesn't Unity have a meta file system that might be doing a similar thing with meshes? 
-	//Or maybe meta-files are used for something else.
-	//Anyways, I don't think I will do it completely like Emil has it in his powerpoint, 
-	//since the code for WriteTo and ReadFrom had no examples,				//EDIT: Emil said WriteTo and ReadFrom is just an encapsulation of the .write and .read functions. So we could just do .write and .read in the for loops.
-	//or maybe those were the examples before the header showcase?
-	//His code must be generalized to some extent.
-	//I know what the basic concept is, give me time and I'll figure out how to write to a new file, write the results of the parse, and possibly even the vboindexer, and then read from it when I want to load a mesh. Could even connect ImGui to read those files names.
-	//The point is also to write and read from a binary file, so instead of using << / >> to write and read from a text file, we use .write and .read for binary files.
-
-
-
-
-
-
-	//here: write to file the results of the parse after file has been closed.
-
 	return true;
-}
-
-bool ObjReader::ReadFrom(std::iostream& file)
-{
-	return false;
-}
-
-bool ObjReader::WriteTo(std::iostream& file) const
-{
-
-	return false;
 }
 
 void ObjReader::Serialization(const std::string& filename)
@@ -188,11 +140,13 @@ void ObjReader::Serialization(const std::string& filename)
 	////write meta-data first, if you want
 	if (file.is_open())
 	{
+		//get size of vectors to integers.
 		int a = myIndexed_vertices.size();
 		int b = myIndexed_uvs.size();
 		int c = myIndexed_normals.size();
 		int d = myIndices.size();
-		//write length of vectors, https://stackoverflow.com/a/31213593
+
+		//write sizes of vectors, https://stackoverflow.com/a/31213593
 		file.write(reinterpret_cast<char*>(&a), sizeof(a));
 		file.write(reinterpret_cast<char*>(&b), sizeof(b));
 		file.write(reinterpret_cast<char*>(&c), sizeof(c));
@@ -205,24 +159,6 @@ void ObjReader::Serialization(const std::string& filename)
 		file.write(reinterpret_cast<char*>(&myIndices[0]), sizeof(unsigned short) * myIndices.size());
 	}
 	file.close();
-	//	for (int i = 0; i < Vertices; i++) //might be possible to use Vertices.data() instead of for looping through every element. Google how to write and read a c++ vector from a binary file.
-	//	{
-	//		vertices[i].WriteTo(file);
-	//	}
-	//	for (int i = 0; i < UVs; i++)
-	//	{
-	//		uvs[i].WriteTo(file);
-	//	}
-	//	for (int i = 0; i < Normals; i++)
-	//	{
-	//		normals[i].WriteTo(file);
-	//	}
-	//	for (int i = 0; i < Faces; i++)
-	//	{
-	//		faces[i].WriteTo(file);
-	//	}
-	//}
-	//file.close();
 }
 
 void ObjReader::Deserialization(const std::string& filename)
@@ -232,7 +168,6 @@ void ObjReader::Deserialization(const std::string& filename)
 	////read meta-data if you wrote that.
 	if (file.is_open())
 	{
-		
 		int vertice;
 		int uv;
 		int normal;
@@ -244,6 +179,7 @@ void ObjReader::Deserialization(const std::string& filename)
 		file.read(reinterpret_cast<char*>(&normal), sizeof(normal));
 		file.read(reinterpret_cast<char*>(&index), sizeof(index));
 
+		//resize vectors to the size read from binary file.
 		myIndexed_vertices.resize(vertice);
 		myIndexed_uvs.resize(uv);
 		myIndexed_normals.resize(normal);
@@ -254,29 +190,6 @@ void ObjReader::Deserialization(const std::string& filename)
 		file.read(reinterpret_cast<char*>(&myIndexed_uvs[0]), sizeof(glm::vec2) * myIndexed_uvs.size());
 		file.read(reinterpret_cast<char*>(&myIndexed_normals[0]), sizeof(glm::vec3)* myIndexed_normals.size());
 		file.read(reinterpret_cast<char*>(&myIndices[0]), sizeof(unsigned short) * myIndices.size());
-
-		//allocate arrays for all data to be read, based on the numbers above.
-		//AllocateArrays();
 	}
 	file.close();
-	//	//read all the data
-	//	for (int i = 0; i < Vertices; i++)
-	//	{
-	//		vertices[i].ReadFrom(file);
-	//	}
-	//	for (int i = 0; i < UVs; i++)
-	//	{
-	//		uvs[i].ReadFrom(file);
-	//	}
-	//	for (int i = 0; i < Normals; i++)
-	//	{
-	//		normals[i].ReadFrom(file);
-	//	}
-	//	for (int i = 0; i < Faces; i++)
-	//	{
-	//		faces[i].ReadFrom(file);
-	//	}
-	//}
-	//
-	//file.close();
 }

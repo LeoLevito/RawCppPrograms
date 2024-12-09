@@ -9,7 +9,11 @@ Camera* Camera::instance = nullptr; //it's supposedly possible to avoid this, se
 
 Camera::Camera()
 {
-	projection = glm::perspective(glm::radians(45.0f), 1280.f / 720.f, 0.1f, 100.0f); //should make variables out of 1280 / 720.
+	FOV = 45.f;
+	nearClipLane = 0.1f;
+	farClipLane = 100.f;
+	isOrthographic = false;
+	projection = glm::perspective(glm::radians(FOV), 1280.f / 720.f, nearClipLane, farClipLane); //should make variables out of 1280 / 720.
 
 	myDirection = glm::vec3(0.0f, 0.0f, -1.0f);
 	myPosition = glm::vec3(0.0f, 0.0f, 3.0f);
@@ -38,7 +42,20 @@ void Camera::SetDirection(const glm::vec3& direction)
 	//std::cout << "CAMERA ROTATION(?) NORMALIZED: " << myDirection.x << " " << myDirection.y << " " << myDirection.z << "\n";
 }
 
+void Camera::UpdateCameraProjection()
+{
+	if (isOrthographic)
+	{
+		projection = glm::ortho(0.f, 12.80f, 0.f, 7.20f, nearClipLane, farClipLane);
+	}
+	else
+	{
+		projection = glm::perspective(glm::radians(FOV), 1280.f / 720.f, nearClipLane, farClipLane);
+	}
+	
+}
 
+//pivot point move?
 
 Camera& Camera::Get()
 {

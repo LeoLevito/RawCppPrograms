@@ -5,6 +5,7 @@
 #include <string>
 #include <GameObjectTest.h>
 #include <iostream>
+#include <gtc/matrix_transform.hpp>
 
 void EditorGUI::Initialize(GLFWwindow* window, Graphics* graphics, GameObjectManager* gameObjectManager, Camera& camera, Shader& shader)
 {
@@ -46,6 +47,7 @@ void EditorGUI::StartImGuiFrame(float deltaTime)
 	//CHANGE THIS TO WHATEVER I WANT / NEED!
 	ImGui::ShowDemoWindow(); // Show demo window! :)
 	FrameRateWindow(deltaTime);
+	CameraWindow();
 	//HierarchyWindow(myCamera, myProjection, myShader);
 }
 
@@ -118,4 +120,44 @@ void EditorGUI::HierarchyWindow(Camera& camera, glm::mat4& projection, Shader& s
 		ImGui::PopID();
 	}
 	ImGui::End(); //stop rendering new ImGui window
+}
+
+void EditorGUI::CameraWindow()
+{
+	ImGui::Begin("Camera settings");
+
+	if (ImGui::SliderFloat("FOV slider", &Camera::Get().FOV, 5, 120))
+	{
+		Camera::Get().UpdateCameraProjection();
+	}
+
+	if (ImGui::SliderFloat("Near clip", &Camera::Get().nearClipLane, 0.001f, 10.f))
+	{
+		Camera::Get().UpdateCameraProjection();
+	}
+
+	if (ImGui::SliderFloat("Far clip", &Camera::Get().farClipLane, 11.f, 1000.f))
+	{
+		Camera::Get().UpdateCameraProjection();
+	}
+
+	if (ImGui::Checkbox("orthographic", &Camera::Get().isOrthographic)) 
+	{
+		Camera::Get().UpdateCameraProjection();
+	}
+	//std::cout << Camera::Get().myPosition << std::endl;
+
+	ImGui::Text("Camera position: %f %f %f", Camera::Get().myPosition.x, Camera::Get().myPosition.y, Camera::Get().myPosition.z);
+	ImGui::Text("Camera direction: %f %f %f", Camera::Get().myDirection.x, Camera::Get().myDirection.y, Camera::Get().myDirection.z);
+	ImGui::Text("Camera up: %f %f %f", Camera::Get().myUp.x, Camera::Get().myUp.y, Camera::Get().myUp.z);
+	ImGui::Text("Camera right: %f %f %f", Camera::Get().myRight.x, Camera::Get().myRight.y, Camera::Get().myRight.z);
+	//ImGui::Text("Camera speed: %f", &Camera::Get().MoveSpeed); //need to call flying camera for this.
+	
+	// //add new camera (not implemented as of yet, need to make a camera manager).
+	//if (ImGui::Button("Add new Camera", &CameraManager::Get().AddNewCamera()))
+	//{
+	//	Camera::Get().UpdateCameraProjection();
+	//}
+
+	ImGui::End();
 }

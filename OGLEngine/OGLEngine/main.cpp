@@ -21,8 +21,8 @@ void voidfunc(int input) {
 	{
 		std::lock_guard<std::mutex> myGuard(mutexTest_mutex); //where to put mutex locks for proper thread writing to same variable? Inside for loop, outside? Before or after?
 		std::cout << "Thread: " << input << " has control." << std::endl;
-		//rama = input + i;
-		mutexTest = input + i; //so multiple threads trying to access this might be causing slowdown when mutex is locked, which is a good thing. But multithreading is SIGNIFICANTLY FASTER when using a local variable that's created by each thread. So maybe try to minimize two threads accessing the same data, and if it's needed use a mutex.
+		rama = input + i;
+		//mutexTest = input + i; //so multiple threads trying to access this might be causing slowdown when mutex is locked, which is a good thing. But multithreading is SIGNIFICANTLY FASTER when using a local variable that's created by each thread. So maybe try to minimize two threads accessing the same data, and if it's needed use a mutex.
 	}
 	//mutexTest = input;
 	//std::lock_guard<std::mutex> myGuard(mutexTest_mutex); //having the mutex lock here before the print results in correct std::endl usage.
@@ -31,7 +31,6 @@ void voidfunc(int input) {
 }
 int main()
 {
-
 	//std::thread t1(voidfunc, 1);
 	//std::thread t2(voidfunc, 2);
 	//std::thread t3(voidfunc, 3);
@@ -130,8 +129,13 @@ int main()
 
 		engine->Update(graphics->window,deltaTime);
 		graphics->Render();
+
+		//std::thread t1(&EditorGUI::HierarchyWindow, editorGUI, std::ref(Camera::Get()), std::ref(Camera::Get().projection), std::ref(*graphics->myShader));
+		//t1.join();
 		editorGUI->HierarchyWindow(Camera::Get(), Camera::Get().projection, *graphics->myShader);
 
+		/*std::thread t2(&EditorGUI::RenderImGui, editorGUI, std::ref(Camera::Get().projection));
+		t2.join();*/
 		editorGUI->RenderImGui(Camera::Get().projection);
 		glfwSwapBuffers(graphics->window); //moved from Graphics::Render().
 	}

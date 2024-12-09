@@ -15,10 +15,6 @@ public:
 
 	bool parseOBJ(const std::string& filename, std::vector<unsigned short>& indices, std::vector<glm::vec3>& indexed_vertices, std::vector<glm::vec2>& indexed_uvs, std::vector<glm::vec3>& indexed_normals);
 
-	bool ReadFrom(std::iostream& file);
-
-	bool WriteTo(std::iostream& file) const;
-
 	void Serialization(const std::string& filename);
 
 	void Deserialization(const std::string& filename);

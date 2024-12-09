@@ -11,6 +11,7 @@ public:
 	void SetNewCursorPosition();
 	void MoveCamera();
 	void RotateCamera(bool firstTimeRun);
+	void MyScrollCallback(GLFWwindow* window, double xOffset, double yOffset);
 private:
 	Camera* myCamera;
 	Input* myInput;

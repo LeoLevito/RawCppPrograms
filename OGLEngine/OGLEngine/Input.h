@@ -6,6 +6,7 @@ public:
 	Input(GLFWwindow* window);
 	static void KeyCallBack(GLFWwindow* window, int key, int scancode, int action, int mods);
 	static void MouseCallBack(GLFWwindow* window, double xPos, double yPos);
+	static void ScrollCallBack(GLFWwindow* window, double xOffset, double yOffset);
 	float GetCursorX();
 	float GetCursorY();
 	void SetCursorX(float x);
@@ -14,6 +15,8 @@ public:
 	bool IsKeyPressed(const int& key);
 	bool IsKeyDown(const int& key);
 	bool IsMouseButtonDown(const int& button);
+	int GetScrollValue();
+
 private:
 	GLFWwindow* myWindow;
 };

@@ -3,7 +3,7 @@
 #include <iostream>
 
 const float Sensitivity = 0.5f;
-const float MoveSpeed = 10.0f;
+const float MoveSpeed = 1.0f;
 
 FlyingCamera::FlyingCamera(Camera* camera, Input* input, EngineTime* engineTime, GLFWwindow* window)
 {
@@ -11,6 +11,8 @@ FlyingCamera::FlyingCamera(Camera* camera, Input* input, EngineTime* engineTime,
 	myInput = input;
 	myEngineTime = engineTime;
 	myWindow = window;
+
+
 }
 
 void FlyingCamera::Update() //maybe this entire update should be run only if the right mouse button is down. 
@@ -42,7 +44,7 @@ void FlyingCamera::MoveCamera()
 	if (myInput->IsKeyDown(GLFW_KEY_E)) velocity.y = 1;
 	if (myInput->IsKeyDown(GLFW_KEY_Q)) velocity.y = -1;
 
-	myCamera->CameraMove(velocity * MoveSpeed * myEngineTime->DeltaTime());
+	myCamera->CameraMove(velocity * MoveSpeed * (float)myInput->GetScrollValue() * myEngineTime->DeltaTime());
 }
 
 void FlyingCamera::RotateCamera(bool firstTimeRun)
@@ -89,4 +91,9 @@ void FlyingCamera::RotateCamera(bool firstTimeRun)
 	direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
 
 	myCamera->SetDirection(direction);
+}
+
+void FlyingCamera::MyScrollCallback(GLFWwindow* window, double xOffset, double yOffset)
+{
+	std::cout << "test" << std::endl;
 }

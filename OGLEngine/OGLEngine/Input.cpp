@@ -6,6 +6,7 @@ std::unordered_map<int, bool> myKeyStates; //this will get bigger and bigger as 
 
 float lastX;
 float lastY;
+int scrollIterator = 1;
 
 Input::Input(GLFWwindow* window)
 {
@@ -22,6 +23,8 @@ Input::Input(GLFWwindow* window)
 
 	glfwSetKeyCallback(window, KeyCallBack);
 	glfwSetCursorPosCallback(window, MouseCallBack);
+	glfwSetScrollCallback(window, ScrollCallBack);
+
 }
 
 void Input::KeyCallBack(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -40,6 +43,15 @@ void Input::MouseCallBack(GLFWwindow* window, double xPos, double yPos)
 {
 	lastX = xPos;
 	lastY = yPos;
+}
+
+void Input::ScrollCallBack(GLFWwindow* window, double xOffset, double yOffset)
+{
+	scrollIterator += yOffset; 
+	if (scrollIterator < 1)
+	{
+		scrollIterator = 1;
+	}
 }
 
 float Input::GetCursorX()
@@ -85,4 +97,9 @@ bool Input::IsKeyDown(const int& key)
 bool Input::IsMouseButtonDown(const int& button)
 {
 	return glfwGetMouseButton(myWindow, button) == GLFW_PRESS;
+}
+
+int Input::GetScrollValue()
+{
+	return scrollIterator;
 }

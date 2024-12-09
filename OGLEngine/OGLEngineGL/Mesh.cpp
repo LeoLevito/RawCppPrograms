@@ -2,6 +2,7 @@
 #include <GLAD/glad.h>
 #include "Shader.h"
 #include <iostream>
+#include <thread>
 
 Mesh::Mesh(float* vertices, size_t vertexSize, unsigned int* indices, size_t indexSize)
 {
@@ -47,6 +48,15 @@ Mesh::Mesh(ObjReader* objreader, vboindexer* VBOindexer, const char* modelPath) 
 	//indexed_vertices.clear();
 	//indexed_uvs.clear();
 	//indexed_normals.clear();
+	std::string* rama  = new std::string(modelPath);
+	std::string rama2 = modelPath;
+
+	//std::thread t1(&ObjReader::Serialization, objreader, rama2);
+
+	//okay so this still grinds the application to a halt when loading new big mesh.
+	//std::thread t2(&ObjReader::parseOBJ, objreader, *rama, std::ref(indices), std::ref(indexed_vertices), std::ref(indexed_uvs), std::ref(indexed_normals));
+	//t2.join();
+	//t2.join();
 
 	bool res = objreader->parseOBJ(modelPath, indices, indexed_vertices, indexed_uvs, indexed_normals);
 

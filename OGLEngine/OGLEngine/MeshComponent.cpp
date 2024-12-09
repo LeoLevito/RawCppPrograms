@@ -11,6 +11,7 @@
 #include <TransformComponent.h>
 #include <GameObject.h>
 #include <windows.h>
+#include <thread>
 
 MeshComponent::MeshComponent()
 {
