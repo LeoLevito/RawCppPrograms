@@ -144,7 +144,10 @@
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MeshComponent.cpp" />
+    <ClCompile Include="Message.cpp" />
+    <ClCompile Include="MessageQueueClass.cpp" />
     <ClCompile Include="Mutex.cpp" />
+    <ClCompile Include="RaycastMessage.cpp" />
     <ClCompile Include="Thread.cpp" />
     <ClCompile Include="TransformComponent.cpp" />
   </ItemGroup>
@@ -157,7 +160,10 @@
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="MeshComponent.h" />
+    <ClInclude Include="Message.h" />
+    <ClInclude Include="MessageQueueClass.h" />
     <ClInclude Include="Mutex.h" />
+    <ClInclude Include="RaycastMessage.h" />
     <ClInclude Include="Thread.h" />
     <ClInclude Include="TransformComponent.h" />
   </ItemGroup>

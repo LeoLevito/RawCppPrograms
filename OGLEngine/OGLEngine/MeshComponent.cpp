@@ -22,8 +22,7 @@ MeshComponent::MeshComponent()
 	myShader->Initialize("../Shaders/VertexShader.vertexs", "../Shaders/FragmentShader.fragments");
 
 	myObjReader = new ObjReader;
-	myVBOindexer = new vboindexer;
-	mesh = new Mesh(myObjReader, myVBOindexer, "../Models/TreeTrunk");
+	mesh = new Mesh(myObjReader, "../Models/TreeTrunk");
 	
 	mesh->ApplyTexture(myTexture);
 
@@ -38,10 +37,12 @@ MeshComponent::~MeshComponent()
 	delete myShader;
 	delete myTexture;
 	delete mesh;
+	delete myObjReader;
 }
 
 void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 {
+	Component::DrawComponentSpecificImGuiHierarchyAdjustables();
 	//Change texture of mesh using ImGui. Would ideally improve this by being able to choose available textures from a drop down menu for example.
 	static char str0[128] = "Bliss2.jpg"; //how it's done in the ImGui demo, tho it is replicated across all objects now...
 	ImGui::InputText("Texture name", str0, IM_ARRAYSIZE(str0)); //Yeah, I gotta change this to a dropdown or something.
@@ -73,7 +74,7 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 		printMemoryStatus();
 		//should probably delete mesh before assigning a new one so as to clear memory.
 		delete mesh;
-		mesh = new (std::nothrow) Mesh(myObjReader, myVBOindexer, path.c_str());
+		mesh = new (std::nothrow) Mesh(myObjReader, path.c_str());
 		if (mesh)
 		{
 			std::cout << "memory allocated successfully" << std::endl;

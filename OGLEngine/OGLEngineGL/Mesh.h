@@ -9,7 +9,7 @@ class Mesh
 {
 public:
 	Mesh(float* vertices, size_t vertexSize, unsigned int* indices, size_t indexSize); //constructor
-	Mesh(ObjReader* objreader, vboindexer* VBOindexer, const char* modelPath); //constructor 2 for obj
+	Mesh(ObjReader* objreader, const char* modelPath); //constructor 2 for obj
 	~Mesh(); //destructor
 	void Draw(Shader* shader);
 	void ApplyTexture(Texture* texture);

@@ -12,6 +12,7 @@ class ObjReader
 {
 public:
 	ObjReader();
+	~ObjReader();
 
 	bool parseOBJ(const std::string& filename, std::vector<unsigned short>& indices, std::vector<glm::vec3>& indexed_vertices, std::vector<glm::vec2>& indexed_uvs, std::vector<glm::vec3>& indexed_normals);
 

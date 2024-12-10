@@ -130,13 +130,13 @@ int main()
 		engine->Update(graphics->window,deltaTime);
 		graphics->Render();
 
-		//std::thread t1(&EditorGUI::HierarchyWindow, editorGUI, std::ref(Camera::Get()), std::ref(Camera::Get().projection), std::ref(*graphics->myShader));
-		//t1.join();
-		editorGUI->HierarchyWindow(Camera::Get(), Camera::Get().projection, *graphics->myShader);
 
+
+		editorGUI->RenderImGui(Camera::Get().projection);
+		//threading doesn't really work right now because it's still in the same while loop. That's my theory at least.
 		/*std::thread t2(&EditorGUI::RenderImGui, editorGUI, std::ref(Camera::Get().projection));
 		t2.join();*/
-		editorGUI->RenderImGui(Camera::Get().projection);
+
 		glfwSwapBuffers(graphics->window); //moved from Graphics::Render().
 	}
 	

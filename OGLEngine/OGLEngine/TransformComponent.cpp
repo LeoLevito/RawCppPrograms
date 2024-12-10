@@ -20,6 +20,7 @@ TransformComponent::~TransformComponent()
 
 void TransformComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 {
+	Component::DrawComponentSpecificImGuiHierarchyAdjustables();
 	ImGui::DragFloat3("Position", &position.x, .01f);
 	ImGui::DragFloat3("Rotation", &rotation.x, .01f);
 	ImGui::DragFloat3("Scale", &scale.x, .01f);

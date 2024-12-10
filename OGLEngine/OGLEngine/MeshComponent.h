@@ -19,7 +19,6 @@ public:
 	Texture* myTexture;
 	Shader* myShader;
 	ObjReader* myObjReader;
-	vboindexer* myVBOindexer;
 
 	void DrawComponentSpecificImGuiHierarchyAdjustables() override;
 

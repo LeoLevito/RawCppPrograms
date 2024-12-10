@@ -1,6 +1,7 @@
 #pragma once
 #include "GameObject.h"
 #include <vector>
+#include "Message.h"
 class GameObjectManager
 {
 public:
@@ -8,6 +9,8 @@ public:
 	void DeleteGameObject(GameObject* gameObject);
 
 	std::vector<GameObject*> gameObjects;
+
+	void ProcessMessage(Message* message);
 private:
 };
 

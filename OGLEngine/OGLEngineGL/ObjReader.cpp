@@ -9,6 +9,11 @@ ObjReader::ObjReader()
 	myVBOindexer = new vboindexer;
 }
 
+ObjReader::~ObjReader()
+{
+	delete myVBOindexer;
+}
+
 bool ObjReader::parseOBJ(const std::string& filename, std::vector<unsigned short>& indices, std::vector<glm::vec3>& indexed_vertices, std::vector<glm::vec2>& indexed_uvs, std::vector<glm::vec3>& indexed_normals)
 {
 	//moved vectors from mesh.cpp to here for vboindex call further down.

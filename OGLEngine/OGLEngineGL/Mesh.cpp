@@ -34,7 +34,7 @@ Mesh::Mesh(float* vertices, size_t vertexSize, unsigned int* indices, size_t ind
 
 }
 
-Mesh::Mesh(ObjReader* objreader, vboindexer* VBOindexer, const char* modelPath) //HERE IS WHERE I NEED TO FIX FOR .obj FILES TO DRAW CORRECTLY.
+Mesh::Mesh(ObjReader* objreader, const char* modelPath) //HERE IS WHERE I NEED TO FIX FOR .obj FILES TO DRAW CORRECTLY.
 {
 	//https://github.com/opengl-tutorials/ogl/blob/master/tutorial07_model_loading/tutorial07.cpp
 	//https://github.com/opengl-tutorials/ogl/blob/master/tutorial09_vbo_indexing/tutorial09.cpp

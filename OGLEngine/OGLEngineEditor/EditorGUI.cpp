@@ -47,8 +47,9 @@ void EditorGUI::StartImGuiFrame(float deltaTime)
 	//CHANGE THIS TO WHATEVER I WANT / NEED!
 	ImGui::ShowDemoWindow(); // Show demo window! :)
 	FrameRateWindow(deltaTime);
+	HierarchyWindow(Camera::Get(), Camera::Get().projection, *myGraphics->myShader);
 	CameraWindow();
-	//HierarchyWindow(myCamera, myProjection, myShader);
+
 }
 
 void EditorGUI::RenderImGui(glm::mat4& projection)
@@ -103,12 +104,17 @@ void EditorGUI::HierarchyWindow(Camera& camera, glm::mat4& projection, Shader& s
 			int componentIndex = 0;
 			for (Component* var : myGameObjectManager->gameObjects.at(objectIndex)->components) //for every component on the current index game object
 			{
+				int componentsSize = myGameObjectManager->gameObjects.at(objectIndex)->components.size();
 				if (ImGui::TreeNode(myGameObjectManager->gameObjects.at(objectIndex)->components.at(componentIndex)->name.c_str())) //treenode shall be named after the components attached to the specified game object!
 				{
 					myGameObjectManager->gameObjects.at(objectIndex)->components.at(componentIndex)->DrawComponentSpecificImGuiHierarchyAdjustables();
 					ImGui::TreePop();
 				}
-				componentIndex++;
+
+				if (myGameObjectManager->gameObjects.at(objectIndex)->components.size() == componentsSize)//check if vector has changed size, e.g. if we've deleted a game object. If the size hasn't changed we increase the iterator as per usual.
+				{
+					componentIndex++;
+				}
 			}
 			myGameObjectManager->gameObjects.at(objectIndex)->DrawObjectSpecificImGuiHierarchyAdjustables(myGameObjectManager->gameObjects); //allows deletion of game object without code above complaining about component being missing. I should probably stream line this a little bit.
 		}
@@ -117,6 +123,7 @@ void EditorGUI::HierarchyWindow(Camera& camera, glm::mat4& projection, Shader& s
 		{
 			objectIndex++;
 		}
+
 		ImGui::PopID();
 	}
 	ImGui::End(); //stop rendering new ImGui window
