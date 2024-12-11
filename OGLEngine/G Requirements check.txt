@@ -1,0 +1,22 @@
+To pass (G), complete the following tasks:
++ UI Framework set up (imgui or other alternative) --> (IMGUI)
++ Implement Entity and EntityManager classes --> (GAMEOBJECT AND GAMEOBJECTMANAGER)
++ Ability to manipulate Entity name, model, texture, position, rotation in the UI --> (CHECK)
++ Ability to render all entities --> (CHECK)
++ .obj-file loader implemented, including Vertices and Faces --> (CHECK)
+- Implement MeshManager which can load meshes, cache and re-use them
+- Write a small Game Engine Architecture document (2 pages minimum)
+- Implement Message class, including 2 sub-classes, and use them in at least 1 communication pattern between Managers in your project
+- Implement the MessageQueue functions in at least 1 Manager and demonstrate usage
+- Implement Memory checking functions, use it in one manager's allocations 
++ Implement serialization (ReadFrom, WriteTo file) for your Mesh class --> (HANDLED IN OBJREADER)
+- Implement Thread and Mutex functionality and run one of your message-supported Managers in its own thread, communicating only with messages
++ Implement a Camera class and UI to configure it for rendering your scene --> (CHECK)
++ Integrate one Texture-loader of choice (besides glfw) --> (STB_IMAGE)
+ 
+To pass with distinction (VG), complete 3 or more bonus tasks:
+- Extend .obj-file loader to load UVs, Normals and support Triangulization
+- Implement iterative resource (.obj-file or texture) loading to support loading huge files in single-threaded contexts
+- Implement a Camera Manager and ability to switch between different cameras, as well as key-bindings for simple camera movement (WSAD, arrow keys) 
+- Implement your own PNG-loader using zlib
+- Implement serialization for your scene/level (Entities, meta-data)
