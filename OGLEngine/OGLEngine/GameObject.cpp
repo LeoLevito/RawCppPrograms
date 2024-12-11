@@ -7,14 +7,6 @@
 #include "TransformComponent.h"
 #include "MeshComponent.h"
 
-//void GameObject::BeginPlay()
-//{
-//}
-//
-//void GameObject::Tick(float deltaTime)
-//{
-//}
-
 GameObject::GameObject()
 {
 	name = "Game object";
@@ -87,6 +79,7 @@ void GameObject::DrawObjectSpecificImGuiHierarchyAdjustables(std::vector<GameObj
 
 	if (ImGui::Button("Remove Game Object"))
 	{
+		//maybe I should make this a function, in case I want to call delete from another class. This would require vec be more accessible, like a singleton maybe.
 		vec.erase(std::remove(vec.begin(), vec.end(), this)); 
 		delete this;
 		std::cout << "Deletion of Game Object completed." << std::endl;

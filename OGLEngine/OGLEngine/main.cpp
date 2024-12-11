@@ -7,6 +7,7 @@
 #include <thread>
 #include <mutex>
 #include <iostream>
+#include "MeshManager.h"
 
 //float myWidth = 1280;
 //float myHeight = 720;
@@ -100,8 +101,6 @@ int main()
 	//
 
 	GameObjectManager* gameObjectManager = new GameObjectManager;
-	Camera::Allocate();
-
 	
 	Graphics* graphics = new Graphics;
 	graphics->Initialize(1280, 720, gameObjectManager);

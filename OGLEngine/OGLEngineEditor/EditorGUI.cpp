@@ -49,7 +49,7 @@ void EditorGUI::StartImGuiFrame(float deltaTime)
 	FrameRateWindow(deltaTime);
 	HierarchyWindow(Camera::Get(), Camera::Get().projection, *myGraphics->myShader);
 	CameraWindow();
-
+	MainMenuBar();
 }
 
 void EditorGUI::RenderImGui(glm::mat4& projection)
@@ -167,4 +167,122 @@ void EditorGUI::CameraWindow()
 	//}
 
 	ImGui::End();
+}
+
+void EditorGUI::MainMenuBar()
+{
+	if (ImGui::BeginMainMenuBar())
+	{
+		if (ImGui::BeginMenu("File"))
+		{
+			if (ImGui::MenuItem("New"))
+			{
+
+			}
+			if (ImGui::MenuItem("Open"))
+			{
+
+			}
+			if (ImGui::MenuItem("Save", "Ctrl+S"))
+			{
+				Serialization("../Levels/LevelSaveTest.test");
+			}
+			if (ImGui::MenuItem("Save As..."))
+			{
+
+			}
+			if (ImGui::MenuItem("Load"))
+			{
+				Deserialization("../Levels/LevelSaveTest.test");
+			}
+			ImGui::EndMenu();
+		}
+		if (ImGui::BeginMenu("Edit"))
+		{
+			if (ImGui::MenuItem("Undo", "Ctrl+Z"))
+			{
+
+			}
+			if (ImGui::MenuItem("Redo", "Ctrl+Shift+Z", false,false)) //disabled item, need to update false to true whenever I get this functionality in and can redo stuff.
+			{
+
+			}
+			if (ImGui::MenuItem("Cut", "Ctrl+X"))
+			{
+
+			}
+			if (ImGui::MenuItem("Copy", "Ctrl+C"))
+			{
+
+			}
+			if (ImGui::MenuItem("Paste", "Ctrl+V"))
+			{
+
+			}
+			ImGui::EndMenu();
+		}
+		ImGui::EndMainMenuBar();
+	}
+
+}
+
+void EditorGUI::Serialization(const std::string& filename)
+{
+	//I could try to write the entire GameObjectManager, if it's possible to even do something like that. Like, getting everything in it and writing/reading all of the data to a binary file.
+	std::fstream file;
+	file.open(filename.c_str(), std::ios_base::out | std::ios_base::binary);
+	static const size_t DATA_CAPACITY = 0x1000;
+
+	if (file.is_open())
+	{
+		//get size of vectors to integers.
+		int a = myGameObjectManager->gameObjects.size();
+
+		//write sizes of vectors, https://stackoverflow.com/a/31213593
+		file.write(reinterpret_cast<char*>(&a), sizeof(a));
+		//write contents of vectors, https://stackoverflow.com/a/31213593
+		file.write(reinterpret_cast<char*>(&myGameObjectManager->gameObjects[0]), sizeof(GameObject) * myGameObjectManager->gameObjects.size());
+
+		for (size_t i = 0; i < a; i++)
+		{
+			int b = myGameObjectManager->gameObjects[i]->components.size();
+			if (b > 0)
+			{
+				file.write(reinterpret_cast<char*>(&b), sizeof(b));
+				file.write(reinterpret_cast<char*>(&myGameObjectManager->gameObjects[i]->components[0]), sizeof(Component) * myGameObjectManager->gameObjects[i]->components.size());
+			}
+		}
+	}
+	file.close();
+}
+
+void EditorGUI::Deserialization(const std::string& filename)
+{
+	std::fstream file;
+	file.open(filename.c_str(), std::ios_base::in | std::ios_base::binary);
+	if (file.is_open())
+	{
+		int a;
+
+		//read sizes of vectors, https://stackoverflow.com/a/31213593
+		file.read(reinterpret_cast<char*>(&a), sizeof(a)); //I see the issue now, we don't know the size of the vector when we want to read it, and since we input the size of an empty vector right now, it's gonna return nothing as well. so maybe we need to write the size to the file for us to retrieve when reading it.
+		myGameObjectManager->gameObjects.clear();
+		myGameObjectManager->gameObjects.resize(a);
+
+		//read contents of vectors, https://stackoverflow.com/a/31213593
+		file.read(reinterpret_cast<char*>(&myGameObjectManager->gameObjects[0]), sizeof(GameObject) * myGameObjectManager->gameObjects.size());
+		
+		for (size_t i = 0; i < a; i++)
+		{
+			int b;
+			file.read(reinterpret_cast<char*>(&b), sizeof(b));
+			if (b > 0)
+			{
+				myGameObjectManager->gameObjects[i]->components.clear();
+				myGameObjectManager->gameObjects[i]->components.resize(b);
+				file.write(reinterpret_cast<char*>(&myGameObjectManager->gameObjects[i]->components[0]), sizeof(Component) * myGameObjectManager->gameObjects[i]->components.size());
+			}
+		}
+	}
+	file.close();
 }

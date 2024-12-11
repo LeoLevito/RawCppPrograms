@@ -18,7 +18,6 @@ public:
 	Mesh* mesh;
 	Texture* myTexture;
 	Shader* myShader;
-	ObjReader* myObjReader;
 
 	void DrawComponentSpecificImGuiHierarchyAdjustables() override;
 

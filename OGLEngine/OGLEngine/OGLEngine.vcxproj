@@ -142,8 +142,11 @@
     <ClCompile Include="GameObjectManager.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Input.cpp" />
+    <ClCompile Include="IWritable.cpp" />
+    <ClCompile Include="Level.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MeshComponent.cpp" />
+    <ClCompile Include="MeshManager.cpp" />
     <ClCompile Include="Message.cpp" />
     <ClCompile Include="MessageQueueClass.cpp" />
     <ClCompile Include="Mutex.cpp" />
@@ -159,7 +162,10 @@
     <ClInclude Include="GameObjectManager.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Input.h" />
+    <ClInclude Include="IWritable.h" />
+    <ClInclude Include="Level.h" />
     <ClInclude Include="MeshComponent.h" />
+    <ClInclude Include="MeshManager.h" />
     <ClInclude Include="Message.h" />
     <ClInclude Include="MessageQueueClass.h" />
     <ClInclude Include="Mutex.h" />

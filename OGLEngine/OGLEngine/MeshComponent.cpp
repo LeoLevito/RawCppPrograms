@@ -12,6 +12,7 @@
 #include <GameObject.h>
 #include <windows.h>
 #include <thread>
+#include <MeshManager.h>
 
 MeshComponent::MeshComponent()
 {
@@ -21,8 +22,7 @@ MeshComponent::MeshComponent()
 	myShader = new Shader;
 	myShader->Initialize("../Shaders/VertexShader.vertexs", "../Shaders/FragmentShader.fragments");
 
-	myObjReader = new ObjReader;
-	mesh = new Mesh(myObjReader, "../Models/TreeTrunk");
+	mesh = MeshManager::Get().LoadMesh("../Models/TreeTrunk");
 	
 	mesh->ApplyTexture(myTexture);
 
@@ -37,7 +37,6 @@ MeshComponent::~MeshComponent()
 	delete myShader;
 	delete myTexture;
 	delete mesh;
-	delete myObjReader;
 }
 
 void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
@@ -74,7 +73,7 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 		printMemoryStatus();
 		//should probably delete mesh before assigning a new one so as to clear memory.
 		delete mesh;
-		mesh = new (std::nothrow) Mesh(myObjReader, path.c_str());
+		mesh = MeshManager::Get().LoadMesh(path);
 		if (mesh)
 		{
 			std::cout << "memory allocated successfully" << std::endl;

@@ -16,6 +16,11 @@ public:
 	void FrameRateWindow(float deltaTime);
 	void HierarchyWindow(Camera& camera, glm::mat4& projection, Shader& shader);
 	void CameraWindow();
+	void MainMenuBar();
+
+	//testing if writing whole game objects will work.
+	void Serialization(const std::string& filename);
+	void Deserialization(const std::string& filename);
 private:
 	Graphics* myGraphics;
 	GameObjectManager* myGameObjectManager;

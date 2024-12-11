@@ -9,9 +9,9 @@ void MessageQueueClass::ProcessMessages()
 {
 	while (messages.size())
 	{
-		Message* message = messages.pop_back();
+		/*Message* message = messages.pop_back();
 		ProcessMessage(message);
-		delete message;
+		delete message;*/
 	}
 
 	//https://gamedev.stackexchange.com/questions/7718/event-driven-communication-in-a-game-engine-yes-or-no

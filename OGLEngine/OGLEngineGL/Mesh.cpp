@@ -34,7 +34,7 @@ Mesh::Mesh(float* vertices, size_t vertexSize, unsigned int* indices, size_t ind
 
 }
 
-Mesh::Mesh(ObjReader* objreader, const char* modelPath) //HERE IS WHERE I NEED TO FIX FOR .obj FILES TO DRAW CORRECTLY.
+Mesh::Mesh(ObjReader* objreader, const std::string& filename) //HERE IS WHERE I NEED TO FIX FOR .obj FILES TO DRAW CORRECTLY.
 {
 	//https://github.com/opengl-tutorials/ogl/blob/master/tutorial07_model_loading/tutorial07.cpp
 	//https://github.com/opengl-tutorials/ogl/blob/master/tutorial09_vbo_indexing/tutorial09.cpp
@@ -48,8 +48,8 @@ Mesh::Mesh(ObjReader* objreader, const char* modelPath) //HERE IS WHERE I NEED T
 	//indexed_vertices.clear();
 	//indexed_uvs.clear();
 	//indexed_normals.clear();
-	std::string* rama  = new std::string(modelPath);
-	std::string rama2 = modelPath;
+	std::string* rama  = new std::string(filename);
+	std::string rama2 = filename;
 
 	//std::thread t1(&ObjReader::Serialization, objreader, rama2);
 
@@ -58,7 +58,7 @@ Mesh::Mesh(ObjReader* objreader, const char* modelPath) //HERE IS WHERE I NEED T
 	//t2.join();
 	//t2.join();
 
-	bool res = objreader->parseOBJ(modelPath, indices, indexed_vertices, indexed_uvs, indexed_normals);
+	bool res = objreader->parseOBJ(filename, indices, indexed_vertices, indexed_uvs, indexed_normals);
 
 	if (!res) //can just call parse obj in an if statement instead of doing this after calling it.
 	{
@@ -152,6 +152,7 @@ Mesh::~Mesh() //when mesh is deleted, also delete Vertex Array and Vertex Buffer
 
 void Mesh::Draw(Shader* shader) //Draw mesh;
 {
+	std::cout << "How many times does it draw until no texture is found?" << std::endl;
 	if (myTexture != NULL) 
 	{
 		glBindTexture(GL_TEXTURE_2D, myTexture->TextureObject); //so we have a new texture binding in Draw() because otherwise fragment shader would take the last binded texture, this allows us to use different textures for different objects (in the future).

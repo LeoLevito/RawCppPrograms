@@ -5,8 +5,6 @@
 
 glm::vec3 WorldUp = glm::vec3(0.0f, 1.0f, 0.0f); //like is this allowed in C++?
 
-Camera* Camera::instance = nullptr; //it's supposedly possible to avoid this, see https://youtu.be/PPup1yeU45I?t=888
-
 Camera::Camera()
 {
 	FOV = 45.f;
@@ -59,14 +57,8 @@ void Camera::UpdateCameraProjection()
 
 Camera& Camera::Get()
 {
-	return *instance;
-}
-
-void Camera::Allocate()
-{
-	//we only want one instance so we do an assert.
-	assert(instance == nullptr); //assert will terminate the program if its argument is false. Common to use when debugging to make the program fail more obviously if an unexpected condition occurs. So basically this is a nullptr check that will terminate the program if false, if I understand correctly.
-	instance = new Camera();
+	static Camera instance;
+	return instance;
 }
 
 //projection matrix is something our objects will be transformed with. The projection matrix calculations happen when we multiply the rest of our matrices (in the vertex shader)
