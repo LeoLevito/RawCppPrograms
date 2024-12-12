@@ -36,7 +36,7 @@ MeshComponent::~MeshComponent()
 	std::cout << "-->Deleting Mesh component." << std::endl;
 	delete myShader;
 	delete myTexture;
-	delete mesh;
+	//delete mesh; //now we cache meshes in the MeshManager, so deleting here screws things up in the MeshManager.
 }
 
 void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
@@ -72,7 +72,7 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 
 		printMemoryStatus();
 		//should probably delete mesh before assigning a new one so as to clear memory.
-		delete mesh;
+		//delete mesh; //woah is it because I delete the mesh?
 		mesh = MeshManager::Get().LoadMesh(path);
 		if (mesh)
 		{

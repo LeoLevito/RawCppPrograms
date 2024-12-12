@@ -32,5 +32,7 @@ private:
 		glm::vec3 Normal;
 		glm::vec2 TexCoords;
 	};
+
+	int rama = 0;
 };
 

@@ -16,7 +16,7 @@ public:
 	//Should I just cache every mesh? No that's a bad idea.
 	//but maybe I can just get an element of this vector and set the mesh to that?
 	std::vector<Mesh*> meshes;
-	std::vector<const std::string*> CachedMeshes; //(should I do this?)
+	std::vector<std::string> CachedMeshes; //(should I do this?) I don't think const is gonna work
 	ObjReader* objreader;
 private:
 

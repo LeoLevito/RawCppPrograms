@@ -20,14 +20,14 @@ MeshManager& MeshManager::Get()
 
 Mesh* MeshManager::LoadMesh(const std::string& filename)
 {
-	for (size_t i = 0; i < CachedMeshes.size(); i++) //why coesn't CachedMeshes know what it has? It just says error can't read string or whatever?
+	for (size_t i = 0; i < CachedMeshes.size(); i++) //why doesn't CachedMeshes know what it has? It just says error can't read string or whatever?
 	{
-		if (CachedMeshes[i] == &filename) {
+		if (CachedMeshes[i] == filename) { //since ImGui entry doesn't require proper capitalization, there can be situations where we load the same mesh multiple times when we don't need to. This would be fixed by having a dropdown to choose meshes from instead of a string entry.
 			return meshes[i];
 		}
 	}
 	Mesh* mesh = new Mesh(objreader, filename);
 	meshes.push_back(mesh);
-	CachedMeshes.push_back(&filename);
+	CachedMeshes.push_back(filename);
 	return mesh;
 }
