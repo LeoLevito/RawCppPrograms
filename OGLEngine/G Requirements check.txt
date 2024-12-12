@@ -4,7 +4,7 @@ To pass (G), complete the following tasks:
 + Ability to manipulate Entity name, model, texture, position, rotation in the UI --> (CHECK)
 + Ability to render all entities --> (CHECK)
 + .obj-file loader implemented, including Vertices and Faces --> (CHECK)
-- Implement MeshManager which can load meshes, cache and re-use them
++ Implement MeshManager which can load meshes, cache and re-use them
 - Write a small Game Engine Architecture document (2 pages minimum)
 - Implement Message class, including 2 sub-classes, and use them in at least 1 communication pattern between Managers in your project
 - Implement the MessageQueue functions in at least 1 Manager and demonstrate usage
