@@ -165,7 +165,8 @@ void Mesh::Draw(Shader* shader) //Draw mesh;
 
 	if (IndicesSize > 0) //Draw loaded obj model. Hopefully.
 	{
-		glDrawElements(GL_TRIANGLES, IndicesSize, GL_UNSIGNED_SHORT, (void*)0);
+		//glDrawArrays(GL_TRIANGLES, 0, 50);
+		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, (void*)0);
 	}
 	else //Draw Cube
 	{

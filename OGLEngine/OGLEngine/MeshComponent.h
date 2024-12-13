@@ -7,6 +7,9 @@
 #include <string>
 #include "ObjReader.h"
 #include "vboindexer.h"
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 
 class ObjReader;
 
@@ -29,5 +32,6 @@ public:
 
 	void Update(Shader* shader) override;
 private:
+	bool hello = false;
 };
 

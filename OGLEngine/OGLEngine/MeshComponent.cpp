@@ -72,11 +72,26 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 		//should probably delete mesh before assigning a new one so as to clear memory.
 		//delete mesh; //woah is it because I delete the mesh?
 		mesh = MeshManager::Get().LoadMesh(path);
-		
+		if (mesh == nullptr)
+		{
+			hello = true;
+		}
+		else
+		{
+			hello = false;
+		}
+
 		//should do like an ImGui warning popup saying that the mesh couldn't load in case the parse fails. 
 		//maybe ImGui::IsPopupOpen()?)
 		mesh->ApplyTexture(myTexture);
 	}
+	if (hello != false)
+	{
+		ImGui::SameLine();
+		ImGui::Text("Mesh not loaded correctly.");
+	}
+
+	
 }
 
 void MeshComponent::DrawMesh(Shader& shader)
