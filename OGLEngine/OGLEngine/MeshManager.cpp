@@ -1,5 +1,6 @@
 #include "MeshManager.h"
-
+#include <iostream>
+#include <windows.h>
 
 
 MeshManager::MeshManager()
@@ -26,8 +27,22 @@ Mesh* MeshManager::LoadMesh(const std::string& filename)
 			return meshes[i];
 		}
 	}
+
+	PrintMemoryStatus();
 	Mesh* mesh = new Mesh(objreader, filename);
+	PrintMemoryStatus();
+
 	meshes.push_back(mesh);
 	CachedMeshes.push_back(filename);
 	return mesh;
+
+}
+
+void MeshManager::PrintMemoryStatus()
+{
+	MEMORYSTATUSEX statex;
+	statex.dwLength = sizeof(statex);
+	GlobalMemoryStatusEx(&statex);
+	std::cout << "There is " << statex.ullAvailPhys / (1024 * 1024) << " MB of physical memory available." << std::endl;
+	std::cout << "There is " << statex.ullAvailVirtual / (1024 * 1024) << " MB of virtual memory available." << std::endl;
 }

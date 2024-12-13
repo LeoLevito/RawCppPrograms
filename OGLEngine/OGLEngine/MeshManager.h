@@ -19,6 +19,6 @@ public:
 	std::vector<std::string> CachedMeshes; //(should I do this?) I don't think const is gonna work
 	ObjReader* objreader;
 private:
-
+	void PrintMemoryStatus();
 };
 

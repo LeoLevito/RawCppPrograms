@@ -5,10 +5,10 @@ To pass (G), complete the following tasks:
 + Ability to render all entities --> (CHECK)
 + .obj-file loader implemented, including Vertices and Faces --> (CHECK)
 + Implement MeshManager which can load meshes, cache and re-use them
-- Write a small Game Engine Architecture document (2 pages minimum)
++ Write a small Game Engine Architecture document (2 pages minimum)
 - Implement Message class, including 2 sub-classes, and use them in at least 1 communication pattern between Managers in your project
 - Implement the MessageQueue functions in at least 1 Manager and demonstrate usage
-- Implement Memory checking functions, use it in one manager's allocations 
++ Implement Memory checking functions, use it in one manager's allocations 
 + Implement serialization (ReadFrom, WriteTo file) for your Mesh class --> (HANDLED IN OBJREADER)
 - Implement Thread and Mutex functionality and run one of your message-supported Managers in its own thread, communicating only with messages
 + Implement a Camera class and UI to configure it for rendering your scene --> (CHECK)

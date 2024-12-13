@@ -48,8 +48,8 @@ Mesh::Mesh(ObjReader* objreader, const std::string& filename) //HERE IS WHERE I 
 	//indexed_vertices.clear();
 	//indexed_uvs.clear();
 	//indexed_normals.clear();
-	std::string* rama  = new std::string(filename);
-	std::string rama2 = filename;
+	//std::string* rama  = new std::string(filename);
+	//std::string rama2 = filename;
 
 	//std::thread t1(&ObjReader::Serialization, objreader, rama2);
 
@@ -152,8 +152,6 @@ Mesh::~Mesh() //when mesh is deleted, also delete Vertex Array and Vertex Buffer
 
 void Mesh::Draw(Shader* shader) //Draw mesh;
 {
-	std::cout << "How many times does it draw until no texture is found? " << rama << std::endl;
-	rama++;
 
 	if (myTexture != NULL) 
 	{

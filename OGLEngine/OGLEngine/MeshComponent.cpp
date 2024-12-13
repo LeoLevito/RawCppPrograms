@@ -52,10 +52,9 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 
 		std::cout << path << std::endl;
 
-		printMemoryStatus();
 		delete myTexture;
 		myTexture = new Texture(path.c_str());
-		printMemoryStatus();
+
 		mesh->ApplyTexture(myTexture);
 	}
 
@@ -70,19 +69,10 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 
 		std::cout << path << std::endl;
 
-		printMemoryStatus();
 		//should probably delete mesh before assigning a new one so as to clear memory.
 		//delete mesh; //woah is it because I delete the mesh?
 		mesh = MeshManager::Get().LoadMesh(path);
-		if (mesh)
-		{
-			std::cout << "memory allocated successfully" << std::endl;
-		}
-		else
-		{
-			std::cout << "memory allocation failed" << std::endl;
-		}
-		printMemoryStatus();
+		
 		//should do like an ImGui warning popup saying that the mesh couldn't load in case the parse fails. 
 		//maybe ImGui::IsPopupOpen()?)
 		mesh->ApplyTexture(myTexture);
@@ -120,13 +110,4 @@ void MeshComponent::Update(Shader* shader)
 	}
 	
 	DrawMesh(*shader); //Shader is scuffed right now.
-}
-
-void MeshComponent::printMemoryStatus()
-{
-	MEMORYSTATUSEX statex;
-	statex.dwLength = sizeof(statex);
-	GlobalMemoryStatusEx(&statex);
-	std::cout << "There is " << statex.ullAvailPhys / (1024 * 1024) << " MB of physical memory available." << std::endl;
-	std::cout << "There is " << statex.ullAvailVirtual / (1024 * 1024) << " MB of virtual memory available." << std::endl;
 }
