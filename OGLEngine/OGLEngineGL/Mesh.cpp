@@ -39,12 +39,16 @@ Mesh::Mesh(ObjReader* objreader, const std::string& filename) //HERE IS WHERE I 
 	//https://github.com/opengl-tutorials/ogl/blob/master/tutorial07_model_loading/tutorial07.cpp
 	//https://github.com/opengl-tutorials/ogl/blob/master/tutorial09_vbo_indexing/tutorial09.cpp
 
+	meshLoadedCorrectly = false;
+
 	bool res = objreader->parseOBJ(filename, indices, indexed_vertices, indexed_uvs, indexed_normals); //reason for big meshes not rendering properly: https://stackoverflow.com/a/26426240, now fixed.
 
 	if (!res) //can just call parse obj in an if statement instead of doing this after calling it.
 	{
+		meshLoadedCorrectly = false;
 		return;
 	}
+	meshLoadedCorrectly = true;
 
 	//5 dec 2024, Emil suggested just saving any variables used for rendering the mesh, like vertices and faces, into a file.
 	//so maybe the fast way of getting this working is to write all vectors here into a file right here.

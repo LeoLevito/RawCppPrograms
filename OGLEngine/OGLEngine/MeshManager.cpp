@@ -47,14 +47,15 @@ void MeshManager::ProcessMessage(Message* message)
 	switch (message->type)
 	{
 	case MessageType::String:
-		if (msg == "LoadMesh") 
-		{
-			LoadMesh("test");
-		}
-		else if (msg == "PrintMemoryStatus")
-		{
-			PrintMemoryStatus();
-		}
+		LoadMesh(msg);
+		//if (msg == "LoadMesh") 
+		//{
+		//	LoadMesh("test");
+		//}
+		//else if (msg == "PrintMemoryStatus")
+		//{
+		//	PrintMemoryStatus();
+		//}
 		break;
 	case MessageType::FloatMessage:
 

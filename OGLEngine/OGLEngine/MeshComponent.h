@@ -32,6 +32,5 @@ public:
 
 	void Update(Shader* shader) override;
 private:
-	bool hello = false;
 };
 

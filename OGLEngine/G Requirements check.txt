@@ -4,13 +4,16 @@ To pass (G), complete the following tasks:
 + Ability to manipulate Entity name, model, texture, position, rotation in the UI --> (CHECK)
 + Ability to render all entities --> (CHECK)
 + .obj-file loader implemented, including Vertices and Faces --> (CHECK)
-+ Implement MeshManager which can load meshes, cache and re-use them
++ Implement MeshManager which can load meshes, cache and re-use them --> (CHECK)
 + Write a small Game Engine Architecture document (2 pages minimum)
 - Implement Message class, including 2 sub-classes, and use them in at least 1 communication pattern between Managers in your project
+//I'm now going to analyse above requirement: Message class. Subclasses of Message class, i.e. classes deriving from Message class. Use the subclasses in at least 1 communication pattern, observer pattern or mediator pattern I presume, between two managers in your project.
 - Implement the MessageQueue functions in at least 1 Manager and demonstrate usage
+//I'm now going to analyse above requirement: implement QueueMessage, ProcessMessages and ProcessMessage in one manager.
 + Implement Memory checking functions, use it in one manager's allocations 
 + Implement serialization (ReadFrom, WriteTo file) for your Mesh class --> (HANDLED IN OBJREADER)
 - Implement Thread and Mutex functionality and run one of your message-supported Managers in its own thread, communicating only with messages
+//I'm now going to QUESTION above requirement: run one of your message-supported Managers in its own thread; when? Only run it in a thread when I need it to, i.e. when calling a function from it, or run it continuously in a thread? How would that work? How would I make sure a singleton always runs its functions in its own thread?
 + Implement a Camera class and UI to configure it for rendering your scene --> (CHECK)
 + Integrate one Texture-loader of choice (besides glfw) --> (STB_IMAGE)
  

@@ -19,6 +19,8 @@ public:
 	std::vector<glm::vec2> indexed_uvs;
 	std::vector<glm::vec3> indexed_normals;
 
+	bool meshLoadedCorrectly;
+
 protected:
 	unsigned int VBO, VAO, EBO;
 	unsigned int NBO, UVBO, CBO;
