@@ -14,7 +14,7 @@ public:
 	void Draw(Shader* shader);
 	void ApplyTexture(Texture* texture);
 
-	std::vector<unsigned short> indices;
+	std::vector<unsigned int> indices;
 	std::vector<glm::vec3> indexed_vertices;
 	std::vector<glm::vec2> indexed_uvs;
 	std::vector<glm::vec3> indexed_normals;

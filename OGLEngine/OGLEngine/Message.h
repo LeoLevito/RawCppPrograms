@@ -11,7 +11,7 @@ enum class MessageType {
 class Message
 {
 public:
-	Message(MessageType);
+	Message(MessageType type, std::string msg);
 	virtual ~Message();
 	MessageType type;
 	std::string msg;

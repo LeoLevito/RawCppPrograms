@@ -14,7 +14,7 @@ public:
 	ObjReader();
 	~ObjReader();
 
-	bool parseOBJ(const std::string& filename, std::vector<unsigned short>& indices, std::vector<glm::vec3>& indexed_vertices, std::vector<glm::vec2>& indexed_uvs, std::vector<glm::vec3>& indexed_normals);
+	bool parseOBJ(const std::string& filename, std::vector<unsigned int>& indices, std::vector<glm::vec3>& indexed_vertices, std::vector<glm::vec2>& indexed_uvs, std::vector<glm::vec3>& indexed_normals);
 
 	void Serialization(const std::string& filename);
 
@@ -22,7 +22,7 @@ public:
 
 	vboindexer* myVBOindexer;
 
-	std::vector<unsigned short> myIndices;
+	std::vector<unsigned int> myIndices;
 	std::vector<glm::vec3> myIndexed_vertices;
 	std::vector<glm::vec2> myIndexed_uvs;
 	std::vector<glm::vec3> myIndexed_normals;

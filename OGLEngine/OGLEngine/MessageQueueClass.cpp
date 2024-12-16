@@ -7,11 +7,12 @@ void MessageQueueClass::QueueMessage(Message* message)
 
 void MessageQueueClass::ProcessMessages()
 {
-	while (messages.size())
+	while (messages.size() >= 1)
 	{
-		/*Message* message = messages.pop_back();
+		Message* message = messages.front();
 		ProcessMessage(message);
-		delete message;*/
+		messages.erase(std::remove(messages.begin(), messages.end(), message));
+		delete message;
 	}
 
 	//https://gamedev.stackexchange.com/questions/7718/event-driven-communication-in-a-game-engine-yes-or-no
@@ -19,4 +20,8 @@ void MessageQueueClass::ProcessMessages()
 	//https://en.wikipedia.org/wiki/Message_queue
 	//https://en.wikipedia.org/wiki/Mediator_pattern
 	//https://en.wikipedia.org/wiki/Observer_pattern
+}
+
+void MessageQueueClass::ProcessMessage(Message* message)
+{
 }

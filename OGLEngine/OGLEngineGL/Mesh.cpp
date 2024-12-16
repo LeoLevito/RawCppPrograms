@@ -39,34 +39,12 @@ Mesh::Mesh(ObjReader* objreader, const std::string& filename) //HERE IS WHERE I 
 	//https://github.com/opengl-tutorials/ogl/blob/master/tutorial07_model_loading/tutorial07.cpp
 	//https://github.com/opengl-tutorials/ogl/blob/master/tutorial09_vbo_indexing/tutorial09.cpp
 
- //   std::vector<glm::vec3> vertices;
-	//std::vector<glm::vec2> uvs;
-	//std::vector<glm::vec3> normals;
-
-	//may not even need to do this since right now we delete the mesh when swapping in the mesh component.
-	//indices.clear();
-	//indexed_vertices.clear();
-	//indexed_uvs.clear();
-	//indexed_normals.clear();
-	//std::string* rama  = new std::string(filename);
-	//std::string rama2 = filename;
-
-	//std::thread t1(&ObjReader::Serialization, objreader, rama2);
-
-	//okay so this still grinds the application to a halt when loading new big mesh.
-	//std::thread t2(&ObjReader::parseOBJ, objreader, *rama, std::ref(indices), std::ref(indexed_vertices), std::ref(indexed_uvs), std::ref(indexed_normals));
-	//t2.join();
-	//t2.join();
-
-	bool res = objreader->parseOBJ(filename, indices, indexed_vertices, indexed_uvs, indexed_normals);
+	bool res = objreader->parseOBJ(filename, indices, indexed_vertices, indexed_uvs, indexed_normals); //reason for big meshes not rendering properly: https://stackoverflow.com/a/26426240, now fixed.
 
 	if (!res) //can just call parse obj in an if statement instead of doing this after calling it.
 	{
 		return;
 	}
-
-	//VBOindexer->indexVBO(vertices, uvs, normals, indices, indexed_vertices, indexed_uvs, indexed_normals);
-
 
 	//5 dec 2024, Emil suggested just saving any variables used for rendering the mesh, like vertices and faces, into a file.
 	//so maybe the fast way of getting this working is to write all vectors here into a file right here.
@@ -74,25 +52,6 @@ Mesh::Mesh(ObjReader* objreader, const std::string& filename) //HERE IS WHERE I 
 //IMPLEMENT TRIANGLULATION FOR .OBJ FILES BUILT OUT OF QUADS.
 
 
-
-
-	//std::vector<float> out_vertices2;
-
-	/*{
-		std::vector<Vertex> out_vertices3;
-		Vertex vert;
-
-		for (size_t i = 0; i < out_vertices.size(); i++)
-		{
-
-		}
-
-		vert.Position;
-		vert.Normal;
-		vert.TexCoords;
-
-		out_vertices3.push_back(vert);
-	}*/
 
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
@@ -112,7 +71,7 @@ Mesh::Mesh(ObjReader* objreader, const std::string& filename) //HERE IS WHERE I 
 	//Element buffer object, this will contain all our indices.
 	glGenBuffers(1, &EBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), &indices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
 
 	//vertex positions
 	glEnableVertexAttribArray(0); //example, here. Doesn't this have to do with which of the shaders to be used? I don't remember.
@@ -133,16 +92,6 @@ Mesh::Mesh(ObjReader* objreader, const std::string& filename) //HERE IS WHERE I 
     IndicesSize = indices.size(); //to be used in Draw();
 }
 
-
-
-
-
-//Create new constructor here for preparing .obj meshes for DRAW()
-
-
-
-
-
 Mesh::~Mesh() //when mesh is deleted, also delete Vertex Array and Vertex Buffer objects.
 {
 	glDeleteVertexArrays(1, &VAO);
@@ -160,27 +109,17 @@ void Mesh::Draw(Shader* shader) //Draw mesh;
 
 	shader->Use();
 	glBindVertexArray(VAO); //only bind VAO when drawing the mesh since it already has a VBO reference already.
-	
-
 
 	if (IndicesSize > 0) //Draw loaded obj model. Hopefully.
 	{
 		//glDrawArrays(GL_TRIANGLES, 0, 50);
-		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, (void*)0);
+		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, (void*)0);
 	}
 	else //Draw Cube
 	{
 		//ERROR, this is giving error for NVIDIA driver, so this likely doesn't conform to the OpenGL specification.
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0); //note the 36, hard coded for a cube right now, we need to specify how many indices we use for it. In the future we will automate this.
 	}
-
-
-//insert new mesh loading code here checking for indices
-
-
-
-
-
 
 	if (EBO == 0) //Draw Triangle
 	{

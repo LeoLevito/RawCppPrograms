@@ -41,6 +41,27 @@ Mesh* MeshManager::LoadMesh(const std::string& filename)
 
 }
 
+void MeshManager::ProcessMessage(Message* message)
+{
+	std::string& msg = message->msg;
+	switch (message->type)
+	{
+	case MessageType::String:
+		if (msg == "LoadMesh") 
+		{
+			LoadMesh("test");
+		}
+		else if (msg == "PrintMemoryStatus")
+		{
+			PrintMemoryStatus();
+		}
+		break;
+	case MessageType::FloatMessage:
+
+		break;
+	}
+}
+
 void MeshManager::PrintMemoryStatus()
 {
 	MEMORYSTATUSEX statex;

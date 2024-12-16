@@ -14,7 +14,7 @@ ObjReader::~ObjReader()
 	delete myVBOindexer;
 }
 
-bool ObjReader::parseOBJ(const std::string& filename, std::vector<unsigned short>& indices, std::vector<glm::vec3>& indexed_vertices, std::vector<glm::vec2>& indexed_uvs, std::vector<glm::vec3>& indexed_normals)
+bool ObjReader::parseOBJ(const std::string& filename, std::vector<unsigned int>& indices, std::vector<glm::vec3>& indexed_vertices, std::vector<glm::vec2>& indexed_uvs, std::vector<glm::vec3>& indexed_normals)
 {
 	//moved vectors from mesh.cpp to here for vboindex call further down.
 	std::vector<glm::vec3> vertices;
@@ -161,7 +161,7 @@ void ObjReader::Serialization(const std::string& filename)
 		file.write(reinterpret_cast<char*>(&myIndexed_vertices[0]), sizeof(glm::vec3)* myIndexed_vertices.size());
 		file.write(reinterpret_cast<char*>(&myIndexed_uvs[0]), sizeof(glm::vec2) * myIndexed_uvs.size());
 		file.write(reinterpret_cast<char*>(&myIndexed_normals[0]), sizeof(glm::vec3) * myIndexed_normals.size());
-		file.write(reinterpret_cast<char*>(&myIndices[0]), sizeof(unsigned short) * myIndices.size());
+		file.write(reinterpret_cast<char*>(&myIndices[0]), sizeof(unsigned int) * myIndices.size());
 	}
 	file.close();
 }
@@ -194,7 +194,7 @@ void ObjReader::Deserialization(const std::string& filename)
 		file.read(reinterpret_cast<char*>(&myIndexed_vertices[0]), sizeof(glm::vec3) * myIndexed_vertices.size());
 		file.read(reinterpret_cast<char*>(&myIndexed_uvs[0]), sizeof(glm::vec2) * myIndexed_uvs.size());
 		file.read(reinterpret_cast<char*>(&myIndexed_normals[0]), sizeof(glm::vec3)* myIndexed_normals.size());
-		file.read(reinterpret_cast<char*>(&myIndices[0]), sizeof(unsigned short) * myIndices.size());
+		file.read(reinterpret_cast<char*>(&myIndices[0]), sizeof(unsigned int) * myIndices.size());
 	}
 	file.close();
 }

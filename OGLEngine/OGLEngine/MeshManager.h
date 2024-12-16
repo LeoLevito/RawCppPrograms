@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "Mesh.h"
+#include "Message.h"
 class MeshManager
 {
 private:
@@ -18,6 +19,8 @@ public:
 	std::vector<Mesh*> meshes;
 	std::vector<std::string> CachedMeshes; //(should I do this?) I don't think const is gonna work
 	ObjReader* objreader;
+
+	void ProcessMessage(Message* message); //you have to use pointer here since a subclass of Message can be used.
 private:
 	void PrintMemoryStatus();
 };
