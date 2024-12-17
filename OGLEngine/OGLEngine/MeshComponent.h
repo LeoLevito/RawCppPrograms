@@ -10,7 +10,9 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
-
+#include "Message.h"
+#include "MeshMessage.h"
+class MeshMessage;
 class ObjReader;
 
 class MeshComponent : public Component
@@ -31,6 +33,8 @@ public:
 	glm::vec3 scale;
 
 	void Update(Shader* shader) override;
+	void ReceiveMessage(MeshMessage* message);
+	bool meshInvalid = false;
 private:
 };
 

@@ -13,7 +13,7 @@
 class Graphics
 {
 public:
-	void Initialize(int width, int height, GameObjectManager* gameObjectManager);
+	void Initialize(int width, int height);
 	void Render();
 	void Cache();
 	bool ShouldClose();
@@ -31,9 +31,6 @@ private:
 	Triangle* myTriangle;
 	Cube* myCube;
 	Texture* myTexture;
-
-
-	GameObjectManager* myGameObjectManager;
 
 	float myWidth;
 	float myHeight;

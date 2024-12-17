@@ -21,6 +21,8 @@ public:
 
 	bool meshLoadedCorrectly;
 
+	void bufferMesh();
+
 protected:
 	unsigned int VBO, VAO, EBO;
 	unsigned int NBO, UVBO, CBO;

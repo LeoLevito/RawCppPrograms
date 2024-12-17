@@ -100,16 +100,16 @@ int main()
 	////woah I don't really know what's happening right now, is it using multiple threads at different times and that's why the int is updated out of order every time?
 	//
 
-	GameObjectManager* gameObjectManager = new GameObjectManager;
+	std::thread MeshManagerThread(&MeshManager::Process, &MeshManager::Get()); //make a wrapper function in Thread class that does std::thread t1(func).
 	
 	Graphics* graphics = new Graphics;
-	graphics->Initialize(1280, 720, gameObjectManager);
+	graphics->Initialize(1280, 720);
 
 	Engine* engine = new Engine;
 	engine->Initialize(graphics->window, &Camera::Get());
 
 	EditorGUI* editorGUI = new EditorGUI;
-	editorGUI->Initialize(graphics->window, graphics, gameObjectManager, Camera::Get(), *graphics->myShader);
+	editorGUI->Initialize(graphics->window, graphics, Camera::Get(), *graphics->myShader);
 
 	float lastTime = 0;
 	float currentTime = 0;
@@ -138,7 +138,13 @@ int main()
 
 		glfwSwapBuffers(graphics->window); //moved from Graphics::Render().
 	}
-	
+
+
+	//terminate thread.
+	MeshManager::Get().shouldRun = false;
+	MeshManagerThread.join();
+	MeshManagerThread.~thread();
+
 
 	editorGUI->CloseImGui();
 	return 0;

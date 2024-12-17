@@ -48,7 +48,11 @@ Mesh::Mesh(ObjReader* objreader, const std::string& filename) //HERE IS WHERE I 
 		meshLoadedCorrectly = false;
 		return;
 	}
-	meshLoadedCorrectly = true;
+	else
+	{
+		meshLoadedCorrectly = true;
+	}
+
 
 	//5 dec 2024, Emil suggested just saving any variables used for rendering the mesh, like vertices and faces, into a file.
 	//so maybe the fast way of getting this working is to write all vectors here into a file right here.
@@ -57,43 +61,7 @@ Mesh::Mesh(ObjReader* objreader, const std::string& filename) //HERE IS WHERE I 
 
 
 
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
 
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, indexed_vertices.size() * sizeof(glm::vec3), &indexed_vertices[0], GL_STATIC_DRAW); //example, here. 
-
-	//glGenBuffers(1, &NBO);
-	//glBindBuffer(GL_ARRAY_BUFFER, NBO);
-	//glBufferData(GL_ARRAY_BUFFER, objdata.vertexNormals.size() * sizeof(glm::vec3), &objdata.vertexNormals[0], GL_STATIC_DRAW); //example, here. 
-
-	//glGenBuffers(1, &UVBO);
-	//glBindBuffer(GL_ARRAY_BUFFER, UVBO);
-	//glBufferData(GL_ARRAY_BUFFER, objdata.vertexTexCoords.size() * sizeof(glm::vec2), &objdata.vertexTexCoords[0], GL_STATIC_DRAW); //example, here. 
-
-	//Element buffer object, this will contain all our indices.
-	glGenBuffers(1, &EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
-
-	//vertex positions
-	glEnableVertexAttribArray(0); //example, here. Doesn't this have to do with which of the shaders to be used? I don't remember.
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0); //these are probably not right, need to modify to read correctly.
-	//vertex color
-	glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-	////vertex normals
-	//glEnableVertexAttribArray(2);
-	//glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-	////vertex texture coords
-	//glEnableVertexAttribArray(3);
-	//glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(objdata.vertices), (void*)offsetof(Vertex, TexCoords));
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0); //right? this wasn't in martin's obj contructor.
-    glBindVertexArray(0);
-
-    IndicesSize = indices.size(); //to be used in Draw();
 }
 
 Mesh::~Mesh() //when mesh is deleted, also delete Vertex Array and Vertex Buffer objects.
@@ -137,4 +105,47 @@ void Mesh::Draw(Shader* shader) //Draw mesh;
 void Mesh::ApplyTexture(Texture* texture) //Set Local myTexture so it can be used in the Draw() function.
 {
 	myTexture = texture;
+}
+
+void Mesh::bufferMesh()
+{
+	//open gl calls should happen in the same context, so calling this mesh constructor in a separate thread messes things up.
+	//need to maybe separate this into a new function and call it on the Graphics thread context instead.
+	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
+
+	glGenBuffers(1, &VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, indexed_vertices.size() * sizeof(glm::vec3), &indexed_vertices[0], GL_STATIC_DRAW); //example, here. 
+
+	//glGenBuffers(1, &NBO);
+	//glBindBuffer(GL_ARRAY_BUFFER, NBO);
+	//glBufferData(GL_ARRAY_BUFFER, objdata.vertexNormals.size() * sizeof(glm::vec3), &objdata.vertexNormals[0], GL_STATIC_DRAW); //example, here. 
+
+	//glGenBuffers(1, &UVBO);
+	//glBindBuffer(GL_ARRAY_BUFFER, UVBO);
+	//glBufferData(GL_ARRAY_BUFFER, objdata.vertexTexCoords.size() * sizeof(glm::vec2), &objdata.vertexTexCoords[0], GL_STATIC_DRAW); //example, here. 
+
+	//Element buffer object, this will contain all our indices.
+	glGenBuffers(1, &EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+
+	//vertex positions
+	glEnableVertexAttribArray(0); //example, here. Doesn't this have to do with which of the shaders to be used? I don't remember.
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0); //these are probably not right, need to modify to read correctly.
+	//vertex color
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	////vertex normals
+	//glEnableVertexAttribArray(2);
+	//glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	////vertex texture coords
+	//glEnableVertexAttribArray(3);
+	//glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(objdata.vertices), (void*)offsetof(Vertex, TexCoords));
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0); //right? this wasn't in martin's obj contructor.
+	glBindVertexArray(0);
+
+	IndicesSize = indices.size(); //to be used in Draw();
 }

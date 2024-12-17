@@ -23,7 +23,7 @@ MeshComponent::MeshComponent()
 	myShader->Initialize("../Shaders/VertexShader.vertexs", "../Shaders/FragmentShader.fragments");
 
 	mesh = MeshManager::Get().LoadMesh("../Models/TreeTrunk");
-	
+	mesh->bufferMesh();
 	mesh->ApplyTexture(myTexture);
 
 	position = glm::vec3(0, 0, 0);
@@ -62,27 +62,44 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 	//EDIT: WOAH, just saw that it's possible to open file explorer with ImGui to choose .obj files from a specified directory, that's a possibility!.
 	static char str1[128] = "TreeTrunk"; //how it's done in the ImGui demo, tho it is replicated across all objects now...
 	ImGui::InputText("Mesh name", str1, IM_ARRAYSIZE(str1)); //Yeah, I gotta change this to a dropdown or something.
-	if (ImGui::Button("Change Mesh"))
+	if (ImGui::Button("load Mesh"))
 	{
 		std::string path = "../Models/";
 		path.append(str1);
-
 		std::cout << path << std::endl;
 
-		//Message* newmessage = new Message(MessageType::String, path);
-		//MeshManager::Get().ProcessMessage(newmessage);
-		mesh = MeshManager::Get().LoadMesh(path);
-		//mesh = MeshManager::Get().meshes.back(); //bro this is kinda bad.
-
-
-		//should do like an ImGui warning popup saying that the mesh couldn't load in case the parse fails. 
-		//maybe ImGui::IsPopupOpen()?)
-		mesh->ApplyTexture(myTexture);
+		MeshMessage* newMessage = new MeshMessage(); //could also change new Message to something like new MeshMessage (subclass).
+		newMessage->meshToLoad = path;
+		MeshManager::Get().QueueMessage(newMessage);
 	}
-	if (mesh->meshLoadedCorrectly == false)
+	
+	if (MeshManager::Get().currentlyLoadingMesh != false)
+	{
+		ImGui::SameLine();
+		ImGui::Text("Loading mesh into memory...");
+	}
+
+	if (ImGui::Button("Change Mesh"))
+	{
+		mesh = MeshManager::Get().lastAccessedMesh; 
+		if (mesh->meshLoadedCorrectly == false)
+		{
+			meshInvalid = true;
+		}
+		else 
+		{
+			meshInvalid = false;
+			mesh->bufferMesh();
+			mesh->ApplyTexture(myTexture);
+		}
+	}
+	if (meshInvalid == true)
 	{
 		ImGui::SameLine();
 		ImGui::Text("Mesh not loaded correctly.");
+
+		//should instead do like an ImGui warning popup saying that the mesh couldn't load in case the parse fails. 
+		//maybe ImGui::IsPopupOpen()?)
 	}
 }
 
@@ -117,4 +134,23 @@ void MeshComponent::Update(Shader* shader)
 	}
 	
 	DrawMesh(*shader); //Shader is scuffed right now.
+}
+
+void MeshComponent::ReceiveMessage(MeshMessage* message) //wait would this be happening in the meshmanager thread?
+{
+	std::string& msg = message->msg;
+	switch (message->type)
+	{
+	case MessageType::MeshMessage:
+		if (msg == "hello")
+		{
+			mesh = message->meshToPass;
+			mesh->bufferMesh();
+			mesh->ApplyTexture(myTexture);
+		}
+		break;
+	case MessageType::FloatMessage:
+
+		break;
+	}
 }

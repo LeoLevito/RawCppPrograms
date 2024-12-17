@@ -1,5 +1,19 @@
 #include "GameObjectManager.h"
 
+GameObjectManager::GameObjectManager()
+{
+}
+
+GameObjectManager::~GameObjectManager()
+{
+}
+
+GameObjectManager& GameObjectManager::Get()
+{
+	static GameObjectManager instance;
+	return instance;
+}
+
 GameObject* GameObjectManager::CreateGameObject()
 {
 	GameObject* gameObject = new GameObject();

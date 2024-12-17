@@ -2,12 +2,14 @@
 #include <vector>
 #include "Mesh.h"
 #include "Message.h"
+#include <thread>
 class MeshManager
 {
 private:
 	MeshManager();
 	~MeshManager();
 public:
+
 	static MeshManager& Get();
 	
 	Mesh* LoadMesh(const std::string& filename); //include load from file or load from memory if requested mesh has been cached.
@@ -18,9 +20,18 @@ public:
 	//but maybe I can just get an element of this vector and set the mesh to that?
 	std::vector<Mesh*> meshes;
 	std::vector<std::string> CachedMeshes; //(should I do this?) I don't think const is gonna work
+	Mesh* lastAccessedMesh;
 	ObjReader* objreader;
 
+
+	void QueueMessage(Message* message);
+	void ProcessMessages();
 	void ProcessMessage(Message* message); //you have to use pointer here since a subclass of Message can be used.
+	std::vector <Message*> queuedMessages;
+	void Process();
+	//std::thread* myThread;
+	bool shouldRun = true;
+	bool currentlyLoadingMesh = false;
 private:
 	void PrintMemoryStatus();
 };

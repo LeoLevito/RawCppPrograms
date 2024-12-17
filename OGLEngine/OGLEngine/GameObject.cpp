@@ -39,7 +39,7 @@ void GameObject::Update(Shader* shader)
 	}
 }
 
-void GameObject::DrawObjectSpecificImGuiHierarchyAdjustables(std::vector<GameObject*>& vec)
+void GameObject::DrawObjectSpecificImGuiHierarchyAdjustables(std::vector<GameObject*>& vec) //maybe this should be called in update instead.
 {
 	static char str0[128] = "name"; //how it's done in the ImGui demo, tho it is replicated across all objects now...
 	ImGui::InputText("Object name", str0, IM_ARRAYSIZE(str0)); //Yeah, I gotta change this to a dropdown or something.

@@ -8,7 +8,7 @@
 class EditorGUI
 {
 public:
-	void Initialize(GLFWwindow* window, Graphics* graphics, GameObjectManager* gameObjectManager, Camera& camera, Shader& shader);
+	void Initialize(GLFWwindow* window, Graphics* graphics, Camera& camera, Shader& shader);
 	void StartImGuiFrame(float deltaTime);
 	void RenderImGui(glm::mat4& projection);
 	void CloseImGui();
@@ -23,7 +23,6 @@ public:
 	void Deserialization(const std::string& filename);
 private:
 	Graphics* myGraphics;
-	GameObjectManager* myGameObjectManager;
 	//Camera myCamera;
 	glm::mat4 myProjection;
 	float currentTime; //May or may not be super accurate at the moment.

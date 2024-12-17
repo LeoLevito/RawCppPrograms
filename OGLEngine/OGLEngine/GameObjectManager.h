@@ -4,7 +4,11 @@
 #include "Message.h"
 class GameObjectManager
 {
+private:
+	GameObjectManager();
+	~GameObjectManager();
 public:
+	static GameObjectManager& Get();
 	GameObject* CreateGameObject();
 	void DeleteGameObject(GameObject* gameObject);
 

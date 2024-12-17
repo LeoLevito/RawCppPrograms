@@ -147,6 +147,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MeshComponent.cpp" />
     <ClCompile Include="MeshManager.cpp" />
+    <ClCompile Include="MeshMessage.cpp" />
     <ClCompile Include="Message.cpp" />
     <ClCompile Include="MessageQueueClass.cpp" />
     <ClCompile Include="Mutex.cpp" />
@@ -166,6 +167,7 @@
     <ClInclude Include="Level.h" />
     <ClInclude Include="MeshComponent.h" />
     <ClInclude Include="MeshManager.h" />
+    <ClInclude Include="MeshMessage.h" />
     <ClInclude Include="Message.h" />
     <ClInclude Include="MessageQueueClass.h" />
     <ClInclude Include="Mutex.h" />
