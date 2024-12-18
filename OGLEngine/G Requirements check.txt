@@ -1,25 +1,44 @@
 To pass (G), complete the following tasks:
 + UI Framework set up (imgui or other alternative) --> (IMGUI)
+
 + Implement Entity and EntityManager classes --> (GAMEOBJECT AND GAMEOBJECTMANAGER)
+
 + Ability to manipulate Entity name, model, texture, position, rotation in the UI --> (CHECK)
+
 + Ability to render all entities --> (CHECK)
+
 + .obj-file loader implemented, including Vertices and Faces --> (CHECK)
+
 + Implement MeshManager which can load meshes, cache and re-use them --> (CHECK)
-+ Write a small Game Engine Architecture document (2 pages minimum)
-- Implement Message class, including 2 sub-classes, and use them in at least 1 communication pattern between Managers in your project
-//I'm now going to analyse above requirement: Message class. Subclasses of Message class, i.e. classes deriving from Message class. Use the subclasses in at least 1 communication pattern, observer pattern or mediator pattern I presume, between two managers in your project.
-- Implement the MessageQueue functions in at least 1 Manager and demonstrate usage
-//I'm now going to analyse above requirement: implement QueueMessage, ProcessMessages and ProcessMessage in one manager.
-+ Implement Memory checking functions, use it in one manager's allocations 
+
++ Write a small Game Engine Architecture document (2 pages minimum) --> (CHECK, will add to it as times goes on)
+
+-+ Implement Message class, including 2 sub-classes, and use them in at least 1 communication pattern between Managers in your project.
+	//I'm now going to analyse above requirement: Message class. Subclasses of Message class, 
+	//i.e. classes deriving from Message class. Use the subclasses in at least 1 communication pattern, 
+	//observer pattern or mediator pattern I presume, between two managers in your project. Send and receive messages between two managers.
+
++ Implement the MessageQueue functions in at least 1 Manager and demonstrate usage. --> (MESHMANAGER).
+	//I'm now going to analyse above requirement: implement QueueMessage, ProcessMessages and ProcessMessage in one manager.
+
++ Implement Memory checking functions, use it in one manager's allocations --> (CHECK, MESHMANAGER)
+
 + Implement serialization (ReadFrom, WriteTo file) for your Mesh class --> (HANDLED IN OBJREADER)
-- Implement Thread and Mutex functionality and run one of your message-supported Managers in its own thread, communicating only with messages
-//I'm now going to QUESTION above requirement: run one of your message-supported Managers in its own thread; when? Only run it in a thread when I need it to, i.e. when calling a function from it, or run it continuously in a thread? How would that work? How would I make sure a singleton always runs its functions in its own thread?
-+ Implement a Camera class and UI to configure it for rendering your scene --> (CHECK)
+
+-+ Implement Thread and Mutex functionality and run one of your message-supported Managers in its own thread, communicating only with messages.
+	//I'm now going to QUESTION above requirement: run one of your message-supported Managers in its own thread; 
+	//when? Only run it in a thread when I need it to, i.e. when calling a function from it, or run it continuously in a thread? 
+	//How would that work? How would I make sure a singleton always runs its functions in its own thread?
+
++ Implement a Camera class and UI to configure it for rendering your scene --> (CHECK, UI PART IN EDITORGUI)
+
 + Integrate one Texture-loader of choice (besides glfw) --> (STB_IMAGE)
  
+
+
 To pass with distinction (VG), complete 3 or more bonus tasks:
 - Extend .obj-file loader to load UVs, Normals and support Triangulization
 - Implement iterative resource (.obj-file or texture) loading to support loading huge files in single-threaded contexts
-- Implement a Camera Manager and ability to switch between different cameras, as well as key-bindings for simple camera movement (WSAD, arrow keys) 
+-+ Implement a Camera Manager and ability to switch between different cameras, as well as key-bindings for simple camera movement (WSAD, arrow keys) 
 - Implement your own PNG-loader using zlib
 - Implement serialization for your scene/level (Entities, meta-data)

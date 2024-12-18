@@ -41,9 +41,6 @@ void EditorGUI::StartImGuiFrame(float deltaTime)
 	ImGui::NewFrame();
 
 
-
-
-	//CHANGE THIS TO WHATEVER I WANT / NEED!
 	ImGui::ShowDemoWindow(); // Show demo window! :)
 	FrameRateWindow(deltaTime);
 	HierarchyWindow(Camera::Get(), Camera::Get().projection, *myGraphics->myShader);
@@ -55,7 +52,6 @@ void EditorGUI::RenderImGui(glm::mat4& projection)
 {
 	// Rendering
 	// (Your code clears your framebuffer, renders your other stuff etc.)
-
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	myProjection = projection;
@@ -84,7 +80,6 @@ void EditorGUI::FrameRateWindow(float deltaTime)
 void EditorGUI::HierarchyWindow(Camera& camera, glm::mat4& projection, Shader& shader)
 {
 	ImGui::Begin("Hierarchy"); //start rendering new ImGui window
-
 
 	if (ImGui::Button("Add Game Object")) //replace code here with GameObjectManager AddGameObject() or similar.
 	{
@@ -225,7 +220,7 @@ void EditorGUI::MainMenuBar()
 
 }
 
-void EditorGUI::Serialization(const std::string& filename)
+void EditorGUI::Serialization(const std::string& filename) //not functional at the moment.
 {
 	//I could try to write the entire GameObjectManager, if it's possible to even do something like that. Like, getting everything in it and writing/reading all of the data to a binary file.
 	std::fstream file;
@@ -255,7 +250,7 @@ void EditorGUI::Serialization(const std::string& filename)
 	file.close();
 }
 
-void EditorGUI::Deserialization(const std::string& filename)
+void EditorGUI::Deserialization(const std::string& filename) //not functional at the moment.
 {
 	std::fstream file;
 	file.open(filename.c_str(), std::ios_base::in | std::ios_base::binary);

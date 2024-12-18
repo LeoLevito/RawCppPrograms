@@ -27,7 +27,7 @@ MeshManager& MeshManager::Get()
 
 Mesh* MeshManager::LoadMesh(const std::string& filename)
 {
-	for (size_t i = 0; i < CachedMeshes.size(); i++) //why doesn't CachedMeshes know what it has? It just says error can't read string or whatever?
+	for (size_t i = 0; i < CachedMeshes.size(); i++) 
 	{
 		if (CachedMeshes[i] == filename) { //since ImGui entry doesn't require proper capitalization, there can be situations where we load the same mesh multiple times when we don't need to. This would be fixed by having a dropdown to choose meshes from instead of a string entry.
 			lastAccessedMesh = meshes[i];
@@ -37,7 +37,9 @@ Mesh* MeshManager::LoadMesh(const std::string& filename)
 
 	PrintMemoryStatus();
 	Mesh* mesh = new Mesh(objreader, filename);
-	PrintMemoryStatus();	
+	PrintMemoryStatus();
+	//18 dec 2024: if check for checking maximum memory, return error if requested memory allocation is too large. Could also use messages for this.
+	//18 dec 2024: Send message back to some manager telling us that the mesh has been loaded, to fulfill G requirement - Emil.
 
 	meshes.push_back(mesh);
 	CachedMeshes.push_back(filename);
@@ -73,28 +75,12 @@ void MeshManager::ProcessMessage(Message* message)
 	switch (message->type)
 	{
 	case MessageType::String:
-		//LoadMesh(msg);
-	    /*
-		if (msg == "LoadMesh") 
-		{
-			LoadMesh("test");
-		}
-		else if (msg == "PrintMemoryStatus")
-		{
-			PrintMemoryStatus();
-		}
-		*/
 		break;
 	case MessageType::MeshMessage:
-		
-		MeshMessage& meshmessage = dynamic_cast<MeshMessage&>(*message);
-		//MeshMessage meshmessage = (MeshMessage&)message;
+		MeshMessage& meshmessage = dynamic_cast<MeshMessage&>(*message); //is this bad practice for messaging? RE:(MeshComponent), apparently this dynamic_cast is better than other types of casts, even Emil has used them multiple times. Plus this cast only happens when processing messages, so not too frequently.
 		currentlyLoadingMesh = true;
 		LoadMesh(meshmessage.meshToLoad);
 		currentlyLoadingMesh = false;
-		//MeshMessage* newmeshmessage = new MeshMessage;
-		//newmeshmessage->meshToPass = lastAccessedMesh;
-		//meshmessage.meshCompRef->ReceiveMessage(newmeshmessage); //this wouldn't work either way.
 		break;
 	}
 }

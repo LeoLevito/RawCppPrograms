@@ -68,7 +68,7 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 		path.append(str1);
 		std::cout << path << std::endl;
 
-		MeshMessage* newMessage = new MeshMessage(); //could also change new Message to something like new MeshMessage (subclass).
+		MeshMessage* newMessage = new MeshMessage();
 		newMessage->meshToLoad = path;
 		MeshManager::Get().QueueMessage(newMessage);
 	}
@@ -134,23 +134,4 @@ void MeshComponent::Update(Shader* shader)
 	}
 	
 	DrawMesh(*shader); //Shader is scuffed right now.
-}
-
-void MeshComponent::ReceiveMessage(MeshMessage* message) //wait would this be happening in the meshmanager thread?
-{
-	std::string& msg = message->msg;
-	switch (message->type)
-	{
-	case MessageType::MeshMessage:
-		if (msg == "hello")
-		{
-			mesh = message->meshToPass;
-			mesh->bufferMesh();
-			mesh->ApplyTexture(myTexture);
-		}
-		break;
-	case MessageType::FloatMessage:
-
-		break;
-	}
 }

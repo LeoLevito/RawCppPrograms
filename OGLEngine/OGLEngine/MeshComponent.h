@@ -33,7 +33,6 @@ public:
 	glm::vec3 scale;
 
 	void Update(Shader* shader) override;
-	void ReceiveMessage(MeshMessage* message);
 	bool meshInvalid = false;
 private:
 };
