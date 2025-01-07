@@ -79,7 +79,7 @@ void MeshManager::ProcessMessage(Message* message)
 	case MessageType::MeshMessage:
 		MeshMessage& meshmessage = dynamic_cast<MeshMessage&>(*message); //is this bad practice for messaging? RE:(MeshComponent), apparently this dynamic_cast is better than other types of casts, even Emil has used them multiple times. Plus this cast only happens when processing messages, so not too frequently.
 		currentlyLoadingMesh = true;
-		LoadMesh(meshmessage.meshToLoad);
+		LoadMesh(meshmessage.meshToLoad); //Using data 'meshToLoad' from the message casted to meshmessage. We wouldn't need to cast if we were calling a class function that doesn't need specific data from a message.
 		currentlyLoadingMesh = false;
 		break;
 	}

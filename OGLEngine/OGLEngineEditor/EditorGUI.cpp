@@ -6,6 +6,7 @@
 #include <GameObjectTest.h>
 #include <iostream>
 #include <gtc/matrix_transform.hpp>
+#include "ObjectMessage.h"
 
 void EditorGUI::Initialize(GLFWwindow* window, Graphics* graphics, Camera& camera, Shader& shader)
 {
@@ -81,9 +82,10 @@ void EditorGUI::HierarchyWindow(Camera& camera, glm::mat4& projection, Shader& s
 {
 	ImGui::Begin("Hierarchy"); //start rendering new ImGui window
 
-	if (ImGui::Button("Add Game Object")) //replace code here with GameObjectManager AddGameObject() or similar.
+	if (ImGui::Button("Add Game Object")) 
 	{
-		GameObjectManager::Get().CreateGameObject(); //create an empty game object.
+		ObjectMessage* newMessage = new ObjectMessage(ObjectMessageType::Create);
+		GameObjectManager::Get().QueueMessage(newMessage); //send a message to create an empty game object.
 	}
 
 	int objectIndex = 0;

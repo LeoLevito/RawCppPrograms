@@ -12,7 +12,8 @@
 int main()
 {
 	std::thread MeshManagerThread(&MeshManager::Process, &MeshManager::Get()); //make a wrapper function in Thread class that does std::thread t1(func).
-	
+	std::thread GameObjectManagerThread(&GameObjectManager::Process, &GameObjectManager::Get()); //make a wrapper function in Thread class that does std::thread t1(func).
+
 	Graphics* graphics = new Graphics;
 	graphics->Initialize(1280, 720);
 
@@ -49,6 +50,11 @@ int main()
 	MeshManager::Get().shouldRun = false;
 	MeshManagerThread.join();
 	MeshManagerThread.~thread();
+
+	//terminate thread.
+	GameObjectManager::Get().shouldRun = false;
+	GameObjectManagerThread.join();
+	GameObjectManagerThread.~thread();
 
 
 	editorGUI->CloseImGui();

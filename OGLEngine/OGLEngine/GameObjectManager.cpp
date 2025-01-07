@@ -1,4 +1,8 @@
 #include "GameObjectManager.h"
+#include "ObjectMessage.h"
+#include <mutex>
+
+std::mutex myMutex2; //oh my god I can't be doing this, I need to have a new mutex name for every new mutex I make. Not convenient.
 
 GameObjectManager::GameObjectManager()
 {
@@ -33,25 +37,49 @@ void GameObjectManager::DeleteGameObject(GameObject* gameObject)
 void GameObjectManager::ProcessMessage(Message* message)
 {
 	std::string& msg = message->msg;
-	switch (message->type) 
+	switch (message->type)
 	{
-	case MessageType::String:
-		if (msg == "StartProcess1") 
+	case MessageType::ObjectMessage:
+		ObjectMessage& objectmessage = dynamic_cast<ObjectMessage&>(*message); //is this bad practice for messaging? RE:(MeshComponent), apparently this dynamic_cast is better than other types of casts, even Emil has used them multiple times. Plus this cast only happens when processing messages, so not too frequently.
+		
+		if (objectmessage.myMessageType == ObjectMessageType::Create)
 		{
-			//StartProcess1();
+			CreateGameObject();
 		}
-		else if (msg == "StopProcess1")
+		if (objectmessage.myMessageType == ObjectMessageType::Delete)
 		{
-			//StopProcess1();
+			DeleteGameObject(objectmessage.gameObjectToDelete);
 		}
-		break;
-
-	case MessageType::Raycast:
-		//do raycast immediately and reply result,
-		//.. or queue it up for processing.
-		//it is up to us to reply asynchronously with a messaging system like this.
-
 		break;
 	}
+}
 
+void GameObjectManager::Process()
+{
+	while (shouldRun)
+	{
+		ProcessMessages();
+	}
+}
+
+void GameObjectManager::QueueMessage(Message* message)
+{
+	//mutex, since we modify the queuedmessages here
+	std::lock_guard<std::mutex> guard(myMutex2); //wrap into Mutex class.
+	queuedMessages.push_back(message);
+	//mutex is released when out of scope, lock_guard does this automatically for us.
+}
+
+void GameObjectManager::ProcessMessages() //I should probably wrap this into a function inside a processmessages class (OR A MANAGER PARENT CLASS!) so I don't need to copy this same code all the time. Because this code will be the same regardless of manager.
+{
+	//mutex since we modify the queuedmessages here
+	std::lock_guard<std::mutex> guard(myMutex2); //wrap into Mutex class.
+	while (queuedMessages.size() >= 1)
+	{
+		Message* message = queuedMessages.front();
+		ProcessMessage(message);
+		queuedMessages.erase(std::remove(queuedMessages.begin(), queuedMessages.end(), message));
+		delete message;
+	}
+	//mutex is released when out of scope, lock_guard does this automatically for us.
 }

@@ -14,7 +14,12 @@ public:
 
 	std::vector<GameObject*> gameObjects;
 
-	void ProcessMessage(Message* message);
+	void QueueMessage(Message* message);
+	void ProcessMessages();
+	void ProcessMessage(Message* message); //you have to use pointer here since a subclass of Message can be used.
+	std::vector <Message*> queuedMessages;
+	void Process();
+	bool shouldRun = true;
 private:
 };
 

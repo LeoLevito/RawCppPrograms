@@ -151,6 +151,7 @@
     <ClCompile Include="Message.cpp" />
     <ClCompile Include="MessageQueueClass.cpp" />
     <ClCompile Include="Mutex.cpp" />
+    <ClCompile Include="ObjectMessage.cpp" />
     <ClCompile Include="RaycastMessage.cpp" />
     <ClCompile Include="Thread.cpp" />
     <ClCompile Include="TransformComponent.cpp" />
@@ -171,6 +172,7 @@
     <ClInclude Include="Message.h" />
     <ClInclude Include="MessageQueueClass.h" />
     <ClInclude Include="Mutex.h" />
+    <ClInclude Include="ObjectMessage.h" />
     <ClInclude Include="RaycastMessage.h" />
     <ClInclude Include="Thread.h" />
     <ClInclude Include="TransformComponent.h" />

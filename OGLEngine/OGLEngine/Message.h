@@ -6,7 +6,8 @@ enum class MessageType {
 	Mouse,
 	FloatMessage,
 	Raycast,
-	MeshMessage
+	MeshMessage,
+	ObjectMessage
 };
 
 class Message
