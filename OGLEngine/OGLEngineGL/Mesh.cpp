@@ -4,7 +4,7 @@
 #include <iostream>
 #include <thread>
 
-Mesh::Mesh(float* vertices, size_t vertexSize, unsigned int* indices, size_t indexSize)
+Mesh::Mesh(float* vertices, size_t vertexSize, unsigned int* indices, size_t indexSize) //Old cube constructor, right?
 {
 //set IndicesSize to 0 here, in this constructor we want to be 0.
 	IndicesSize = 0;
@@ -68,6 +68,8 @@ Mesh::~Mesh() //when mesh is deleted, also delete Vertex Array and Vertex Buffer
 {
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
+	glDeleteBuffers(1, &UVBO);
+	glDeleteBuffers(1, &NBO);
 	glDeleteBuffers(1, &EBO);
 }
 
@@ -114,35 +116,38 @@ void Mesh::bufferMesh()
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
 
+	//https://github.com/opengl-tutorials/ogl/blob/master/tutorial09_vbo_indexing/tutorial09.cpp
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, indexed_vertices.size() * sizeof(glm::vec3), &indexed_vertices[0], GL_STATIC_DRAW); //example, here. 
 
-	//glGenBuffers(1, &NBO);
-	//glBindBuffer(GL_ARRAY_BUFFER, NBO);
-	//glBufferData(GL_ARRAY_BUFFER, objdata.vertexNormals.size() * sizeof(glm::vec3), &objdata.vertexNormals[0], GL_STATIC_DRAW); //example, here. 
+	glGenBuffers(1, &UVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, UVBO);
+	glBufferData(GL_ARRAY_BUFFER, indexed_uvs.size() * sizeof(glm::vec2), &indexed_uvs[0], GL_STATIC_DRAW); //example, here. 
 
-	//glGenBuffers(1, &UVBO);
-	//glBindBuffer(GL_ARRAY_BUFFER, UVBO);
-	//glBufferData(GL_ARRAY_BUFFER, objdata.vertexTexCoords.size() * sizeof(glm::vec2), &objdata.vertexTexCoords[0], GL_STATIC_DRAW); //example, here. 
+	glGenBuffers(1, &NBO);
+	glBindBuffer(GL_ARRAY_BUFFER, NBO);
+	glBufferData(GL_ARRAY_BUFFER, indexed_normals.size() * sizeof(glm::vec3), &indexed_normals[0], GL_STATIC_DRAW); //example, here. 
 
 	//Element buffer object, this will contain all our indices.
 	glGenBuffers(1, &EBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
 
+	//https://github.com/opengl-tutorials/ogl/blob/master/tutorial09_vbo_indexing/tutorial09.cpp
 	//vertex positions
 	glEnableVertexAttribArray(0); //example, here. Doesn't this have to do with which of the shaders to be used? I don't remember.
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0); //these are probably not right, need to modify to read correctly.
-	//vertex color
+	//vertex texture coords
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-	////vertex normals
-	//glEnableVertexAttribArray(2);
-	//glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-	////vertex texture coords
-	//glEnableVertexAttribArray(3);
-	//glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(objdata.vertices), (void*)offsetof(Vertex, TexCoords));
+	glBindBuffer(GL_ARRAY_BUFFER, UVBO);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	//vertex normals
+	glEnableVertexAttribArray(2);
+	glBindBuffer(GL_ARRAY_BUFFER, NBO);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0); //right? this wasn't in martin's obj contructor.
 	glBindVertexArray(0);
