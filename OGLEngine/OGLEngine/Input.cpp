@@ -50,7 +50,7 @@ void Input::ScrollCallBack(GLFWwindow* window, double xOffset, double yOffset)
 	scrollIterator += yOffset; 
 	if (scrollIterator < 1)
 	{
-		scrollIterator = 1;
+		scrollIterator = 1; //I should make this psuedo exponential when at camera MoveSpeeds lower than 1.
 	}
 }
 

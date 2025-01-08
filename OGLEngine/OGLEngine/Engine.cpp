@@ -1,5 +1,11 @@
 #include "Engine.h"
 
+Engine& Engine::Get()
+{
+	static Engine instance;
+	return instance;
+}
+
 void Engine::Initialize(GLFWwindow* window, Camera* camera)
 {
 	myInput = new Input(window);

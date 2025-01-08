@@ -1,4 +1,5 @@
 #include "GameObject.h"
+#include "GameObjectManager.h"
 #include "GLFW/glfw3.h"
 #include "iostream"
 #include "imgui.h"
@@ -6,6 +7,8 @@
 #include "imgui_impl_opengl3.h"
 #include "TransformComponent.h"
 #include "MeshComponent.h"
+#include "LightComponent.h"
+
 
 GameObject::GameObject()
 {
@@ -49,7 +52,7 @@ void GameObject::DrawObjectSpecificImGuiHierarchyAdjustables(std::vector<GameObj
 	}
 
 	static int selectedComponent = -1;
-	const char* componentNames[] = { "Transform component", "Mesh component" };
+	const char* componentNames[] = { "Transform component", "Mesh component", "Light component" };
 	if (ImGui::Button("Add component"))
 	{
 		ImGui::OpenPopup("Component popup");
@@ -71,6 +74,10 @@ void GameObject::DrawObjectSpecificImGuiHierarchyAdjustables(std::vector<GameObj
 				{
 					AddComponent(new MeshComponent);
 				}
+				else if (i == 2)
+				{
+					AddComponent(new LightComponent);
+				}
 			}
 		}
 		ImGui::EndPopup();
@@ -80,8 +87,7 @@ void GameObject::DrawObjectSpecificImGuiHierarchyAdjustables(std::vector<GameObj
 	if (ImGui::Button("Remove Game Object"))
 	{
 		//maybe I should make this a function, in case I want to call delete from another class. This would require vec be more accessible, like a singleton maybe.
-		vec.erase(std::remove(vec.begin(), vec.end(), this)); 
-		delete this;
+		GameObjectManager::Get().DeleteGameObject(this);
 		std::cout << "Deletion of Game Object completed." << std::endl;
 	}
 }

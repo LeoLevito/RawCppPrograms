@@ -12,9 +12,10 @@ public:
 	void MoveCamera();
 	void RotateCamera(bool firstTimeRun);
 	void MyScrollCallback(GLFWwindow* window, double xOffset, double yOffset);
+	Input* myInput;
 private:
 	Camera* myCamera;
-	Input* myInput;
+
 	EngineTime* myEngineTime;
 
 	float yaw, pitch;

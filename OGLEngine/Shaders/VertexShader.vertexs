@@ -7,6 +7,7 @@ layout (location = 2) in vec3 aNormal;
 //out vec4 vertexColor;
 out vec2 texCoord;
 out vec3 normal;
+out vec3 fragPos;
 
 uniform mat4 transform; 
 uniform mat4 projection;
@@ -17,5 +18,8 @@ void main()
     gl_Position = projection * view * transform * vec4(aPos, 1.0);
     //vertexColor = vec4(aColor, 1.0);
     texCoord = aTexCoord;
-    normal = aNormal;
+    normal = mat3(transpose(inverse(transform))) * aNormal; //Inversing matrices is a costly operation for shaders, since they have to be done on each vertex of your scene. Calculate the normal matrix on the CPU and send it to the shaders via a uniform before drawing (just like the model matrix) for better efficiency. https://learnopengl.com/Lighting/Basic-Lighting
+    //normal = aNormal;
+
+    fragPos = vec3(transform * vec4(aPos, 1.0f));
 }

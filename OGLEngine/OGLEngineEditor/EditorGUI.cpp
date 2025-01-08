@@ -7,6 +7,7 @@
 #include <iostream>
 #include <gtc/matrix_transform.hpp>
 #include "ObjectMessage.h"
+#include "Engine.h"
 
 void EditorGUI::Initialize(GLFWwindow* window, Graphics* graphics, Camera& camera, Shader& shader)
 {
@@ -154,8 +155,8 @@ void EditorGUI::CameraWindow()
 	ImGui::Text("Camera direction: %f %f %f", Camera::Get().myDirection.x, Camera::Get().myDirection.y, Camera::Get().myDirection.z);
 	ImGui::Text("Camera up: %f %f %f", Camera::Get().myUp.x, Camera::Get().myUp.y, Camera::Get().myUp.z);
 	ImGui::Text("Camera right: %f %f %f", Camera::Get().myRight.x, Camera::Get().myRight.y, Camera::Get().myRight.z);
-	//ImGui::Text("Camera speed: %f", &Camera::Get().MoveSpeed); //need to call flying camera for this.
-	
+	ImGui::Text("Camera speed: %i", Engine::Get().myFlyingCamera->myInput->GetScrollValue());
+
 	// //add new camera (not implemented as of yet, need to make a camera manager).
 	//if (ImGui::Button("Add new Camera", &CameraManager::Get().AddNewCamera()))
 	//{

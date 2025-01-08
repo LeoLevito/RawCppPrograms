@@ -17,8 +17,7 @@ int main()
 	Graphics* graphics = new Graphics;
 	graphics->Initialize(1280, 720);
 
-	Engine* engine = new Engine;
-	engine->Initialize(graphics->window, &Camera::Get());
+	Engine::Get().Initialize(graphics->window, &Camera::Get());
 
 	EditorGUI* editorGUI = new EditorGUI;
 	editorGUI->Initialize(graphics->window, graphics, Camera::Get(), *graphics->myShader);
@@ -38,7 +37,7 @@ int main()
 		glfwPollEvents(); //moved from Graphics::Render().
 		editorGUI->StartImGuiFrame(deltaTime);
 
-		engine->Update(graphics->window,deltaTime);
+		Engine::Get().Update(graphics->window,deltaTime);
 		graphics->Render();
 
 		editorGUI->RenderImGui(Camera::Get().projection);

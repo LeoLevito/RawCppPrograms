@@ -4,12 +4,60 @@ out vec4 FragColor;
 //in vec4 vertexColor;
 in vec2 texCoord;
 in vec3 normal;
+in vec3 fragPos;
 
 uniform sampler2D Texture; //automatically gets the last bound texture. No need to write to this uniform variable manually like the ones in the vertex shader. Whenever we Bind the texture the sampler2D will use that texture.
+//uniform sampler2D baseColor; //AKA DIFFUSE MAP
+//uniform sampler2D normalMap;
+//uniform sampler2D specularMap;
+//uniform sampler2D metallicMap;
+//uniform sampler2D AO;
+
+
+uniform vec3 objectColor = vec3(0f, 1.0f, 0f);
+uniform vec3 lightColor =  vec3(1.0f, 1.0f, 1.0f);
+uniform vec3 lightPosition = vec3(20.0f, 20.0f, 20.0f); 
+uniform vec3 viewPos;
 
 void main()
 {
-	FragColor = texture(Texture, texCoord); 
-	//FragColor = vertexColor;
-	//FragColor = vec4(1, 0.2, 0.1, 1);
+	//Diffuse/BaseColor update
+	//vec4 diffuseTexel = texture(diffuseMap, texCoord);
+	//FragColor = vec4(0,0,0 diffuseTexel.w);
+	//FragColor.xyz += diffuseTexel.xyz * materialAmbient * light_ambient;
+	//FragColor.xyz += diffuseTexel.xyz * diffusePart * attenuation;
+
+	//Specular update
+	//vec3 specularTexel = texture(specularMap, texCoord)
+	//FragColor.xyz += totalBrightness * light_specular * attenuation * materialSpecular.xyz * specularTexel;
+	//ALT:
+	//FragColor.xyz += diffuseTexel.xyz * totalBrightness * light_specular * attenuation * materialSpecular.xyz;
+
+	//for (int i = 0; i< specularTexel.x; i++)
+	//{
+	//	totalBrightness *= initialBrightness;
+	//}
+
+
+
+	float ambientStrength = 0.1f;
+	vec3 ambient = ambientStrength * lightColor;
+
+	vec3 norm = normalize(normal);
+	vec3 lightDir = normalize(lightPosition - fragPos); //lightPos now follows the fragPos wherever it goes, need to change this to... world position (?).
+
+	float diff = max(dot(norm,lightDir), 0.0f);
+	vec3 diffuse = diff * lightColor;
+
+	float specularStrength = 0.9f;
+	vec3 viewDir = normalize(viewPos - fragPos);
+	vec3 reflectDir = reflect(-lightDir, norm); 
+
+	float spec = pow(max(dot(viewDir, reflectDir),0.0f), 128); //32 is the shininess value of the specular highlight. Increase the value, more shininess to the highlight, decrease the value, more matte highlight.
+	vec3 specular = specularStrength * spec * lightColor;
+
+	vec3 result = (ambient + diffuse + specular) * objectColor;
+	FragColor = vec4(result, 1.0f);
+	//FragColor = texture(Texture, texCoord); 
+
 }

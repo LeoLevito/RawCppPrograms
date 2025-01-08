@@ -117,6 +117,7 @@ void MeshComponent::DrawMesh(Shader& shader)
 	shader.SetMatrix4(trans, "transform"); //apperently there's a better way to do this compared to using a Uniform type variable inside the vertex shader, Shader Buffer Storage Object, something like that, where we can have even more variables inside the shader and update them.
 	shader.SetMatrix4(Camera::Get().myView, "view");
 	shader.SetMatrix4(Camera::Get().projection, "projection");
+	shader.SetVector3(Camera::Get().myPosition, "viewPos"); //Doesn't really make sense to update this here but whatever.
 	mesh->Draw(&shader);
 }
 

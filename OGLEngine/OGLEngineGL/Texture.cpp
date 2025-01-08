@@ -8,8 +8,8 @@
 Texture::Texture(const char* path)
 {
 	int Channels = 0;
-	Width = 0;
-	Height = 0;
+	Width = 0; //set in stbi_load.
+	Height = 0; //set in stbi_load.
 
 	stbi_set_flip_vertically_on_load(true); //mirror texture vertically before loading it because OpenGL is weird. //https://learnopengl.com/index.php?p=Getting-started/Textures
 	unsigned char* data = stbi_load(path, &Width, &Height, &Channels, 0); //load in texture from path using stb_image header.
