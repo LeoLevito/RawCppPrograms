@@ -1,84 +1,93 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    <Filter Include="Camera">
+      <UniqueIdentifier>{5831f6c9-3df7-4fe1-b4c2-794b12e18154}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    <Filter Include="Graphics">
+      <UniqueIdentifier>{a2fc84bc-abf8-4bd0-9aef-56a1b371bead}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="Mesh">
+      <UniqueIdentifier>{8142da82-71ce-4f5c-b07f-c5f4be428727}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GLAD">
+      <UniqueIdentifier>{446b293e-03d1-402b-bafa-d13375054eb0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="STB_IMAGE">
+      <UniqueIdentifier>{c0176fa8-34fa-4893-b07f-d8a0b7789f92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader">
+      <UniqueIdentifier>{bc5c6288-d303-48be-ab39-f6c9c5af8ba2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Texture">
+      <UniqueIdentifier>{5d7d8d84-dc5d-421e-aacd-8e84fa905757}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Dependencies\GLAD\src\glad.c">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Camera</Filter>
     </ClCompile>
     <ClCompile Include="Graphics.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Shader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Mesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Triangle.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Cube.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Mesh</Filter>
     </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="stb_image.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Texture.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Mesh</Filter>
     </ClCompile>
     <ClCompile Include="ObjReader.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="Triangle.cpp">
+      <Filter>Mesh</Filter>
     </ClCompile>
     <ClCompile Include="vboindexer.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Dependencies\GLAD\src\glad.c">
+      <Filter>GLAD</Filter>
+    </ClCompile>
+    <ClCompile Include="stb_image.cpp">
+      <Filter>STB_IMAGE</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Texture</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
     <ClInclude Include="Graphics.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Shader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Mesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Triangle.h">
-      <Filter>Header Files</Filter>
+      <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Cube.h">
-      <Filter>Header Files</Filter>
+      <Filter>Mesh</Filter>
     </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="stb_image.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Texture.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Mesh.h">
+      <Filter>Mesh</Filter>
     </ClInclude>
     <ClInclude Include="ObjReader.h">
-      <Filter>Header Files</Filter>
+      <Filter>Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Triangle.h">
+      <Filter>Mesh</Filter>
     </ClInclude>
     <ClInclude Include="vboindexer.h">
-      <Filter>Header Files</Filter>
+      <Filter>Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="stb_image.h">
+      <Filter>STB_IMAGE</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Texture</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

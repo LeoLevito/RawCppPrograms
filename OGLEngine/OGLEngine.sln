@@ -13,7 +13,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OGLEngineEditor", "OGLEngin
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OGLEnginePhysics", "OGLEnginePhysics\OGLEnginePhysics.vcxproj", "{1CFAFE04-3830-4DBF-94FD-AD0FE41F0209}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{AED4FC76-6231-4DF3-A019-3A95887EB951}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "My Shaders", "My Shaders", "{AED4FC76-6231-4DF3-A019-3A95887EB951}"
 	ProjectSection(SolutionItems) = preProject
 		Shaders\FragmentShader.fragments = Shaders\FragmentShader.fragments
 		Shaders\VertexShader.vertexs = Shaders\VertexShader.vertexs
