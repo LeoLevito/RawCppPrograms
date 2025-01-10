@@ -17,7 +17,7 @@
 MeshComponent::MeshComponent()
 {
 	name = "Mesh component";
-
+	myTexture = new Texture("../Textures/Bliss/Bliss.jpg");
 	//mesh = MeshManager::Get().LoadMesh("../Models/TreeTrunk");
 	//mesh->bufferMesh();
 	//mesh->ApplyTexture(myTexture);
@@ -152,8 +152,8 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 
 	if (ImGui::BeginPopup("Texture Popup"))
 	{
-		//ImTextureID texid = myTexture->TextureObject;
-		//ImVec2 texsize = ImVec2(32, 32);
+		ImTextureID texid = myTexture->TextureObject;
+		ImVec2 texsize = ImVec2(32, 32);
 
 		ImGui::SeparatorText("TEXTURES:");
 
@@ -171,8 +171,8 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 			}
 			else
 			{
-				//ImGui::Image(texid, texsize); //Display image. I need a texture manager. 
-				//ImGui::SameLine(); 
+				ImGui::Image(texid, texsize); //Display image. I need a texture manager. 
+				ImGui::SameLine(); 
 				std::string textureName = textureVector[i].path().string().c_str();
 				textureName.erase(textureName.length() - 4);
 				textureName.erase(textureName.begin(), textureName.begin() + currentDirectoryName.length() + 1);
