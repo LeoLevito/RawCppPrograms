@@ -34,27 +34,8 @@ void Graphics::Initialize(int width, int height)
 
 	myShader = new Shader; //quick fix for the 0xCCCCCCCC write/read access violation.
 	myShader->Initialize("../Shaders/VertexShader.vertexs", "../Shaders/FragmentShader.fragments");
-	//myTriangle = new Triangle(); //quick fix for the 0xCCCCCCCC write/read access violation. Probably need to remember to do this more.
-	myCube = new Cube();
-	myTexture = new Texture("../Textures/Bliss.jpg"); //I remember Martin saying that the texture will load to fragment shader without having to set the uniform variable in it.
-	myCube->ApplyTexture(myTexture); 
-	//myCubePositions.push_back(glm::vec3(0.0f,0.0f,0.0f));
 
 	glEnable(GL_DEPTH_TEST); //enable depth testing, this makes it so objects in front occlude objects in back.
-
-	for (size_t x = 0; x < 10; x++) //10x10 grid, is this how to make the 100 cubes Martin did? EDIT: It is!
-	{
-		for (size_t y = 0; y < 10; y++)
-		{
-			for (size_t z = 0; z < 10; z++)
-			{
-				//VirtualObject* b = new VIrtualObject(*myCube, *myTexture, *myShader);
-				//myObjects->puch.back();
-				myCubePositions.push_back(glm::vec3(x * 2.0f, z * 2.0f, y * 2.0f));
-			}
-		}
-	}
-	myCubePositions[0].x -= 5.5f; //test to move a single cube.
 }
 
 void Graphics::Render()

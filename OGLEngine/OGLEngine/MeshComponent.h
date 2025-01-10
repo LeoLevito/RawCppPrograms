@@ -12,6 +12,8 @@
 #include "imgui_impl_opengl3.h"
 #include "Message.h"
 #include "MeshMessage.h"
+#include <filesystem>
+
 class MeshMessage;
 class ObjReader;
 
@@ -34,6 +36,9 @@ public:
 
 	void Update(Shader* shader) override;
 	bool meshInvalid = false;
+	std::string lastSelectedMeshName;
+	std::vector<std::filesystem::directory_entry> textureVector;
+	std::vector<std::filesystem::directory_entry> meshVector;
 private:
 };
 

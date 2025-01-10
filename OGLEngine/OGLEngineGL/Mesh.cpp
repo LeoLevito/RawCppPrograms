@@ -75,7 +75,6 @@ Mesh::~Mesh() //when mesh is deleted, also delete Vertex Array and Vertex Buffer
 
 void Mesh::Draw(Shader* shader) //Draw mesh;
 {
-
 	if (myTexture != NULL) 
 	{
 		glBindTexture(GL_TEXTURE_2D, myTexture->TextureObject); //so we have a new texture binding in Draw() because otherwise fragment shader would take the last binded texture, this allows us to use different textures for different objects (in the future).

@@ -18,88 +18,178 @@ MeshComponent::MeshComponent()
 {
 	name = "Mesh component";
 
-	myTexture = new Texture("../Textures/Bliss.jpg");
-	myShader = new Shader;
-	myShader->Initialize("../Shaders/VertexShader.vertexs", "../Shaders/FragmentShader.fragments");
-
-	mesh = MeshManager::Get().LoadMesh("../Models/TreeTrunk");
-	mesh->bufferMesh();
-	mesh->ApplyTexture(myTexture);
+	//mesh = MeshManager::Get().LoadMesh("../Models/TreeTrunk");
+	//mesh->bufferMesh();
+	//mesh->ApplyTexture(myTexture);
 
 	position = glm::vec3(0, 0, 0);
 	rotation = glm::vec3(0, 0, 0);
 	scale = glm::vec3(1, 1, 1);
+
+
+	//Get all texture file names.
+	std::string path = "../Textures/";
+	for (const std::filesystem::directory_entry entry : std::filesystem::recursive_directory_iterator(path))
+	{
+		textureVector.push_back(entry);
+	}
+
+	//Get all mesh file names.
+	std::string path2 = "../Meshes/";
+	for (const std::filesystem::directory_entry entry : std::filesystem::recursive_directory_iterator(path2))
+	{
+		if (!entry.path().has_extension())
+		{
+			meshVector.push_back(entry);
+		}
+		else
+		{
+			if (entry.path().extension() == ".obj")
+			{
+				meshVector.push_back(entry);
+			}
+		}
+	}
 }
 
 MeshComponent::~MeshComponent()
 {
 	std::cout << "-->Deleting Mesh component." << std::endl;
-	delete myShader;
 	delete myTexture;
-	//delete mesh; //now we cache meshes in the MeshManager, so deleting here screws things up in the MeshManager.
 }
 
 void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 {
 	Component::DrawComponentSpecificImGuiHierarchyAdjustables();
-	//Change texture of mesh using ImGui. Would ideally improve this by being able to choose available textures from a drop down menu for example.
-	static char str0[128] = "Bliss2.jpg"; //how it's done in the ImGui demo, tho it is replicated across all objects now...
-	ImGui::InputText("Texture name", str0, IM_ARRAYSIZE(str0)); //Yeah, I gotta change this to a dropdown or something.
-	if (ImGui::Button("Change Texture"))
+
+	//<-----------------MESH SELECTION UI--------------------->
+
+	if (ImGui::Button("Select Mesh"))
 	{
-		std::string path = "../Textures/";
-		path.append(str0);
-
-		std::cout << path << std::endl;
-
-		delete myTexture;
-		myTexture = new Texture(path.c_str());
-
-		mesh->ApplyTexture(myTexture);
+		ImGui::OpenPopup("Mesh Popup");
 	}
 
-	//Change mesh of mesh using ImGui. Would ideally improve this by being able to choose available meshes from a drop down menu for example.
-	//EDIT: WOAH, just saw that it's possible to open file explorer with ImGui to choose .obj files from a specified directory, that's a possibility!.
-	static char str1[128] = "TreeTrunk"; //how it's done in the ImGui demo, tho it is replicated across all objects now...
-	ImGui::InputText("Mesh name", str1, IM_ARRAYSIZE(str1)); //Yeah, I gotta change this to a dropdown or something.
-	if (ImGui::Button("load Mesh"))
+	if (ImGui::BeginPopup("Mesh Popup"))
 	{
-		std::string path = "../Models/";
-		path.append(str1);
-		std::cout << path << std::endl;
+		ImGui::SeparatorText("MESHES:");
 
-		MeshMessage* newMessage = new MeshMessage();
-		newMessage->meshToLoad = path;
-		MeshManager::Get().QueueMessage(newMessage);
+		std::string currentDirectoryName;
+
+		for (int i = 0; i < meshVector.size(); i++)
+		{
+			ImGui::PushID(i);
+
+			if (!meshVector[i].path().has_extension())
+			{
+				currentDirectoryName = meshVector[i].path().string().c_str();
+				ImGui::SeparatorText(currentDirectoryName.c_str()); //Display new SeparatorText for directories.
+			}
+			else
+			{
+				std::string loadableMeshName = meshVector[i].path().string().c_str();
+				loadableMeshName.erase(loadableMeshName.length() - 4);
+
+				std::string selectableMeshName = loadableMeshName;
+				selectableMeshName.erase(selectableMeshName.begin(), selectableMeshName.begin() + currentDirectoryName.length() + 1);
+
+				if (ImGui::Selectable(selectableMeshName.c_str())) //Display new Selectable for texture files.
+				{
+					lastSelectedMeshName = selectableMeshName;
+					MeshMessage* newMessage = new MeshMessage();
+					newMessage->meshToLoad = loadableMeshName.c_str();
+					MeshManager::Get().QueueMessage(newMessage);
+				}
+			}
+			ImGui::PopID();
+		}
+		ImGui::EndPopup();
 	}
-	
+
 	if (MeshManager::Get().currentlyLoadingMesh != false)
 	{
 		ImGui::SameLine();
 		ImGui::Text("Loading mesh into memory...");
 	}
 
-	if (ImGui::Button("Change Mesh"))
+	if (ImGui::Button("Apply mesh")) //Not ideal right now, but it was the fastest way to get threaded mesh loading working. Maybe wanna send back a message to this component to change the mesh once the MeshManager is done loading the mesh.
 	{
-		mesh = MeshManager::Get().lastAccessedMesh; 
+		mesh = MeshManager::Get().lastAccessedMesh;
 		if (mesh->meshLoadedCorrectly == false)
 		{
 			meshInvalid = true;
+			ImGui::OpenPopup("MeshInvalidPopupModal");
 		}
-		else 
+		else
 		{
 			meshInvalid = false;
 			mesh->bufferMesh();
 			mesh->ApplyTexture(myTexture);
 		}
 	}
-	if (meshInvalid == true)
-	{
-		ImGui::SameLine();
-		ImGui::Text("Mesh not loaded correctly.");
 
-		//should instead do like an ImGui warning popup saying that the mesh couldn't load in case the parse fails. 
-		//maybe ImGui::IsPopupOpen()?)
+	if (ImGui::BeginPopupModal("MeshInvalidPopupModal"))
+	{
+		ImGui::Text("Error message: Failed to read mesh data. ");
+		ImGui::Text("Name of mesh: %s", lastSelectedMeshName.c_str());
+		ImGui::Text("The specified mesh may not be compatible with our .obj parser, \ntry re-exporting it from your 3D-program.");
+		ImGui::Separator();
+
+		if (ImGui::Button("OK", ImVec2(120, 0)))
+		{
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::EndPopup();
+	}
+
+
+	//<-----------------TEXTURE SELECTION UI--------------------->
+
+
+	if (ImGui::Button("Texture Popup test"))
+	{
+		ImGui::OpenPopup("Texture Popup");
+	}
+
+	if (ImGui::BeginPopup("Texture Popup"))
+	{
+		//ImTextureID texid = myTexture->TextureObject;
+		//ImVec2 texsize = ImVec2(32, 32);
+
+		ImGui::SeparatorText("TEXTURES:");
+
+		std::string currentDirectoryName;
+
+		for (int i = 0; i < textureVector.size(); i++)
+		{
+			ImGui::PushID(i);
+
+			if (!textureVector[i].path().has_extension())
+			{
+				currentDirectoryName = textureVector[i].path().string().c_str();
+				ImGui::SeparatorText(currentDirectoryName.c_str()); //Display new SeparatorText for directories.
+
+			}
+			else
+			{
+				//ImGui::Image(texid, texsize); //Display image. I need a texture manager. 
+				//ImGui::SameLine(); 
+				std::string textureName = textureVector[i].path().string().c_str();
+				textureName.erase(textureName.length() - 4);
+				textureName.erase(textureName.begin(), textureName.begin() + currentDirectoryName.length() + 1);
+				if (ImGui::Selectable(textureName.c_str())) //Display new Selectable for texture files.
+				{
+					delete myTexture;
+					myTexture = new Texture(textureVector[i].path().string().c_str()); //full path with file extension needed for stbi_load to work.
+
+					if (mesh != nullptr)
+					{
+						mesh->ApplyTexture(myTexture);
+					}
+				}
+			}
+			ImGui::PopID();
+		}
+		ImGui::EndPopup();
 	}
 }
 
@@ -133,6 +223,9 @@ void MeshComponent::Update(Shader* shader)
 			scale = dynamic_cast<TransformComponent*>(owner->components[i])->scale;
 		}
 	}
-	
-	DrawMesh(*shader); //Shader is scuffed right now.
+
+	if (mesh != nullptr)
+	{
+		DrawMesh(*shader);
+	}
 }
