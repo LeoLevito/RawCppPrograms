@@ -172,7 +172,7 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 			else
 			{
 				ImGui::Image(texid, texsize); //Display image. I need a texture manager. 
-				ImGui::SameLine(); 
+				ImGui::SameLine();
 				std::string textureName = textureVector[i].path().string().c_str();
 				textureName.erase(textureName.length() - 4);
 				textureName.erase(textureName.begin(), textureName.begin() + currentDirectoryName.length() + 1);
@@ -190,6 +190,23 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 			ImGui::PopID();
 		}
 		ImGui::EndPopup();
+	}
+
+	if (ImGui::DragFloat3("ambient", &ambient.x, .01f))
+	{
+		shaderRef->SetVector3(ambient, "material.ambient");
+	}
+	if (ImGui::DragFloat3("diffuse", &diffuse.x, .01f))
+	{
+		shaderRef->SetVector3(diffuse, "material.diffuse");
+	}
+	if (ImGui::DragFloat3("specular", &specular.x, .01f))
+	{
+		shaderRef->SetVector3(specular, "material.specular");
+	}
+	if (ImGui::DragFloat("shininess", &shininess, .01f))
+	{
+		shaderRef->SetFloat(shininess, "material.shininess");
 	}
 }
 
@@ -213,6 +230,24 @@ void MeshComponent::DrawMesh(Shader& shader)
 
 void MeshComponent::Update(Shader* shader)
 {
+	if (!isShaderRefSet) //I need to get rid of this shader pointer in the Update function. Maybe a ShaderManager would work.
+	{
+		Shader& realShaderRef = *shader;
+		shaderRef = &realShaderRef;
+
+		//setting default values for material light behavior. Also, why does the Light Component only work properly when I add a new Mesh Component to the same GameObject? Need to investigate futher.
+		ambient = glm::vec3(0, 0, 0);
+		diffuse = glm::vec3(1, 1, 1);
+		specular = glm::vec3(1, 1, 1);
+		shininess = 128.0f;
+		shaderRef->SetVector3(ambient, "material.ambient");
+		shaderRef->SetVector3(diffuse, "material.diffuse");
+		shaderRef->SetVector3(specular, "material.specular");
+		shaderRef->SetFloat(shininess, "material.shininess");
+
+		isShaderRefSet = true;
+	}
+
 	for (size_t i = 0; i < owner->components.size(); i++)
 	{
 		if (dynamic_cast<TransformComponent*>(owner->components[i])) //checking if owner has a component of type TransformComponent. Is of-type correct word-use in this case?

@@ -123,4 +123,9 @@ void Shader::SetVector3(glm::vec3 vector3, const std::string& name)
     glUniform3fv(glGetUniformLocation(myShaderProgram, name.c_str()), 1, &vector3[0]);
 }
 
+void Shader::SetFloat(float value, const std::string& name)
+{
+    glUniform1f(glGetUniformLocation(myShaderProgram, name.c_str()), value);
+}
+
 

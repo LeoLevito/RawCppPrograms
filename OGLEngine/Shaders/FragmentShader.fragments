@@ -19,6 +19,27 @@ uniform vec3 lightColor =  vec3(1.0f, 1.0f, 1.0f);
 uniform vec3 lightPosition = vec3(20.0f, 20.0f, 20.0f); 
 uniform vec3 viewPos;
 
+struct Material 
+{
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
+	float shininess;
+};
+
+uniform Material material;
+
+struct Light 
+{
+	vec3 position;
+
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
+};
+
+uniform Light light;
+
 void main()
 {
 	//Diffuse/BaseColor update
@@ -40,24 +61,26 @@ void main()
 
 
 
+
 	float ambientStrength = 0.1f;
-	vec3 ambient = ambientStrength * lightColor;
-
-	vec3 norm = normalize(normal);
-	vec3 lightDir = normalize(lightPosition - fragPos); //lightPos now follows the fragPos wherever it goes, need to change this to... world position (?).
-
-	float diff = max(dot(norm,lightDir), 0.0f);
-	vec3 diffuse = diff * lightColor;
-
 	float specularStrength = 0.9f;
+
+	//ambient
+	vec3 ambient = light.ambient * material.ambient;
+
+	//diffuse
+	vec3 norm = normalize(normal);
+	vec3 lightDir = normalize(light.position - fragPos); //lightPos now follows the fragPos wherever it goes, need to change this to... world position (?).
+	float diff = max(dot(norm,lightDir), 0.0f);
+	vec3 diffuse = light.diffuse * (diff * material.diffuse);
+
+	//specular
 	vec3 viewDir = normalize(viewPos - fragPos);
 	vec3 reflectDir = reflect(-lightDir, norm); 
+	float spec = pow(max(dot(viewDir, reflectDir), 0.0f), material.shininess); //32 is the shininess value of the specular highlight. Increase the value, more shininess to the highlight with smaller radius, decrease the value, more matte highlight with larger radius.
+	vec3 specular = light.specular * (spec * material.specular);
 
-	float spec = pow(max(dot(viewDir, reflectDir),0.0f), 128); //32 is the shininess value of the specular highlight. Increase the value, more shininess to the highlight, decrease the value, more matte highlight.
-	vec3 specular = specularStrength * spec * lightColor;
-
-	vec3 result = (ambient + diffuse + specular) * objectColor;
+	//Final result
+	vec3 result = ambient + diffuse + specular;
 	FragColor = vec4(result, 1.0f);
-	//FragColor = texture(Texture, texCoord); 
-
 }

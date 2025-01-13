@@ -39,6 +39,18 @@ public:
 	std::string lastSelectedMeshName;
 	std::vector<std::filesystem::directory_entry> textureVector;
 	std::vector<std::filesystem::directory_entry> meshVector;
+
+
+	//fast and sloppy coding.
+	Shader* shaderRef;
+	bool isShaderRefSet;
+
+	//material properties.
+	glm::vec3 ambient;
+	glm::vec3 diffuse;
+	glm::vec3 specular;
+	float shininess;
+
 private:
 };
 
