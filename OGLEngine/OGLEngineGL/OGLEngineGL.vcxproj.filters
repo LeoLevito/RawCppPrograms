@@ -22,6 +22,9 @@
     <Filter Include="Texture">
       <UniqueIdentifier>{5d7d8d84-dc5d-421e-aacd-8e84fa905757}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Managers">
+      <UniqueIdentifier>{da583f7d-e4b9-4218-a2ec-f0ba46197387}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp">

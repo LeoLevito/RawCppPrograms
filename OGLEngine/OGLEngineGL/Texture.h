@@ -8,5 +8,6 @@ public:
 	int Height;
 	
 	unsigned int TextureObject;
+	//GLenum imageFormat;
 };
 

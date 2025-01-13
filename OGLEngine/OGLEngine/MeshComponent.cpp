@@ -17,7 +17,7 @@
 MeshComponent::MeshComponent()
 {
 	name = "Mesh component";
-	myTexture = new Texture("../Textures/Bliss/Bliss.jpg");
+	diffuseMap = new Texture("../Textures/Bliss/Bliss.jpg");
 	//mesh = MeshManager::Get().LoadMesh("../Models/TreeTrunk");
 	//mesh->bufferMesh();
 	//mesh->ApplyTexture(myTexture);
@@ -55,7 +55,8 @@ MeshComponent::MeshComponent()
 MeshComponent::~MeshComponent()
 {
 	std::cout << "-->Deleting Mesh component." << std::endl;
-	delete myTexture;
+	delete diffuseMap;
+	delete specularMap;
 }
 
 void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
@@ -123,7 +124,7 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 		{
 			meshInvalid = false;
 			mesh->bufferMesh();
-			mesh->ApplyTexture(myTexture);
+			mesh->ApplyDiffuseMap(diffuseMap);
 		}
 	}
 
@@ -145,14 +146,21 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 	//<-----------------TEXTURE SELECTION UI--------------------->
 
 
-	if (ImGui::Button("Texture Popup test"))
+	if (ImGui::Button("Choose diffuse map"))
 	{
+		textureChoice = TextureChoice::choice_diffuse;
+		ImGui::OpenPopup("Texture Popup");
+	}
+
+	if (ImGui::Button("Choose specular map"))
+	{
+		textureChoice = TextureChoice::choice_specular;
 		ImGui::OpenPopup("Texture Popup");
 	}
 
 	if (ImGui::BeginPopup("Texture Popup"))
 	{
-		ImTextureID texid = myTexture->TextureObject;
+		ImTextureID texid = diffuseMap->TextureObject;
 		ImVec2 texsize = ImVec2(32, 32);
 
 		ImGui::SeparatorText("TEXTURES:");
@@ -178,12 +186,27 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 				textureName.erase(textureName.begin(), textureName.begin() + currentDirectoryName.length() + 1);
 				if (ImGui::Selectable(textureName.c_str())) //Display new Selectable for texture files.
 				{
-					delete myTexture;
-					myTexture = new Texture(textureVector[i].path().string().c_str()); //full path with file extension needed for stbi_load to work.
-
 					if (mesh != nullptr)
 					{
-						mesh->ApplyTexture(myTexture);
+						switch (textureChoice)
+						{
+						case MeshComponent::choice_diffuse:
+							delete diffuseMap;
+							diffuseMap = new Texture(textureVector[i].path().string().c_str()); //full path with file extension needed for stbi_load to work.
+							shaderRef->SetInt(0, "material.diffuse"); //why do I need to do this again? time to re-read https://learnopengl.com/Lighting/Lighting-maps
+							mesh->ApplyDiffuseMap(diffuseMap);
+							
+							break;
+						case MeshComponent::choice_specular:
+							delete specularMap;
+							specularMap = new Texture(textureVector[i].path().string().c_str()); //full path with file extension needed for stbi_load to work.
+							shaderRef->SetInt(1, "material.specular"); //why do I need to do this again? time to re-read https://learnopengl.com/Lighting/Lighting-maps
+							mesh->ApplySpecularMap(specularMap);
+							break;
+						default:
+							break;
+						}
+						
 					}
 				}
 			}

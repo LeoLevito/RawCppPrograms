@@ -12,7 +12,8 @@ public:
 	Mesh(ObjReader* objreader, const std::string& filename); //constructor 2 for obj
 	~Mesh(); //destructor
 	void Draw(Shader* shader);
-	void ApplyTexture(Texture* texture);
+	void ApplyDiffuseMap(Texture* texture);
+	void ApplySpecularMap(Texture* texture);
 
 	std::vector<unsigned int> indices;
 	std::vector<glm::vec3> indexed_vertices;
@@ -23,10 +24,13 @@ public:
 
 	void bufferMesh();
 
+	Texture* diffuseMap;
+	Texture* specularMap;
+
 protected:
 	unsigned int VBO, VAO, EBO;
 	unsigned int NBO, UVBO, CBO;
-	Texture* myTexture;
+
 private:
 	int IndicesSize;
 

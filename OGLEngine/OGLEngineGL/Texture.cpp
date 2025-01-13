@@ -14,6 +14,7 @@ Texture::Texture(const char* path)
 	stbi_set_flip_vertically_on_load(true); //mirror texture vertically before loading it because OpenGL is weird. //https://learnopengl.com/index.php?p=Getting-started/Textures
 	unsigned char* data = stbi_load(path, &Width, &Height, &Channels, 0); //load in texture from path using stb_image header.
 
+	std::cout << "how many channels in texture? Answer: " << Channels << std::endl;
 	glGenTextures(1, &TextureObject); //similar to what we do in Mesh constructor with the VBO and VAO, we have to generate the TextureObject and bind it.
 	glBindTexture(GL_TEXTURE_2D, TextureObject);
 
@@ -24,7 +25,37 @@ Texture::Texture(const char* path)
 
 	if (data)
 	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, Width, Height, 0, GL_RGB, GL_UNSIGNED_BYTE, data); //bind texture that was loaded from path after parameters have been set. (data).
+		//example if channels = 1 or similar, change GL_RGB to GL_RG or similar.
+		//											    here.
+		auto imageFormat = GL_RGB;
+		switch (Channels)
+		{
+		case 0:
+			std::cout << "Failed to load texture, no channels in image. " << std::endl;
+			return;
+		case 1:
+			imageFormat = GL_RED;
+
+			//map red channel to rest of channels;
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_RED);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_RED);
+			//Alpha channel?
+
+			break;
+		case 2:
+			imageFormat = GL_RG;
+			break;
+		case 3:
+			imageFormat = GL_RGB;
+			break;
+		case 4:
+			imageFormat = GL_RGBA;
+			break;
+		default:
+			break;
+		}
+
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, Width, Height, 0, imageFormat, GL_UNSIGNED_BYTE, data); //bind texture that was loaded from path after parameters have been set. (data). NOTE: GL_RGB doesn't support images with a bit depth of 8. So be sure to re-save your images for 24, 32, 48 and maybe even 16 .
 		glGenerateMipmap(GL_TEXTURE_2D); //Generate mipmaps
 	}
 	else

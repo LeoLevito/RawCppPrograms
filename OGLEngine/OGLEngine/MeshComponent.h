@@ -23,8 +23,9 @@ public:
 	MeshComponent();
 	~MeshComponent();
 	Mesh* mesh;
-	Texture* myTexture;
-	Shader* myShader;
+
+	Texture* diffuseMap;
+	Texture* specularMap;
 
 	void DrawComponentSpecificImGuiHierarchyAdjustables() override;
 
@@ -50,6 +51,14 @@ public:
 	glm::vec3 diffuse;
 	glm::vec3 specular;
 	float shininess;
+
+	enum TextureChoice
+	{
+		choice_diffuse,
+		choice_specular
+	};
+
+	TextureChoice textureChoice;
 
 private:
 };

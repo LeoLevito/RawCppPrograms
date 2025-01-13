@@ -75,9 +75,16 @@ Mesh::~Mesh() //when mesh is deleted, also delete Vertex Array and Vertex Buffer
 
 void Mesh::Draw(Shader* shader) //Draw mesh;
 {
-	if (myTexture != NULL) 
+	if (diffuseMap != NULL) 
 	{
-		glBindTexture(GL_TEXTURE_2D, myTexture->TextureObject); //so we have a new texture binding in Draw() because otherwise fragment shader would take the last binded texture, this allows us to use different textures for different objects (in the future).
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, diffuseMap->TextureObject); //so we have a new texture binding in Draw() because otherwise fragment shader would take the last binded texture, this allows us to use different textures for different objects (in the future).
+	}
+
+	if (specularMap != NULL)
+	{
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, specularMap->TextureObject); //so we have a new texture binding in Draw() because otherwise fragment shader would take the last binded texture, this allows us to use different textures for different objects (in the future).
 	}
 
 	shader->Use();
@@ -103,9 +110,14 @@ void Mesh::Draw(Shader* shader) //Draw mesh;
 	glBindTexture(GL_TEXTURE_2D, 0); //unbind texture after we're done drawing. This allows us to use different textures for different objects (in the future), since the fragment shader used for this specific mesh will use basically it's own binded texture, if I understand correctly.
 }
 
-void Mesh::ApplyTexture(Texture* texture) //Set Local myTexture so it can be used in the Draw() function.
+void Mesh::ApplyDiffuseMap(Texture* texture) //Set Local myTexture so it can be used in the Draw() function.
 {
-	myTexture = texture;
+	diffuseMap = texture;
+}
+
+void Mesh::ApplySpecularMap(Texture* texture)
+{
+	specularMap = texture;
 }
 
 void Mesh::bufferMesh()

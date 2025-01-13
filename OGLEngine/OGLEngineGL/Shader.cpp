@@ -128,4 +128,9 @@ void Shader::SetFloat(float value, const std::string& name)
     glUniform1f(glGetUniformLocation(myShaderProgram, name.c_str()), value);
 }
 
+void Shader::SetInt(int value, const std::string& name)
+{
+    glUniform1i(glGetUniformLocation(myShaderProgram, name.c_str()), value);
+}
+
 

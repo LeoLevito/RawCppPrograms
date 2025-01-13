@@ -41,6 +41,8 @@ void LightComponent::Update(Shader* shader)
 		{
 			//multiple casts, in UPDATE()? not sure how efficient this is. EDIT 5 dec 2024, apparently this dynamic_cast is better than other types of casts, even Emil has used them multiple times.
 			position = dynamic_cast<TransformComponent*>(owner->components[i])->position; //need to get a reference to the transform component if there is one.
+			//rotation = dynamic_cast<TransformComponent*>(owner->components[i])->rotation;
+			//scale = dynamic_cast<TransformComponent*>(owner->components[i])->scale;
 			shader->SetVector3(position, "light.position"); //Light position will be kept when this component is deleted, because it was last updated here.
 		}
 	}
