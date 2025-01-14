@@ -1,23 +1,36 @@
 #version 330 core
 out vec4 FragColor;
 
-in vec2 texCoord;
-in vec3 normal;
-in vec3 fragPos;
-
-uniform vec3 viewPos;
-
 struct Material 
 {
 	sampler2D diffuse;
 	sampler2D specular;
-	//vec3 specular;
 	float shininess;
 };
 
-uniform Material material;
+struct DirectionalLight 
+{
+	vec3 direction;
 
-struct Light 
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
+};
+
+struct PointLight 
+{
+	vec3 position;
+
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
+
+	float constant;
+	float linear;
+	float quadratic;
+};
+
+struct SpotLight 
 {
 	vec3 position;
 	vec3 direction;
@@ -34,40 +47,102 @@ struct Light
 	float outerCutoff;
 };
 
-uniform Light light;
+#define NR_POINT_LIGHTS 4
+
+in vec2 texCoord;
+in vec3 normal;
+in vec3 FragPos;
+
+uniform vec3 viewPos;
+uniform DirectionalLight directionalLight;
+uniform PointLight pointLights[NR_POINT_LIGHTS];
+uniform SpotLight spotLight;
+uniform Material material;
+
+vec3 CalcDirectionalLight(DirectionalLight light, vec3 norm, vec3 viewDir);							//forward declare function so we can define it below the main() function.
+vec3 CalcPointLight(PointLight light, vec3 norm, vec3 fragPos, vec3 viewDir); 
+vec3 CalcSpotLight(SpotLight light, vec3 norm, vec3 fragPos, vec3 viewDir);
 
 void main()
 {
-		//ambient
-		vec3 ambient = light.ambient * vec3(texture(material.diffuse, texCoord));
+	vec3 norm = normalize(normal);
+	vec3 viewDir = normalize(viewPos - FragPos);
 
-		//diffuse
-		vec3 norm = normalize(normal);
-		vec3 lightDir = normalize(light.position - fragPos); //lightPos now follows the fragPos wherever it goes, need to change this to... world position (?).
-		float diff = max(dot(norm,lightDir), 0.0f);
-		vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, texCoord));
+	//Final result
+	vec3 result = CalcDirectionalLight(directionalLight, norm, viewDir);
 
-		//specular
-		vec3 viewDir = normalize(viewPos - fragPos);
-		vec3 reflectDir = reflect(-lightDir, norm); 
-		float spec = pow(max(dot(viewDir, reflectDir), 0.0f), material.shininess); //32 is the shininess value of the specular highlight. Increase the value, more shininess to the highlight with smaller radius, decrease the value, more matte highlight with larger radius.
-		vec3 specular = light.specular * spec * vec3(texture(material.specular, texCoord));
+	//for(int i = 0; i < NR_POINT_LIGHTS; i++)
+	//{
+	//	result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);
+	//}
 
-		//spotlight (soft edges)
-		float theta = dot(lightDir, normalize(-light.direction));
-		float epsilon = (light.cutoff - light.outerCutoff);
-		float intensity = clamp((theta - light.outerCutoff) / epsilon, 0.0f, 1.0f);
-		diffuse *= intensity;
-		specular *= intensity;
+	result += CalcSpotLight(spotLight, norm, FragPos, viewDir); //SOMETHING WEIRD IS GOING ON WITH THE QUADRATIC PART OF THE SPOTLIGHT CALCULATIONS, IT NEEDS TO BE ANYTHING BUT 0 FOR THIS += TO WORK! NEED TO INVESTIGATE FURTHER TO PROPERLY IMPLEMENT MULTIPLE LIGHTS.
 
-		//attenuation
-		float distance = length(light.position - fragPos);
-		float attenuation = 1.0f / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
-		ambient *= attenuation;
-		diffuse *= attenuation;
-		specular *= attenuation;
 
-		//Final result
-		vec3 result = ambient + diffuse + specular;
-		FragColor = vec4(result, 1.0f);
+	FragColor = vec4(result, 1.0f);
+}
+
+
+vec3 CalcDirectionalLight(DirectionalLight light, vec3 norm, vec3 viewDir)
+{
+	vec3 lightDir = normalize(-light.direction); 
+
+	float diff = max(dot(norm,lightDir), 0.0f);
+
+	vec3 reflectDir = reflect(-lightDir, norm); 
+	float spec = pow(max(dot(viewDir, reflectDir), 0.0f), material.shininess); //32 is the shininess value of the specular highlight. Increase the value, more shininess to the highlight with smaller radius, decrease the value, more matte highlight with larger radius.
+
+	vec3 ambient = light.ambient * vec3(texture(material.diffuse, texCoord));
+	vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, texCoord));
+	vec3 specular = light.specular * spec * vec3(texture(material.specular, texCoord));
+
+	return (ambient + diffuse + specular);
+}
+
+vec3 CalcPointLight(PointLight light, vec3 norm, vec3 fragPos, vec3 viewDir)
+{
+	vec3 lightDir = normalize(light.position - fragPos); 
+
+	float diff = max(dot(norm,lightDir), 0.0f);
+
+	vec3 reflectDir = reflect(-lightDir, norm); 
+	float spec = pow(max(dot(viewDir, reflectDir), 0.0f), material.shininess);
+
+	float distance = length(light.position - fragPos);
+	float attenuation = 1.0f / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
+
+	vec3 ambient = light.ambient * vec3(texture(material.diffuse, texCoord));
+	vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, texCoord));
+	vec3 specular = light.specular * spec * vec3(texture(material.specular, texCoord));
+	ambient *= attenuation;
+	diffuse *= attenuation;
+	specular *= attenuation;
+
+	return (ambient + diffuse + specular);
+}
+
+vec3 CalcSpotLight(SpotLight light, vec3 norm, vec3 fragPos, vec3 viewDir)
+{
+	vec3 lightDir = normalize(light.position - fragPos); 
+
+	float diff = max(dot(norm,lightDir), 0.0f);
+
+	vec3 reflectDir = reflect(-lightDir, norm); 
+	float spec = pow(max(dot(viewDir, reflectDir), 0.0f), material.shininess);
+
+	float distance = length(light.position - fragPos);
+	float attenuation = 1.0f / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
+
+	float theta = dot(lightDir, normalize(-light.direction));
+	float epsilon = (light.cutoff - light.outerCutoff);
+	float intensity = clamp((theta - light.outerCutoff) / epsilon, 0.0f, 1.0f);
+
+	vec3 ambient = light.ambient * vec3(texture(material.diffuse, texCoord));
+	vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, texCoord));
+	vec3 specular = light.specular * spec * vec3(texture(material.specular, texCoord));
+	ambient *= attenuation * intensity;
+	diffuse *= attenuation * intensity;
+	specular *= attenuation * intensity;
+
+	return (ambient + diffuse + specular);
 }

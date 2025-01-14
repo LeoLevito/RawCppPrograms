@@ -29,6 +29,7 @@ public:
 	Shader* shaderRef;
 	bool isShaderRefSet;
 
+	int selectedType = 0;
 private:
 };
 
