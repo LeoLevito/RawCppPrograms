@@ -27,7 +27,7 @@ Texture::Texture(const char* path)
 	{
 		//example if channels = 1 or similar, change GL_RGB to GL_RG or similar.
 		//											    here.
-		auto imageFormat = GL_RGB;
+		int imageFormat = GL_RGB;
 		switch (Channels)
 		{
 		case 0:

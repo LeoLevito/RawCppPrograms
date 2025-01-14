@@ -12,12 +12,19 @@ public:
 	void DrawComponentSpecificImGuiHierarchyAdjustables() override;
 
 	glm::vec3 position;
-	//glm::vec3 rotation;
+	glm::vec3 rotation;
 	//glm::vec3 scale;
 
 	glm::vec3 ambient;
 	glm::vec3 diffuse;
 	glm::vec3 specular;
+
+	float constant;
+	float linear;
+	float quadratic;
+
+	float cutoff;
+	float outerCutoff;
 
 	Shader* shaderRef;
 	bool isShaderRefSet;

@@ -1,22 +1,10 @@
 #version 330 core
 out vec4 FragColor;
 
-//in vec4 vertexColor;
 in vec2 texCoord;
 in vec3 normal;
 in vec3 fragPos;
 
-uniform sampler2D Texture; //automatically gets the last bound texture. No need to write to this uniform variable manually like the ones in the vertex shader. Whenever we Bind the texture the sampler2D will use that texture.
-//uniform sampler2D baseColor; //AKA DIFFUSE MAP
-//uniform sampler2D normalMap;
-//uniform sampler2D specularMap;
-//uniform sampler2D metallicMap;
-//uniform sampler2D AO;
-
-
-uniform vec3 objectColor = vec3(0f, 1.0f, 0f);
-uniform vec3 lightColor =  vec3(1.0f, 1.0f, 1.0f);
-uniform vec3 lightPosition = vec3(20.0f, 20.0f, 20.0f); 
 uniform vec3 viewPos;
 
 struct Material 
@@ -32,55 +20,54 @@ uniform Material material;
 struct Light 
 {
 	vec3 position;
+	vec3 direction;
 
 	vec3 ambient;
 	vec3 diffuse;
 	vec3 specular;
+
+	float constant;
+	float linear;
+	float quadratic;
+
+	float cutoff;
+	float outerCutoff;
 };
 
 uniform Light light;
 
 void main()
 {
-	//Diffuse/BaseColor update
-	//vec4 diffuseTexel = texture(diffuseMap, texCoord);
-	//FragColor = vec4(0,0,0 diffuseTexel.w);
-	//FragColor.xyz += diffuseTexel.xyz * materialAmbient * light_ambient;
-	//FragColor.xyz += diffuseTexel.xyz * diffusePart * attenuation;
+		//ambient
+		vec3 ambient = light.ambient * vec3(texture(material.diffuse, texCoord));
 
-	//Specular update
-	//vec3 specularTexel = texture(specularMap, texCoord)
-	//FragColor.xyz += totalBrightness * light_specular * attenuation * materialSpecular.xyz * specularTexel;
-	//ALT:
-	//FragColor.xyz += diffuseTexel.xyz * totalBrightness * light_specular * attenuation * materialSpecular.xyz;
+		//diffuse
+		vec3 norm = normalize(normal);
+		vec3 lightDir = normalize(light.position - fragPos); //lightPos now follows the fragPos wherever it goes, need to change this to... world position (?).
+		float diff = max(dot(norm,lightDir), 0.0f);
+		vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, texCoord));
 
-	//for (int i = 0; i< specularTexel.x; i++)
-	//{
-	//	totalBrightness *= initialBrightness;
-	//}
+		//specular
+		vec3 viewDir = normalize(viewPos - fragPos);
+		vec3 reflectDir = reflect(-lightDir, norm); 
+		float spec = pow(max(dot(viewDir, reflectDir), 0.0f), material.shininess); //32 is the shininess value of the specular highlight. Increase the value, more shininess to the highlight with smaller radius, decrease the value, more matte highlight with larger radius.
+		vec3 specular = light.specular * spec * vec3(texture(material.specular, texCoord));
 
+		//spotlight (soft edges)
+		float theta = dot(lightDir, normalize(-light.direction));
+		float epsilon = (light.cutoff - light.outerCutoff);
+		float intensity = clamp((theta - light.outerCutoff) / epsilon, 0.0f, 1.0f);
+		diffuse *= intensity;
+		specular *= intensity;
 
+		//attenuation
+		float distance = length(light.position - fragPos);
+		float attenuation = 1.0f / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
+		ambient *= attenuation;
+		diffuse *= attenuation;
+		specular *= attenuation;
 
-
-	float ambientStrength = 0.1f;
-	float specularStrength = 0.9f;
-
-	//ambient
-	vec3 ambient = light.ambient * vec3(texture(material.diffuse, texCoord));
-
-	//diffuse
-	vec3 norm = normalize(normal);
-	vec3 lightDir = normalize(light.position - fragPos); //lightPos now follows the fragPos wherever it goes, need to change this to... world position (?).
-	float diff = max(dot(norm,lightDir), 0.0f);
-	vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, texCoord));
-
-	//specular
-	vec3 viewDir = normalize(viewPos - fragPos);
-	vec3 reflectDir = reflect(-lightDir, norm); 
-	float spec = pow(max(dot(viewDir, reflectDir), 0.0f), material.shininess); //32 is the shininess value of the specular highlight. Increase the value, more shininess to the highlight with smaller radius, decrease the value, more matte highlight with larger radius.
-	vec3 specular = light.specular * spec * vec3(texture(material.specular, texCoord));
-
-	//Final result
-	vec3 result = ambient + diffuse + specular;
-	FragColor = vec4(result, 1.0f);
+		//Final result
+		vec3 result = ambient + diffuse + specular;
+		FragColor = vec4(result, 1.0f);
 }
