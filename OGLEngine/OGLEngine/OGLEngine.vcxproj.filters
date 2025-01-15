@@ -90,6 +90,9 @@
     <ClCompile Include="MessageQueueClass.cpp">
       <Filter>Unused Classes</Filter>
     </ClCompile>
+    <ClCompile Include="LightManager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Component.h">
@@ -151,6 +154,9 @@
     </ClInclude>
     <ClInclude Include="MessageQueueClass.h">
       <Filter>Unused Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="LightManager.h">
+      <Filter>Managers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

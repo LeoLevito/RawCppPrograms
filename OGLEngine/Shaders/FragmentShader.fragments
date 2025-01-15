@@ -47,7 +47,7 @@ struct SpotLight
 	float outerCutoff;
 };
 
-#define NR_POINT_LIGHTS 4
+#define NR_POINT_LIGHTS 2
 
 in vec2 texCoord;
 in vec3 normal;
@@ -69,12 +69,13 @@ void main()
 	vec3 viewDir = normalize(viewPos - FragPos);
 
 	//Final result
-	vec3 result = CalcDirectionalLight(directionalLight, norm, viewDir);
+	vec3 result;
+	result = CalcDirectionalLight(directionalLight, norm, viewDir);
 
-	//for(int i = 0; i < NR_POINT_LIGHTS; i++)
-	//{
-	//	result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);
-	//}
+	for(int i = 0; i < NR_POINT_LIGHTS; i++)
+	{
+		result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);
+	}
 
 	result += CalcSpotLight(spotLight, norm, FragPos, viewDir); //SOMETHING WEIRD IS GOING ON WITH THE QUADRATIC PART OF THE SPOTLIGHT CALCULATIONS, IT NEEDS TO BE ANYTHING BUT 0 FOR THIS += TO WORK! NEED TO INVESTIGATE FURTHER TO PROPERLY IMPLEMENT MULTIPLE LIGHTS.
 
@@ -101,6 +102,8 @@ vec3 CalcDirectionalLight(DirectionalLight light, vec3 norm, vec3 viewDir)
 
 vec3 CalcPointLight(PointLight light, vec3 norm, vec3 fragPos, vec3 viewDir)
 {
+	light.constant = 1.0f; //we usually want the constant to be 1 in all scenarios, so i'm cheating and just setting it here instead of doing it in the light component.
+
 	vec3 lightDir = normalize(light.position - fragPos); 
 
 	float diff = max(dot(norm,lightDir), 0.0f);
@@ -123,6 +126,8 @@ vec3 CalcPointLight(PointLight light, vec3 norm, vec3 fragPos, vec3 viewDir)
 
 vec3 CalcSpotLight(SpotLight light, vec3 norm, vec3 fragPos, vec3 viewDir)
 {
+	light.constant = 1.0f; //we usually want the constant to be 1 in all scenarios, so i'm cheating and just setting it here instead of doing it in the light component.
+
 	vec3 lightDir = normalize(light.position - fragPos); 
 
 	float diff = max(dot(norm,lightDir), 0.0f);

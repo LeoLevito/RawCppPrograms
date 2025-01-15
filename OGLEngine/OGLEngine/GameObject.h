@@ -11,7 +11,7 @@ public:
 
 	void AddComponent(Component* component); //should look into having a choice between components in the ImGui window. And a button to add components like in Unity.
 
-	std::vector<Component*> components;
+	std::vector<Component*> components; //I need to make it so you can only have one of each component on a game object. Maybe grey out the options in the dropdown menu.
 	std::string name;
 	virtual void Update(Shader* shader);
 	virtual void DrawObjectSpecificImGuiHierarchyAdjustables(std::vector<GameObject*>& vec);
