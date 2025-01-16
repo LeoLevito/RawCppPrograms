@@ -13,6 +13,7 @@
 #include <windows.h>
 #include <thread>
 #include <MeshManager.h>
+#include "ShaderManager.h"
 
 MeshComponent::MeshComponent()
 {
@@ -50,6 +51,16 @@ MeshComponent::MeshComponent()
 			}
 		}
 	}
+
+	//setting default values for material light behavior. Also, why does the Light Component only work properly when I add a new Mesh Component to the same GameObject? Need to investigate futher.
+	ambient = glm::vec3(0, 0, 0);
+	diffuse = glm::vec3(1, 1, 1);
+	specular = glm::vec3(1, 1, 1);
+	shininess = 128.0f;
+	ShaderManager::Get().shader->SetVector3(ambient, "material.ambient");
+	ShaderManager::Get().shader->SetVector3(diffuse, "material.diffuse");
+	ShaderManager::Get().shader->SetVector3(specular, "material.specular");
+	ShaderManager::Get().shader->SetFloat(shininess, "material.shininess");
 }
 
 MeshComponent::~MeshComponent()
@@ -193,14 +204,14 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 						case MeshComponent::choice_diffuse:
 							delete diffuseMap;
 							diffuseMap = new Texture(textureVector[i].path().string().c_str()); //full path with file extension needed for stbi_load to work.
-							shaderRef->SetInt(0, "material.diffuse"); //why do I need to do this again? time to re-read https://learnopengl.com/Lighting/Lighting-maps
+							ShaderManager::Get().shader->SetInt(0, "material.diffuse"); //why do I need to do this again? time to re-read https://learnopengl.com/Lighting/Lighting-maps
 							mesh->ApplyDiffuseMap(diffuseMap);
 							
 							break;
 						case MeshComponent::choice_specular:
 							delete specularMap;
 							specularMap = new Texture(textureVector[i].path().string().c_str()); //full path with file extension needed for stbi_load to work.
-							shaderRef->SetInt(1, "material.specular"); //why do I need to do this again? time to re-read https://learnopengl.com/Lighting/Lighting-maps
+							ShaderManager::Get().shader->SetInt(1, "material.specular"); //why do I need to do this again? time to re-read https://learnopengl.com/Lighting/Lighting-maps
 							mesh->ApplySpecularMap(specularMap);
 							break;
 						default:
@@ -217,23 +228,23 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 
 	if (ImGui::DragFloat3("ambient", &ambient.x, .01f))
 	{
-		shaderRef->SetVector3(ambient, "material.ambient");
+		ShaderManager::Get().shader->SetVector3(ambient, "material.ambient");
 	}
 	if (ImGui::DragFloat3("diffuse", &diffuse.x, .01f))
 	{
-		shaderRef->SetVector3(diffuse, "material.diffuse");
+		ShaderManager::Get().shader->SetVector3(diffuse, "material.diffuse");
 	}
 	if (ImGui::DragFloat3("specular", &specular.x, .01f))
 	{
-		shaderRef->SetVector3(specular, "material.specular");
+		ShaderManager::Get().shader->SetVector3(specular, "material.specular");
 	}
 	if (ImGui::DragFloat("shininess", &shininess, .01f))
 	{
-		shaderRef->SetFloat(shininess, "material.shininess");
+		ShaderManager::Get().shader->SetFloat(shininess, "material.shininess");
 	}
 }
 
-void MeshComponent::DrawMesh(Shader& shader)
+void MeshComponent::DrawMesh()
 {
 	glm::mat4 trans = glm::mat4(1.0f);
 
@@ -244,33 +255,15 @@ void MeshComponent::DrawMesh(Shader& shader)
 	trans = glm::scale(trans, scale);
 
 	//write to Vertex Shader
-	shader.SetMatrix4(trans, "transform"); //apperently there's a better way to do this compared to using a Uniform type variable inside the vertex shader, Shader Buffer Storage Object, something like that, where we can have even more variables inside the shader and update them.
-	shader.SetMatrix4(Camera::Get().myView, "view");
-	shader.SetMatrix4(Camera::Get().projection, "projection");
-	shader.SetVector3(Camera::Get().myPosition, "viewPos"); //Doesn't really make sense to update this here but whatever.
-	mesh->Draw(&shader);
+	ShaderManager::Get().shader->SetMatrix4(trans, "transform"); //apperently there's a better way to do this compared to using a Uniform type variable inside the vertex shader, Shader Buffer Storage Object, something like that, where we can have even more variables inside the shader and update them.
+	ShaderManager::Get().shader->SetMatrix4(Camera::Get().myView, "view");
+	ShaderManager::Get().shader->SetMatrix4(Camera::Get().projection, "projection");
+	ShaderManager::Get().shader->SetVector3(Camera::Get().myPosition, "viewPos"); //Doesn't really make sense to update this here but whatever.
+	mesh->Draw();
 }
 
-void MeshComponent::Update(Shader* shader)
+void MeshComponent::Update()
 {
-	if (!isShaderRefSet) //I need to get rid of this shader pointer in the Update function. Maybe a ShaderManager would work.
-	{
-		Shader& realShaderRef = *shader;
-		shaderRef = &realShaderRef;
-
-		//setting default values for material light behavior. Also, why does the Light Component only work properly when I add a new Mesh Component to the same GameObject? Need to investigate futher.
-		ambient = glm::vec3(0, 0, 0);
-		diffuse = glm::vec3(1, 1, 1);
-		specular = glm::vec3(1, 1, 1);
-		shininess = 128.0f;
-		shaderRef->SetVector3(ambient, "material.ambient");
-		shaderRef->SetVector3(diffuse, "material.diffuse");
-		shaderRef->SetVector3(specular, "material.specular");
-		shaderRef->SetFloat(shininess, "material.shininess");
-
-		isShaderRefSet = true;
-	}
-
 	for (size_t i = 0; i < owner->components.size(); i++)
 	{
 		if (dynamic_cast<TransformComponent*>(owner->components[i])) //checking if owner has a component of type TransformComponent. Is of-type correct word-use in this case?
@@ -284,6 +277,6 @@ void MeshComponent::Update(Shader* shader)
 
 	if (mesh != nullptr)
 	{
-		DrawMesh(*shader);
+		DrawMesh();
 	}
 }

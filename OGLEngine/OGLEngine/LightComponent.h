@@ -1,5 +1,6 @@
 #pragma once
 #include "Component.h"
+#include "Light.h"
 
 class LightComponent : public Component
 {
@@ -8,7 +9,7 @@ public:
 	LightComponent();
 	~LightComponent();
 
-	void Update(Shader* shader) override;
+	void Update() override;
 	void DrawComponentSpecificImGuiHierarchyAdjustables() override;
 
 	void SetDirectionalLightToDefault();
@@ -28,12 +29,12 @@ public:
 	//glm::vec3 scale;
 
 
-		//directional light properties
+//directional light properties
 	glm::vec3 directionalAmbient;
 	glm::vec3 directionalDiffuse;
 	glm::vec3 directionalSpecular;
 
-		//point light properties
+//point light properties
 	glm::vec3 pointAmbient;
 	glm::vec3 pointDiffuse;
 	glm::vec3 pointSpecular;
@@ -41,7 +42,7 @@ public:
 	float pointLinear;
 	float pointQuadratic;
 
-		//spot light properties
+//spot light properties
 	glm::vec3 spotAmbient;
 	glm::vec3 spotDiffuse;
 	glm::vec3 spotSpecular;
@@ -53,11 +54,16 @@ public:
 	float spotOuterCutoff;
 
 
+//shader reference
 
-	Shader* shaderRef;
-	bool isShaderRefSet;
 
 	int selectedType = 0;
+
+
+
+
+
+	Light* myLight;
 private:
 };
 

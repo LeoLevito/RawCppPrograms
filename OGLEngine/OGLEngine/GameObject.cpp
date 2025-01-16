@@ -38,7 +38,7 @@ void GameObject::Update(Shader* shader)
 {
 	for (int i = 0; i < components.size(); i++)
 	{
-		components[i]->Update(shader);
+		components[i]->Update();
 	}
 }
 
@@ -61,8 +61,10 @@ void GameObject::DrawObjectSpecificImGuiHierarchyAdjustables(std::vector<GameObj
 	if (ImGui::BeginPopup("Component popup"))
 	{
 		ImGui::SeparatorText("Components:");
+
 		for (int i = 0; i < IM_ARRAYSIZE(componentNames); i++)
 		{
+			//ImGui::BeginDisabled();
 			if (ImGui::Selectable(componentNames[i])) 
 			{
 				selectedComponent = i;
@@ -79,6 +81,7 @@ void GameObject::DrawObjectSpecificImGuiHierarchyAdjustables(std::vector<GameObj
 					AddComponent(new LightComponent);
 				}
 			}
+			//ImGui::EndDisabled();
 		}
 		ImGui::EndPopup();
 	}

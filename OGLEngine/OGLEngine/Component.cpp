@@ -23,6 +23,6 @@ void Component::DrawComponentSpecificImGuiHierarchyAdjustables()
 	}
 }
 
-void Component::Update(Shader* shader)
+void Component::Update()
 {
 }

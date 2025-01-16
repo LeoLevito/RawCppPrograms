@@ -1,0 +1,55 @@
+LightManager
+{
+	Get();
+
+	//std::vector<Light> lights;
+	std::vector<DirectionalLight> lights;
+	std::vector<PointLight> lights;
+	std::vector<SpotLight> lights;
+	
+
+	AddNewLight(type);
+	RemoveLight(type, ID);
+
+
+	AssignIDToDirectionalLight();
+	AssignIDToPointLight();
+	AssignIDToSpotLight();
+
+
+}
+
+LightComponent
+{
+	SetLightType();
+	RequestID();
+}
+
+Light
+{
+	virtual SetToDefault();
+	virtual SetToCurrent();
+	virtual SetToZero();
+	virtual DrawImgui();
+}
+
+DirectionalLight : Light
+{
+	SetToDefault() override;
+	SetToCurrent() override;
+	SetToZero() override;
+}
+
+PointLight : Light
+{
+	SetToDefault() override;
+	SetToCurrent() override;
+	SetToZero() override;
+}
+
+SpotLight : Light
+{
+	SetToDefault() override;
+	SetToCurrent() override;
+	SetToZero() override;
+}

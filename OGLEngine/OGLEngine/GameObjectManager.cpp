@@ -22,6 +22,7 @@ GameObject* GameObjectManager::CreateGameObject()
 {
 	GameObject* gameObject = new GameObject();
 	gameObjects.push_back(gameObject);
+	gameObject->ID = gameObjects.size() - 1;
 	return gameObject;
 }
 

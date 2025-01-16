@@ -47,7 +47,7 @@ struct SpotLight
 	float outerCutoff;
 };
 
-#define NR_POINT_LIGHTS 2
+#define NR_POINT_LIGHTS 3
 
 in vec2 texCoord;
 in vec3 normal;

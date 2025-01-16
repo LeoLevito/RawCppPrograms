@@ -14,7 +14,7 @@ public:
 	virtual ~Component();
 	std::string name;
 	virtual void DrawComponentSpecificImGuiHierarchyAdjustables();
-	virtual void Update(Shader* shader);
+	virtual void Update();
 	GameObject* owner;
 private:
 };

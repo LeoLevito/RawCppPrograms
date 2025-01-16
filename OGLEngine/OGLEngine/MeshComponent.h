@@ -29,22 +29,17 @@ public:
 
 	void DrawComponentSpecificImGuiHierarchyAdjustables() override;
 
-	void DrawMesh(Shader& shader);
+	void DrawMesh();
 
 	glm::vec3 position;
 	glm::vec3 rotation;
 	glm::vec3 scale;
 
-	void Update(Shader* shader) override;
+	void Update() override;
 	bool meshInvalid = false;
 	std::string lastSelectedMeshName;
 	std::vector<std::filesystem::directory_entry> textureVector;
 	std::vector<std::filesystem::directory_entry> meshVector;
-
-
-	//fast and sloppy coding.
-	Shader* shaderRef;
-	bool isShaderRefSet;
 
 	//material properties.
 	glm::vec3 ambient;

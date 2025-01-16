@@ -1,7 +1,8 @@
 #include "Graphics.h"
 #include <iostream>
 #include <gtc/matrix_transform.hpp>
-#include<thread>
+#include <thread>
+#include "ShaderManager.h"
 
 void Graphics::Initialize(int width, int height)
 {
@@ -31,9 +32,6 @@ void Graphics::Initialize(int width, int height)
 		std::cout << "failed to initialize GLAD" << std::endl;
 		return;
 	}
-
-	myShader = new Shader; //quick fix for the 0xCCCCCCCC write/read access violation.
-	myShader->Initialize("../Shaders/VertexShader.vertexs", "../Shaders/FragmentShader.fragments");
 
 	glEnable(GL_DEPTH_TEST); //enable depth testing, this makes it so objects in front occlude objects in back.
 }
@@ -80,11 +78,12 @@ void Graphics::ExampleCube() //put this in Graphics. Currently this is orthograp
         //trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
 
 		//write to Vertex Shader
-		myShader->SetMatrix4(trans, "transform"); //apperently there's a better way to do this compared to using a Uniform type variable inside the vertex shader, Shader Buffer Storage Object, something like that, where we can have even more variables inside the shader and update them.
-		myShader->SetMatrix4(Camera::Get().myView, "view");
-		myShader->SetMatrix4(Camera::Get().projection, "projection");
+		
+		ShaderManager::Get().shader->SetMatrix4(trans, "transform"); //apperently there's a better way to do this compared to using a Uniform type variable inside the vertex shader, Shader Buffer Storage Object, something like that, where we can have even more variables inside the shader and update them.
+		ShaderManager::Get().shader->SetMatrix4(Camera::Get().myView, "view");
+		ShaderManager::Get().shader->SetMatrix4(Camera::Get().projection, "projection");
 
-        myCube->Draw(myShader);
+        myCube->Draw();
 		//myTriangle->Draw(myShader);
     }
 }
