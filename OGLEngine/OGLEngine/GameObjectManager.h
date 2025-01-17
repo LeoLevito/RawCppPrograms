@@ -20,6 +20,16 @@ public:
 	std::vector <Message*> queuedMessages;
 	void Process();
 	bool shouldRun = true;
+
+
+
+
+
+	//I should have a copy/paste function for game objects.
+
+
+
+
 private:
 };
 

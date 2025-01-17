@@ -1,0 +1,7 @@
+Issues with lighting right now:
+
+ID shifting causes confusion with lights swapping LightComponents.
+
+New lights have garbled properties.
+
+Can't delete LightComponent without getting an error.

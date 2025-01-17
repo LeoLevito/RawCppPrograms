@@ -47,16 +47,18 @@ struct SpotLight
 	float outerCutoff;
 };
 
+#define NR_DIRECTIONAL_LIGHTS 3
 #define NR_POINT_LIGHTS 3
+#define NR_SPOT_LIGHTS 3
 
 in vec2 texCoord;
 in vec3 normal;
 in vec3 FragPos;
 
 uniform vec3 viewPos;
-uniform DirectionalLight directionalLight;
+uniform DirectionalLight directionalLights[NR_DIRECTIONAL_LIGHTS];
 uniform PointLight pointLights[NR_POINT_LIGHTS];
-uniform SpotLight spotLight;
+uniform SpotLight spotLights[NR_SPOT_LIGHTS];
 uniform Material material;
 
 vec3 CalcDirectionalLight(DirectionalLight light, vec3 norm, vec3 viewDir);							//forward declare function so we can define it below the main() function.
@@ -70,14 +72,23 @@ void main()
 
 	//Final result
 	vec3 result;
-	result = CalcDirectionalLight(directionalLight, norm, viewDir);
+
+	for(int i = 0; i < NR_DIRECTIONAL_LIGHTS; i++)
+	{
+		result += CalcDirectionalLight(directionalLights[i], norm, viewDir);
+	}
+	//result = CalcDirectionalLight(directionalLight, norm, viewDir);
 
 	for(int i = 0; i < NR_POINT_LIGHTS; i++)
 	{
 		result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);
 	}
 
-	result += CalcSpotLight(spotLight, norm, FragPos, viewDir); //SOMETHING WEIRD IS GOING ON WITH THE QUADRATIC PART OF THE SPOTLIGHT CALCULATIONS, IT NEEDS TO BE ANYTHING BUT 0 FOR THIS += TO WORK! NEED TO INVESTIGATE FURTHER TO PROPERLY IMPLEMENT MULTIPLE LIGHTS.
+	for(int i = 0; i < NR_SPOT_LIGHTS; i++)
+	{
+		result += CalcSpotLight(spotLights[i], norm, FragPos, viewDir);
+	}
+	//result += CalcSpotLight(spotLight, norm, FragPos, viewDir); //SOMETHING WEIRD IS GOING ON WITH THE QUADRATIC PART OF THE SPOTLIGHT CALCULATIONS, IT NEEDS TO BE ANYTHING BUT 0 FOR THIS += TO WORK! NEED TO INVESTIGATE FURTHER TO PROPERLY IMPLEMENT MULTIPLE LIGHTS.
 
 
 	FragColor = vec4(result, 1.0f);

@@ -5,19 +5,11 @@
 #include "PointLight.h"
 #include "SpotLight.h"
 
-enum LightType
-{
-	DirectionalLightType,
-	PointLightType,
-	SpotLightType
-};
 
 class LightManager
 {
 public:
-	static LightManager Get();
-
-
+	static LightManager& Get();
 
 	Light* AddNewLight(LightType type);
 	void DeleteLight(LightType type, Light* light);

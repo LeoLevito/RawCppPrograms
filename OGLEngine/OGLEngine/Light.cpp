@@ -24,6 +24,14 @@ void Light::SetToZero()
 {
 }
 
+void Light::SetPosition(glm::vec3 pos)
+{
+}
+
+void Light::SetDirection(glm::vec3 dir)
+{
+}
+
 void Light::DrawImgui()
 {
 }

@@ -1,15 +1,17 @@
 #include "DirectionalLight.h"
-#include <string>
-#include "ShaderManager.h"
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
+
+DirectionalLight::DirectionalLight()
+{
+}
 
 void DirectionalLight::UpdateIDBasedStrings()
 {
 	IDstring = "directionalLights[";
 	IDstring += std::to_string(ID);
 	IDstring += "].";
+
+	directionString = IDstring;
+	directionString += "direction";
 
 	ambientString = IDstring;
 	ambientString += "ambient";
@@ -44,6 +46,12 @@ void DirectionalLight::SetToZero()
 	ShaderManager::Get().shader->SetVector3(glm::vec3(0, 0, 0), ambientString);
 	ShaderManager::Get().shader->SetVector3(glm::vec3(0, 0, 0), diffuseString);
 	ShaderManager::Get().shader->SetVector3(glm::vec3(0, 0, 0), specularString);
+}
+
+void DirectionalLight::SetDirection(glm::vec3 dir)
+{
+	direction = dir;
+	ShaderManager::Get().shader->SetVector3(direction, directionString);
 }
 
 void DirectionalLight::DrawImgui()
