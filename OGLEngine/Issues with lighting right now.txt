@@ -5,3 +5,5 @@ ID shifting causes confusion with lights swapping LightComponents.
 New lights have garbled properties.
 
 Can't delete LightComponent without getting an error.
+
+Need to add a MeshComponent for the first light to work. I don't want that.
