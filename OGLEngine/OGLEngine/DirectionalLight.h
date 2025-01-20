@@ -20,7 +20,6 @@ public:
 	std::string diffuseString;
 	std::string specularString;
 
-
 	virtual void UpdateIDBasedStrings() override;
 
 	virtual void SetToDefault() override;

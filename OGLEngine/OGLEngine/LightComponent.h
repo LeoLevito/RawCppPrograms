@@ -19,6 +19,7 @@ public:
 	int selectedType = 0;
 
 	Light* myLight;
+
 private:
 };
 

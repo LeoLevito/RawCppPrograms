@@ -34,4 +34,8 @@ void Light::SetDirection(glm::vec3 dir)
 
 void Light::DrawImgui()
 {
+	if (ImGui::Checkbox("Blinn?", &blinn))
+	{
+		ShaderManager::Get().shader->SetBool(blinn, "blinn");
+	}
 }

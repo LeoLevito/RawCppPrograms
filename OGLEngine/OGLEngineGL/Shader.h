@@ -16,5 +16,6 @@ public:
 	void SetVector3(glm::vec3 vector3, const std::string& name);
 	void SetFloat(float value, const std::string& name);
 	void SetInt(int value, const std::string& name);
+	void SetBool(bool value, const std::string& name);
 };
 

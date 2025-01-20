@@ -56,6 +56,8 @@ void DirectionalLight::SetDirection(glm::vec3 dir)
 
 void DirectionalLight::DrawImgui()
 {
+	Light::DrawImgui();
+
 	if (ImGui::Button("reset to defaults"))
 	{
 		SetToDefault();

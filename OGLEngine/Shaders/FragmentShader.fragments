@@ -60,6 +60,7 @@ uniform DirectionalLight directionalLights[NR_DIRECTIONAL_LIGHTS];
 uniform PointLight pointLights[NR_POINT_LIGHTS];
 uniform SpotLight spotLights[NR_SPOT_LIGHTS];
 uniform Material material;
+uniform bool blinn;
 
 vec3 CalcDirectionalLight(DirectionalLight light, vec3 norm, vec3 viewDir);							//forward declare function so we can define it below the main() function.
 vec3 CalcPointLight(PointLight light, vec3 norm, vec3 fragPos, vec3 viewDir); 
@@ -77,7 +78,6 @@ void main()
 	{
 		result += CalcDirectionalLight(directionalLights[i], norm, viewDir);
 	}
-	//result = CalcDirectionalLight(directionalLight, norm, viewDir);
 
 	for(int i = 0; i < NR_POINT_LIGHTS; i++)
 	{
@@ -88,7 +88,6 @@ void main()
 	{
 		result += CalcSpotLight(spotLights[i], norm, FragPos, viewDir);
 	}
-	//result += CalcSpotLight(spotLight, norm, FragPos, viewDir); //SOMETHING WEIRD IS GOING ON WITH THE QUADRATIC PART OF THE SPOTLIGHT CALCULATIONS, IT NEEDS TO BE ANYTHING BUT 0 FOR THIS += TO WORK! NEED TO INVESTIGATE FURTHER TO PROPERLY IMPLEMENT MULTIPLE LIGHTS.
 
 
 	FragColor = vec4(result, 1.0f);
@@ -98,11 +97,20 @@ void main()
 vec3 CalcDirectionalLight(DirectionalLight light, vec3 norm, vec3 viewDir)
 {
 	vec3 lightDir = normalize(-light.direction); 
+	vec3 halfwayDir = normalize(lightDir + viewDir);
 
 	float diff = max(dot(norm,lightDir), 0.0f);
 
 	vec3 reflectDir = reflect(-lightDir, norm); 
-	float spec = pow(max(dot(viewDir, reflectDir), 0.0f), material.shininess); //32 is the shininess value of the specular highlight. Increase the value, more shininess to the highlight with smaller radius, decrease the value, more matte highlight with larger radius.
+	float spec = 0.0f;
+	if(blinn)
+	{
+		spec = pow(max(dot(norm, halfwayDir), 0.0f), material.shininess); //32 is the shininess value of the specular highlight. Increase the value, more shininess to the highlight with smaller radius, decrease the value, more matte highlight with larger radius.
+	}
+	else
+	{
+		spec = pow(max(dot(viewDir, reflectDir), 0.0f), material.shininess); //32 is the shininess value of the specular highlight. Increase the value, more shininess to the highlight with smaller radius, decrease the value, more matte highlight with larger radius.
+	}
 
 	vec3 ambient = light.ambient * vec3(texture(material.diffuse, texCoord));
 	vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, texCoord));
@@ -116,11 +124,20 @@ vec3 CalcPointLight(PointLight light, vec3 norm, vec3 fragPos, vec3 viewDir)
 	light.constant = 1.0f; //we usually want the constant to be 1 in all scenarios, so i'm cheating and just setting it here instead of doing it in the light component.
 
 	vec3 lightDir = normalize(light.position - fragPos); 
+	vec3 halfwayDir = normalize(lightDir + viewDir);
 
 	float diff = max(dot(norm,lightDir), 0.0f);
 
 	vec3 reflectDir = reflect(-lightDir, norm); 
-	float spec = pow(max(dot(viewDir, reflectDir), 0.0f), material.shininess);
+	float spec = 0.0f;
+	if(blinn)
+	{
+		spec = pow(max(dot(norm, halfwayDir), 0.0f), material.shininess); 
+	}
+	else
+	{
+		spec = pow(max(dot(viewDir, reflectDir), 0.0f), material.shininess); 
+	}
 
 	float distance = length(light.position - fragPos);
 	float attenuation = 1.0f / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
@@ -139,13 +156,22 @@ vec3 CalcSpotLight(SpotLight light, vec3 norm, vec3 fragPos, vec3 viewDir)
 {
 	light.constant = 1.0f; //we usually want the constant to be 1 in all scenarios, so i'm cheating and just setting it here instead of doing it in the light component.
 
-	vec3 lightDir = normalize(light.position - fragPos); 
+	vec3 lightDir = normalize(light.position - fragPos);
+	vec3 halfwayDir = normalize(lightDir + viewDir);
 
 	float diff = max(dot(norm,lightDir), 0.0f);
 
 	vec3 reflectDir = reflect(-lightDir, norm); 
-	float spec = pow(max(dot(viewDir, reflectDir), 0.0f), material.shininess);
-
+	float spec = 0.0f;
+	if(blinn)
+	{
+		spec = pow(max(dot(norm, halfwayDir), 0.0f), material.shininess); 
+	}
+	else
+	{
+		spec = pow(max(dot(viewDir, reflectDir), 0.0f), material.shininess); 
+	}
+	
 	float distance = length(light.position - fragPos);
 	float attenuation = 1.0f / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
 

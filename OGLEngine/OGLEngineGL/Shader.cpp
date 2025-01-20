@@ -133,4 +133,9 @@ void Shader::SetInt(int value, const std::string& name)
     glUniform1i(glGetUniformLocation(myShaderProgram, name.c_str()), value);
 }
 
+void Shader::SetBool(bool value, const std::string& name)
+{
+    glUniform1i(glGetUniformLocation(myShaderProgram, name.c_str()), (int)value);
+}
+
 

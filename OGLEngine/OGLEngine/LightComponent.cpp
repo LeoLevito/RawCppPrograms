@@ -18,6 +18,7 @@ LightComponent::LightComponent()
 LightComponent::~LightComponent()
 {
 	std::cout << "-->Deleting Light component." << std::endl;
+	//LightManager::Get().DeleteLight(myLight->type, myLight);
 }
 
 void LightComponent::Update()
@@ -45,7 +46,7 @@ void LightComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 
 	ImGui::Text("Current type:");
 	ImGui::SameLine();
-	ImGui::Text(typeNames[selectedType]);
+	ImGui::Text(typeNames[selectedType]); //getting error here after deletion because selectedType has been cleared and is therefore garbled.
 	ImGui::Text("ID:");
 	std::string currentID = std::to_string(myLight->ID);
 	ImGui::SameLine();

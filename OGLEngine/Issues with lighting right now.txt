@@ -6,4 +6,4 @@ New lights have garbled properties.
 
 Can't delete LightComponent without getting an error.
 
-Need to add a MeshComponent for the first light to work. I don't want that.
+Need to add a MeshComponent for the first light to work. I don't want that. EDIT: material.shininess needs to be updated for lights to work, so it works if I just update that in the mesh component instead of adding a new mesh component which updates it in its constructor. This is a bit of an issue tho, since the shininess value is not per-object. This means updating the shininess value will make every mesh have the same shininess, which may or may not be desired. But then again, isn't this supposed to be solved by proper specular mapping? Ehhhh, specular highlights are still affected by the shininess value in the fragment shader.

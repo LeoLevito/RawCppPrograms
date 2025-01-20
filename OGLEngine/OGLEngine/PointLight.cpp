@@ -72,6 +72,8 @@ void PointLight::SetPosition(glm::vec3 pos)
 
 void PointLight::DrawImgui()
 {
+	Light::DrawImgui();
+
 	if (ImGui::Button("reset to defaults"))
 	{
 		SetToDefault();

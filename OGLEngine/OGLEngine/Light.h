@@ -34,7 +34,7 @@ public:
 
 	virtual void DrawImgui();
 
-
+	bool blinn;
 private:
 };
 
