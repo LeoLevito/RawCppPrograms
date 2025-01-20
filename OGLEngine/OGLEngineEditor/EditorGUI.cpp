@@ -48,6 +48,7 @@ void EditorGUI::StartImGuiFrame(float deltaTime)
 	HierarchyWindow(Camera::Get(), Camera::Get().projection, *myGraphics->myShader);
 	CameraWindow();
 	MainMenuBar();
+	QuickGUITesting();
 }
 
 void EditorGUI::RenderImGui(glm::mat4& projection)
@@ -221,6 +222,23 @@ void EditorGUI::MainMenuBar()
 		ImGui::EndMainMenuBar();
 	}
 
+}
+
+void EditorGUI::QuickGUITesting()
+{
+	ImGui::Begin("Quick GUI testing");
+	if (ImGui::Checkbox("Gamma Correction?", &gammaCorrection))
+	{
+		if (gammaCorrection)
+		{
+			glEnable(GL_FRAMEBUFFER_SRGB); //enable gamma correction.
+		}
+		else 
+		{
+			glDisable(GL_FRAMEBUFFER_SRGB); //disable gamma correction.
+		}
+	}
+	ImGui::End();
 }
 
 void EditorGUI::Serialization(const std::string& filename) //not functional at the moment.
