@@ -88,8 +88,19 @@ void Mesh::Draw() //Draw mesh;
 		glBindTexture(GL_TEXTURE_2D, specularMap->TextureObject); //so we have a new texture binding in Draw() because otherwise fragment shader would take the last binded texture, this allows us to use different textures for different objects (in the future).
 	}
 
-	
-	ShaderManager::Get().shader->Use();
+	//if (myShadowMap != NULL)
+	//{
+	//	glActiveTexture(GL_TEXTURE2);
+	//	glBindTexture(GL_TEXTURE_2D, myShadowMap->depthMap);
+	//}
+
+
+
+	//ShaderManager::Get().shader->Use();
+
+
+
+
 	glBindVertexArray(VAO); //only bind VAO when drawing the mesh since it already has a VBO reference already.
 
 	if (IndicesSize > 0) //Draw loaded obj model. Hopefully.
@@ -121,6 +132,11 @@ void Mesh::ApplySpecularMap(Texture* texture)
 {
 	specularMap = texture;
 }
+
+//void Mesh::ApplyShadowMap(ShadowMap* shadowMap)
+//{
+//	myShadowMap = shadowMap;
+//}
 
 void Mesh::bufferMesh()
 {

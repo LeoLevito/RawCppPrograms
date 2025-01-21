@@ -16,7 +16,7 @@ public:
 
 	MeshComponent* meshComponent;
 
-	void Update(Shader* shader) override; //why am I doing this in the header file?
+	void Update() override; //why am I doing this in the header file?
 
 	void DrawObjectSpecificImGuiHierarchyAdjustables(std::vector<GameObject*>& vec) override;
 private:

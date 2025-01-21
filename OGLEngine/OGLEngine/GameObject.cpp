@@ -34,7 +34,7 @@ void GameObject::AddComponent(Component* component)
 	components.push_back(component);
 }
 
-void GameObject::Update(Shader* shader) 
+void GameObject::Update() 
 {
 	for (int i = 0; i < components.size(); i++)
 	{

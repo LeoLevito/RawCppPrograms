@@ -10,6 +10,7 @@ struct Material
 
 struct DirectionalLight 
 {
+	vec3 position;
 	vec3 direction;
 
 	vec3 ambient;
@@ -54,6 +55,7 @@ struct SpotLight
 in vec2 texCoord;
 in vec3 normal;
 in vec3 FragPos;
+in vec4 FragPosLightSpace;
 
 uniform vec3 viewPos;
 uniform DirectionalLight directionalLights[NR_DIRECTIONAL_LIGHTS];
@@ -61,10 +63,13 @@ uniform PointLight pointLights[NR_POINT_LIGHTS];
 uniform SpotLight spotLights[NR_SPOT_LIGHTS];
 uniform Material material;
 uniform bool blinn;
+uniform sampler2D shadowMap;
 
-vec3 CalcDirectionalLight(DirectionalLight light, vec3 norm, vec3 viewDir);							//forward declare function so we can define it below the main() function.
+//forward declare functions so we can define it below the main() function.
+vec3 CalcDirectionalLight(DirectionalLight light, vec3 norm, vec3 viewDir, vec3 fragPos);							
 vec3 CalcPointLight(PointLight light, vec3 norm, vec3 fragPos, vec3 viewDir); 
 vec3 CalcSpotLight(SpotLight light, vec3 norm, vec3 fragPos, vec3 viewDir);
+float CalcShadow(vec4 fragPosLightSpace);
 
 void main()
 {
@@ -76,7 +81,7 @@ void main()
 
 	for(int i = 0; i < NR_DIRECTIONAL_LIGHTS; i++)
 	{
-		result += CalcDirectionalLight(directionalLights[i], norm, viewDir);
+		result += CalcDirectionalLight(directionalLights[i], norm, viewDir, FragPos);
 	}
 
 	for(int i = 0; i < NR_POINT_LIGHTS; i++)
@@ -94,9 +99,10 @@ void main()
 }
 
 
-vec3 CalcDirectionalLight(DirectionalLight light, vec3 norm, vec3 viewDir)
+vec3 CalcDirectionalLight(DirectionalLight light, vec3 norm, vec3 viewDir, vec3 fragPos)
 {
-	vec3 lightDir = normalize(-light.direction); 
+	//vec3 lightDir = normalize(-light.direction); 
+	vec3 lightDir = normalize(light.position - fragPos);
 	vec3 halfwayDir = normalize(lightDir + viewDir);
 
 	float diff = max(dot(norm,lightDir), 0.0f);
@@ -116,7 +122,10 @@ vec3 CalcDirectionalLight(DirectionalLight light, vec3 norm, vec3 viewDir)
 	vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, texCoord));
 	vec3 specular = light.specular * spec * vec3(texture(material.specular, texCoord));
 
-	return (ambient + diffuse + specular);
+
+	float shadow = CalcShadow(FragPosLightSpace);
+	//return (ambient + diffuse + specular);
+	return (ambient + (1.0f - shadow) * (diffuse + specular));
 }
 
 vec3 CalcPointLight(PointLight light, vec3 norm, vec3 fragPos, vec3 viewDir)
@@ -187,4 +196,21 @@ vec3 CalcSpotLight(SpotLight light, vec3 norm, vec3 fragPos, vec3 viewDir)
 	specular *= attenuation * intensity;
 
 	return (ambient + diffuse + specular);
+}
+
+
+
+float CalcShadow(vec4 fragPosLightSpace)
+{
+	vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+
+	projCoords = projCoords * 0.5f + 0.5f;
+
+	float closestDepth = texture(shadowMap, projCoords.xy).r;
+
+	float currentDepth = projCoords.z;
+
+	float shadow = currentDepth > closestDepth ? 1.0f : 0.0f; //determine if current fragment position in shadow or not.
+
+	return shadow;
 }

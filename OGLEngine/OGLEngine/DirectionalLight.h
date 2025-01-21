@@ -5,6 +5,7 @@ class DirectionalLight : public Light
 public:
 	DirectionalLight();
 
+	glm::vec3 position;
 	glm::vec3 direction;
 
 	glm::vec3 ambient;
@@ -14,6 +15,7 @@ public:
 
 	std::string IDstring;
 
+	std::string positionString;
 	std::string directionString;
 
 	std::string ambientString;
@@ -26,6 +28,7 @@ public:
 	virtual void SetToCurrent() override;
 	virtual void SetToZero() override;
 
+	virtual void SetPosition(glm::vec3 pos);
 	virtual void SetDirection(glm::vec3 dir) override;
 
 	virtual void DrawImgui() override;

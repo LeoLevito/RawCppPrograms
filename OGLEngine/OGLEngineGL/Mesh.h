@@ -3,6 +3,7 @@
 #include "Texture.h"
 #include "ObjReader.h"
 #include "vboindexer.h"
+#include "ShadowMap.h"
 //class Shader; //forward declaration.
 
 class Mesh
@@ -14,6 +15,7 @@ public:
 	void Draw();
 	void ApplyDiffuseMap(Texture* texture);
 	void ApplySpecularMap(Texture* texture);
+	//void ApplyShadowMap(ShadowMap* shadowMap);
 
 	std::vector<unsigned int> indices;
 	std::vector<glm::vec3> indexed_vertices;
@@ -26,6 +28,7 @@ public:
 
 	Texture* diffuseMap;
 	Texture* specularMap;
+	//ShadowMap* myShadowMap;
 
 protected:
 	unsigned int VBO, VAO, EBO;

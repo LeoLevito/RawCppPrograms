@@ -26,12 +26,12 @@ GameObjectTest::~GameObjectTest() //need to delete any objects/pointers that was
 	//delete meshComponent;
 }
 
-void GameObjectTest::Update(Shader* shader)
+void GameObjectTest::Update()
 {
 	//meshComponent->position = transformComponent->position;
 	//meshComponent->rotation = transformComponent->rotation;
 	//meshComponent->scale = transformComponent->scale;
-	GameObject::Update(shader);
+	GameObject::Update();
 }
 
 void GameObjectTest::DrawObjectSpecificImGuiHierarchyAdjustables(std::vector<GameObject*>& vec)

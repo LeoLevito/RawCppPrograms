@@ -226,7 +226,7 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 		ImGui::EndPopup();
 	}
 
-	if (ImGui::DragFloat3("ambient", &ambient.x, .01f))
+	if (ImGui::DragFloat3("ambient", &ambient.x, .01f)) //these don't do anything, except for thje shininess float, because in the fragment shader the material struct only has diffuse and specular SAMPLER2Ds and not vec3s. And I removed ambient, maybe if I reintroduce it I can get emissive textures?
 	{
 		ShaderManager::Get().shader->SetVector3(ambient, "material.ambient");
 	}
@@ -255,10 +255,12 @@ void MeshComponent::DrawMesh()
 	trans = glm::scale(trans, scale);
 
 	//write to Vertex Shader
+
 	ShaderManager::Get().shader->SetMatrix4(trans, "transform"); //apperently there's a better way to do this compared to using a Uniform type variable inside the vertex shader, Shader Buffer Storage Object, something like that, where we can have even more variables inside the shader and update them.
 	ShaderManager::Get().shader->SetMatrix4(Camera::Get().myView, "view");
 	ShaderManager::Get().shader->SetMatrix4(Camera::Get().projection, "projection");
 	ShaderManager::Get().shader->SetVector3(Camera::Get().myPosition, "viewPos"); //Doesn't really make sense to update this here but whatever.
+	ShaderManager::Get().depthShader->SetMatrix4(trans, "transform"); //this is required for meshes to be rendered to depthMap.
 	mesh->Draw();
 }
 
