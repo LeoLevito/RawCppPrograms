@@ -7,7 +7,9 @@ class ShaderManager
 private:
 	ShaderManager();
 	~ShaderManager();
+
 public:
+	void Initialize();
 	static ShaderManager& Get();
 	Shader* shader;
 	Shader* depthShader;

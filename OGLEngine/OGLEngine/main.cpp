@@ -8,6 +8,8 @@
 #include <mutex>
 #include <iostream>
 #include "MeshManager.h"
+#include "ShaderManager.h"
+
 
 int main()
 {
@@ -20,7 +22,7 @@ int main()
 	Engine::Get().Initialize(graphics->window, &Camera::Get());
 
 	EditorGUI* editorGUI = new EditorGUI;
-	editorGUI->Initialize(graphics->window, graphics, Camera::Get(), *graphics->myShader);
+	editorGUI->Initialize(graphics->window, graphics, Camera::Get());
 
 	float lastTime = 0;
 	float currentTime = 0;
@@ -28,6 +30,7 @@ int main()
 
 	glfwSwapInterval(1); //set max framerate, think (1/50) * 50 for 1 fps at 50hz, this doesn't function like a VSYNC toggle it seems to my eyes. Edit: well, when a big mesh is rendering it does seem to lock the framerate perfectly.
 
+	ShaderManager::Get().Initialize(); //initialize shadermanager with shadowmap.
 	while (!graphics->ShouldClose())
 	{
 		currentTime = glfwGetTime(); //May or may not be super accurate at the moment.

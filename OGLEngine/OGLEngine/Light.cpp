@@ -36,6 +36,9 @@ void Light::DrawImgui()
 {
 	if (ImGui::Checkbox("Blinn?", &blinn))
 	{
-		ShaderManager::Get().shader->SetBool(blinn, "blinn");
+		if (ShaderManager::Get().depthPass == false)
+		{
+			ShaderManager::Get().shader->SetBool(blinn, "blinn");
+		}
 	}
 }

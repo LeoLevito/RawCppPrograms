@@ -1,10 +1,11 @@
 #version 330 core
 out vec4 FragColor;
-
+uniform sampler2D THEshadowMap;
 struct Material 
 {
 	sampler2D diffuse;
 	sampler2D specular;
+
 	float shininess;
 };
 
@@ -63,7 +64,6 @@ uniform PointLight pointLights[NR_POINT_LIGHTS];
 uniform SpotLight spotLights[NR_SPOT_LIGHTS];
 uniform Material material;
 uniform bool blinn;
-uniform sampler2D shadowMap;
 
 //forward declare functions so we can define it below the main() function.
 vec3 CalcDirectionalLight(DirectionalLight light, vec3 norm, vec3 viewDir, vec3 fragPos);							
@@ -102,7 +102,7 @@ void main()
 vec3 CalcDirectionalLight(DirectionalLight light, vec3 norm, vec3 viewDir, vec3 fragPos)
 {
 	//vec3 lightDir = normalize(-light.direction); 
-	vec3 lightDir = normalize(light.position - fragPos);
+	vec3 lightDir = normalize(light.position - fragPos); 
 	vec3 halfwayDir = normalize(lightDir + viewDir);
 
 	float diff = max(dot(norm,lightDir), 0.0f);
@@ -206,7 +206,7 @@ float CalcShadow(vec4 fragPosLightSpace)
 
 	projCoords = projCoords * 0.5f + 0.5f;
 
-	float closestDepth = texture(shadowMap, projCoords.xy).r;
+	float closestDepth = texture(THEshadowMap, projCoords.xy).r;
 
 	float currentDepth = projCoords.z;
 

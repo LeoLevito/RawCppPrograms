@@ -15,7 +15,7 @@ public:
 	void Draw();
 	void ApplyDiffuseMap(Texture* texture);
 	void ApplySpecularMap(Texture* texture);
-	//void ApplyShadowMap(ShadowMap* shadowMap);
+	void ApplyShadowMap(ShadowMap& shadowMap);
 
 	std::vector<unsigned int> indices;
 	std::vector<glm::vec3> indexed_vertices;
@@ -28,7 +28,7 @@ public:
 
 	Texture* diffuseMap;
 	Texture* specularMap;
-	//ShadowMap* myShadowMap;
+	ShadowMap* myShadowMap;
 
 protected:
 	unsigned int VBO, VAO, EBO;

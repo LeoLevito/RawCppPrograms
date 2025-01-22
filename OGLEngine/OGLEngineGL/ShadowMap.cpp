@@ -1,5 +1,7 @@
 #include "ShadowMap.h"
 #include <GLAD/glad.h>
+#include "ShaderManager.h"
+
 
 ShadowMap::ShadowMap()
 {
@@ -26,4 +28,9 @@ void ShadowMap::CreateDepthTexture()
 	glDrawBuffer(GL_NONE); //explicitly tell opengl to not render any color data.
 	glReadBuffer(GL_NONE); //explicitly tell opengl to not render any color data.
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	ShaderManager::Get().shader->Use();
+	ShaderManager::Get().shader->SetInt(0, "material.diffuse");
+	ShaderManager::Get().shader->SetInt(1, "material.specular");
+	ShaderManager::Get().shader->SetInt(2, "THEshadowMap");
 }

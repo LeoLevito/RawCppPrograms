@@ -130,6 +130,8 @@ void Shader::SetFloat(float value, const std::string& name)
 
 void Shader::SetInt(int value, const std::string& name)
 {
+    //int location = glGetUniformLocation(myShaderProgram, name.c_str());
+    //std::cout << "location: " << location << " name: " << name << " this is my location, if this is -1 it's invalid!!!" << std::endl;
     glUniform1i(glGetUniformLocation(myShaderProgram, name.c_str()), value);
 }
 

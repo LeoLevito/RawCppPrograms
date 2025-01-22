@@ -32,35 +32,50 @@ void DirectionalLight::SetToDefault()
 	diffuse = glm::vec3(1, 1, 1);
 	specular = glm::vec3(1, 1, 1);
 
-	ShaderManager::Get().shader->SetVector3(ambient, ambientString);
-	ShaderManager::Get().shader->SetVector3(diffuse, diffuseString);
-	ShaderManager::Get().shader->SetVector3(specular, specularString);
+	if (ShaderManager::Get().depthPass == false)
+	{
+		ShaderManager::Get().shader->SetVector3(ambient, ambientString);
+		ShaderManager::Get().shader->SetVector3(diffuse, diffuseString);
+		ShaderManager::Get().shader->SetVector3(specular, specularString);
+	}
 }
 
 void DirectionalLight::SetToCurrent()
 {
-	ShaderManager::Get().shader->SetVector3(ambient, ambientString);
-	ShaderManager::Get().shader->SetVector3(diffuse, diffuseString);
-	ShaderManager::Get().shader->SetVector3(specular, specularString);
+	if (ShaderManager::Get().depthPass == false)
+	{
+		ShaderManager::Get().shader->SetVector3(ambient, ambientString);
+		ShaderManager::Get().shader->SetVector3(diffuse, diffuseString);
+		ShaderManager::Get().shader->SetVector3(specular, specularString);
+	}
 }
 
 void DirectionalLight::SetToZero()
 {
-	ShaderManager::Get().shader->SetVector3(glm::vec3(0, 0, 0), ambientString);
-	ShaderManager::Get().shader->SetVector3(glm::vec3(0, 0, 0), diffuseString);
-	ShaderManager::Get().shader->SetVector3(glm::vec3(0, 0, 0), specularString);
+	if (ShaderManager::Get().depthPass == false)
+	{
+		ShaderManager::Get().shader->SetVector3(glm::vec3(0, 0, 0), ambientString);
+		ShaderManager::Get().shader->SetVector3(glm::vec3(0, 0, 0), diffuseString);
+		ShaderManager::Get().shader->SetVector3(glm::vec3(0, 0, 0), specularString);
+	}
 }
 
 void DirectionalLight::SetPosition(glm::vec3 pos)
 {
 	position = pos;
-	ShaderManager::Get().shader->SetVector3(position, positionString);
+	if (ShaderManager::Get().depthPass == false)
+	{
+		ShaderManager::Get().shader->SetVector3(position, positionString);
+	}
 }
 
 void DirectionalLight::SetDirection(glm::vec3 dir)
 {
 	direction = dir;
-	ShaderManager::Get().shader->SetVector3(direction, directionString);
+	if (ShaderManager::Get().depthPass == false)
+	{
+		ShaderManager::Get().shader->SetVector3(direction, directionString);
+	}
 
 	glm::mat4 lightProjection;
 	glm::mat4 lightView;
@@ -74,9 +89,16 @@ void DirectionalLight::SetDirection(glm::vec3 dir)
 	glm::vec3 normalizedup = glm::normalize(up);
 	lightView = glm::lookAt(position, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)); //should probably put this in light component.
 	lightSpaceMatrix = lightProjection * lightView;
-	ShaderManager::Get().depthShader->Use();
-	ShaderManager::Get().depthShader->SetMatrix4(lightSpaceMatrix, "lightSpaceMatrix");
-	ShaderManager::Get().shader->SetMatrix4(lightSpaceMatrix, "lightSpaceMatrix");
+	//ShaderManager::Get().depthShader->Use();
+
+	if (ShaderManager::Get().depthPass == false)
+	{
+		ShaderManager::Get().shader->SetMatrix4(lightSpaceMatrix, "lightSpaceMatrix");
+	}
+	else
+	{
+		ShaderManager::Get().depthShader->SetMatrix4(lightSpaceMatrix, "lightSpaceMatrix");
+	}
 }
 
 void DirectionalLight::DrawImgui()
@@ -94,14 +116,23 @@ void DirectionalLight::DrawImgui()
 
 	if (ImGui::DragFloat3("ambient", &ambient.x, .01f))
 	{
-		ShaderManager::Get().shader->SetVector3(ambient, ambientString);
+		if (ShaderManager::Get().depthPass == false)
+		{
+			ShaderManager::Get().shader->SetVector3(ambient, ambientString);
+		}
 	}
 	if (ImGui::DragFloat3("diffuse", &diffuse.x, .01f))
 	{
-		ShaderManager::Get().shader->SetVector3(diffuse, diffuseString);
+		if (ShaderManager::Get().depthPass == false)
+		{
+			ShaderManager::Get().shader->SetVector3(diffuse, diffuseString);
+		}
 	}
 	if (ImGui::DragFloat3("specular", &specular.x, .01f))
 	{
-		ShaderManager::Get().shader->SetVector3(specular, specularString);
+		if (ShaderManager::Get().depthPass == false)
+		{
+			ShaderManager::Get().shader->SetVector3(specular, specularString);
+		}
 	}
 }

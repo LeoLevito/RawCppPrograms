@@ -9,7 +9,7 @@
 #include "ObjectMessage.h"
 #include "Engine.h"
 
-void EditorGUI::Initialize(GLFWwindow* window, Graphics* graphics, Camera& camera, Shader& shader)
+void EditorGUI::Initialize(GLFWwindow* window, Graphics* graphics, Camera& camera)
 {
 	//Initialize ImGui, check https://github.com/ocornut/imgui/wiki/Getting-Started#example-if-you-are-using-glfw--openglwebgl, and cross-reference with Martin's project as well.
 	// Setup Dear ImGui context
@@ -45,7 +45,7 @@ void EditorGUI::StartImGuiFrame(float deltaTime)
 
 	ImGui::ShowDemoWindow(); // Show demo window! :)
 	FrameRateWindow(deltaTime);
-	HierarchyWindow(Camera::Get(), Camera::Get().projection, *myGraphics->myShader);
+	HierarchyWindow(Camera::Get(), Camera::Get().projection);
 	CameraWindow();
 	MainMenuBar();
 	QuickGUITesting();
@@ -80,7 +80,7 @@ void EditorGUI::FrameRateWindow(float deltaTime)
 	ImGui::End(); //stop rendering new ImGui window
 }
 
-void EditorGUI::HierarchyWindow(Camera& camera, glm::mat4& projection, Shader& shader)
+void EditorGUI::HierarchyWindow(Camera& camera, glm::mat4& projection)
 {
 	ImGui::Begin("Hierarchy"); //start rendering new ImGui window
 

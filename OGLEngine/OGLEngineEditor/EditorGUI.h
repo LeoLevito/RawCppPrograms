@@ -8,13 +8,13 @@
 class EditorGUI
 {
 public:
-	void Initialize(GLFWwindow* window, Graphics* graphics, Camera& camera, Shader& shader);
+	void Initialize(GLFWwindow* window, Graphics* graphics, Camera& camera);
 	void StartImGuiFrame(float deltaTime);
 	void RenderImGui(glm::mat4& projection);
 	void CloseImGui();
 
 	void FrameRateWindow(float deltaTime);
-	void HierarchyWindow(Camera& camera, glm::mat4& projection, Shader& shader);
+	void HierarchyWindow(Camera& camera, glm::mat4& projection);
 	void CameraWindow();
 	void MainMenuBar();
 	void QuickGUITesting();

@@ -1,3 +1,5 @@
+UI (module 2):
+
 To pass (G), complete the following tasks:
 + UI Framework set up (imgui or other alternative) --> (IMGUI)
 
@@ -39,6 +41,48 @@ To pass (G), complete the following tasks:
 To pass with distinction (VG), complete 3 or more bonus tasks:
 - Extend .obj-file loader to load UVs, Normals and support Triangulization
 - Implement iterative resource (.obj-file or texture) loading to support loading huge files in single-threaded contexts
--+ Implement a Camera Manager and ability to switch between different cameras, as well as key-bindings for simple camera movement (WSAD, arrow keys) 
+-+ Implement a Camera Manager and ability to switch between different cameras, as well as key-bindings for simple camera movement (WSAD, arrow keys) --> (CHECK, camera movement implemented, but not multiple cameras if I don't count from lights point of view when generating shadow maps.)
 - Implement your own PNG-loader using zlib
 - Implement serialization for your scene/level (Entities, meta-data)
+
+
+
+
+
+
+
+
+
+GRAPHICS (module 3):
+
+To pass (G), complete the following tasks:
++ Update Obj loader to support loading and buffering UVs and Normals to OpenGL --> (CHECK, modifications to ObjReader and addition of vboindexer, also BufferMesh() in Mesh class.)
+
++ Implement usage of Diffuse/Albedo maps and Specular (shininess) maps, including UI to set per entity and using in shader --> (CHECK)
+
+- Add MipMap settings (scene-wide, or per entity)
+
++ Implement Phong shader, supporting multiple lights and light types --> (CHECK)
+
++ Add 3 different types of lights to your scene, Point, Directional, Spot light --> (CHECK, can't save scenes at the moment so I have to add them manually every time.)
+
+-+ Add UI to configure all light properties, Create and Delete --> (CHECK, create and delete happens when I add/remove (NEED TO FIX REMOVE ISSUE) a LightComponent and also when I change the light type in its properties.)
+
+-+ Implement either: Shadow mapping, or Deferred Rendering --> (CHECK, shadowmapping being worked on)
+
+
+REMEMBER TO UPDATE GAME ENGINE ARCHITECTURE DOCUMENT BEFORE MONDAY 27 JANUARY.
+
+ 
+To pass with distinction (VG), in addition to the above, complete one of the following:
+- Implement normal mapping
+- Implement render pipeline supporting both Shadow Mapping and Deferred Rendering combined
+- Implement Blend shapes/Morph targets
+- Implement Frustum Culling
+ 
+.. and 2 or more bonus tasks:
+- Add possibility to reload shaders in run-time using a key-binding or button
+- Add a toggle to switch between a Flat shader and the Phong shader for your scene (Flat just samples albedo)
+- Add a toggle to render your lights as wireframes
++ Add possibility to attach a light to an entity via a LightProperty --> (CHECK, in my case the LightProperty would be a LightComponent.)
+- Use Uniform Buffer Objects to enable use of very many lights (requires Deferred)

@@ -19,6 +19,7 @@ MeshComponent::MeshComponent()
 {
 	name = "Mesh component";
 	diffuseMap = new Texture("../Textures/Bliss/Bliss.jpg");
+	specularMap = new Texture("../Textures/Bliss/Bliss2.jpg");
 	//mesh = MeshManager::Get().LoadMesh("../Models/TreeTrunk");
 	//mesh->bufferMesh();
 	//mesh->ApplyTexture(myTexture);
@@ -136,6 +137,7 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 			meshInvalid = false;
 			mesh->bufferMesh();
 			mesh->ApplyDiffuseMap(diffuseMap);
+			mesh->ApplySpecularMap(specularMap);
 		}
 	}
 
@@ -167,6 +169,15 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 	{
 		textureChoice = TextureChoice::choice_specular;
 		ImGui::OpenPopup("Texture Popup");
+	}
+
+	if (ImGui::Button("Choose shadow map"))
+	{
+		if (ShaderManager::Get().depthPass == false)
+		{
+			ShaderManager::Get().shader->SetInt(2, "material.shadowMap"); //why do I need to do this again? time to re-read https://learnopengl.com/Lighting/Lighting-maps
+			mesh->ApplyShadowMap(*(ShaderManager::Get().shadowMap));
+		}
 	}
 
 	if (ImGui::BeginPopup("Texture Popup"))
@@ -204,15 +215,21 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 						case MeshComponent::choice_diffuse:
 							delete diffuseMap;
 							diffuseMap = new Texture(textureVector[i].path().string().c_str()); //full path with file extension needed for stbi_load to work.
-							ShaderManager::Get().shader->SetInt(0, "material.diffuse"); //why do I need to do this again? time to re-read https://learnopengl.com/Lighting/Lighting-maps
-							mesh->ApplyDiffuseMap(diffuseMap);
+							if (ShaderManager::Get().depthPass == false)
+							{
+								ShaderManager::Get().shader->SetInt(0, "material.diffuse"); //why do I need to do this again? time to re-read https://learnopengl.com/Lighting/Lighting-maps
+								mesh->ApplyDiffuseMap(diffuseMap);
+							}
 							
 							break;
 						case MeshComponent::choice_specular:
 							delete specularMap;
 							specularMap = new Texture(textureVector[i].path().string().c_str()); //full path with file extension needed for stbi_load to work.
-							ShaderManager::Get().shader->SetInt(1, "material.specular"); //why do I need to do this again? time to re-read https://learnopengl.com/Lighting/Lighting-maps
-							mesh->ApplySpecularMap(specularMap);
+							if (ShaderManager::Get().depthPass == false)
+							{
+								ShaderManager::Get().shader->SetInt(1, "material.specular"); //why do I need to do this again? time to re-read https://learnopengl.com/Lighting/Lighting-maps
+								mesh->ApplySpecularMap(specularMap);
+							}
 							break;
 						default:
 							break;
@@ -226,21 +243,24 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 		ImGui::EndPopup();
 	}
 
-	if (ImGui::DragFloat3("ambient", &ambient.x, .01f)) //these don't do anything, except for thje shininess float, because in the fragment shader the material struct only has diffuse and specular SAMPLER2Ds and not vec3s. And I removed ambient, maybe if I reintroduce it I can get emissive textures?
-	{
-		ShaderManager::Get().shader->SetVector3(ambient, "material.ambient");
-	}
-	if (ImGui::DragFloat3("diffuse", &diffuse.x, .01f))
-	{
-		ShaderManager::Get().shader->SetVector3(diffuse, "material.diffuse");
-	}
-	if (ImGui::DragFloat3("specular", &specular.x, .01f))
-	{
-		ShaderManager::Get().shader->SetVector3(specular, "material.specular");
-	}
+	//if (ImGui::DragFloat3("ambient", &ambient.x, .01f)) //these don't do anything, except for the shininess float, because in the fragment shader the material struct only has diffuse and specular SAMPLER2Ds and not vec3s. And I removed ambient, maybe if I reintroduce it I can get emissive textures?
+	//{
+	//	ShaderManager::Get().shader->SetVector3(ambient, "material.ambient");
+	//}
+	//if (ImGui::DragFloat3("diffuse", &diffuse.x, .01f))
+	//{
+	//	ShaderManager::Get().shader->SetVector3(diffuse, "material.diffuse");
+	//}
+	//if (ImGui::DragFloat3("specular", &specular.x, .01f))
+	//{
+	//	ShaderManager::Get().shader->SetVector3(specular, "material.specular");
+	//}
 	if (ImGui::DragFloat("shininess", &shininess, .01f))
 	{
-		ShaderManager::Get().shader->SetFloat(shininess, "material.shininess");
+		if (ShaderManager::Get().depthPass == false)
+		{
+			ShaderManager::Get().shader->SetFloat(shininess, "material.shininess");
+		}
 	}
 }
 
@@ -255,12 +275,18 @@ void MeshComponent::DrawMesh()
 	trans = glm::scale(trans, scale);
 
 	//write to Vertex Shader
-
-	ShaderManager::Get().shader->SetMatrix4(trans, "transform"); //apperently there's a better way to do this compared to using a Uniform type variable inside the vertex shader, Shader Buffer Storage Object, something like that, where we can have even more variables inside the shader and update them.
-	ShaderManager::Get().shader->SetMatrix4(Camera::Get().myView, "view");
-	ShaderManager::Get().shader->SetMatrix4(Camera::Get().projection, "projection");
-	ShaderManager::Get().shader->SetVector3(Camera::Get().myPosition, "viewPos"); //Doesn't really make sense to update this here but whatever.
-	ShaderManager::Get().depthShader->SetMatrix4(trans, "transform"); //this is required for meshes to be rendered to depthMap.
+	if (ShaderManager::Get().depthPass == false)
+	{
+		ShaderManager::Get().shader->SetMatrix4(trans, "transform"); //apperently there's a better way to do this compared to using a Uniform type variable inside the vertex shader, Shader Buffer Storage Object, something like that, where we can have even more variables inside the shader and update them.
+		ShaderManager::Get().shader->SetMatrix4(Camera::Get().myView, "view");
+		ShaderManager::Get().shader->SetMatrix4(Camera::Get().projection, "projection");
+		ShaderManager::Get().shader->SetVector3(Camera::Get().myPosition, "viewPos"); //Doesn't really make sense to update this here but whatever.
+	}
+	else 
+	{
+		ShaderManager::Get().depthShader->SetMatrix4(trans, "transform"); //this is required for meshes to be rendered to depthMap.
+	}
+	
 	mesh->Draw();
 }
 
