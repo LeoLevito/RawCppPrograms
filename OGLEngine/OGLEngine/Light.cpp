@@ -32,6 +32,10 @@ void Light::SetDirection(glm::vec3 dir)
 {
 }
 
+void Light::SetLightSpaceMatrix()
+{
+}
+
 void Light::DrawImgui()
 {
 	if (ImGui::Checkbox("Blinn?", &blinn))

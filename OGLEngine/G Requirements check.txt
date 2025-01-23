@@ -39,7 +39,7 @@ To pass (G), complete the following tasks:
 
 
 To pass with distinction (VG), complete 3 or more bonus tasks:
-- Extend .obj-file loader to load UVs, Normals and support Triangulization
+-+ Extend .obj-file loader to load UVs, Normals and support Triangulization --> (CHECK, as we can see further below in the Graphics Module tasks, though I have NOT implemented any Triangulation.)
 - Implement iterative resource (.obj-file or texture) loading to support loading huge files in single-threaded contexts
 -+ Implement a Camera Manager and ability to switch between different cameras, as well as key-bindings for simple camera movement (WSAD, arrow keys) --> (CHECK, camera movement implemented, but not multiple cameras if I don't count from lights point of view when generating shadow maps.)
 - Implement your own PNG-loader using zlib
@@ -60,13 +60,13 @@ To pass (G), complete the following tasks:
 
 + Implement usage of Diffuse/Albedo maps and Specular (shininess) maps, including UI to set per entity and using in shader --> (CHECK)
 
-- Add MipMap settings (scene-wide, or per entity)
++ Add MipMap settings (scene-wide, or per entity) --> (CHECK, per MeshComponent)
 
 + Implement Phong shader, supporting multiple lights and light types --> (CHECK)
 
 + Add 3 different types of lights to your scene, Point, Directional, Spot light --> (CHECK, can't save scenes at the moment so I have to add them manually every time.)
 
--+ Add UI to configure all light properties, Create and Delete --> (CHECK, create and delete happens when I add/remove (NEED TO FIX REMOVE ISSUE) a LightComponent and also when I change the light type in its properties.)
++ Add UI to configure all light properties, Create and Delete --> (CHECK, create and delete happens when I add/remove a LightComponent and also when I change the light type in its properties.)
 
 -+ Implement either: Shadow mapping, or Deferred Rendering --> (CHECK, shadowmapping being worked on)
 

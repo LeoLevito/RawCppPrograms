@@ -18,6 +18,7 @@ void Component::DrawComponentSpecificImGuiHierarchyAdjustables()
 	if (ImGui::Button("Remove component"))
 	{
 		owner->components.erase(std::remove(owner->components.begin(), owner->components.end(), this));
+		isMarkedForDeletion = true;
 		delete this;
 		std::cout << "Deletion of component completed." << std::endl;
 	}

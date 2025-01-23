@@ -2,7 +2,7 @@
 class Texture
 {
 public:
-	Texture(const char* path);
+	Texture(const char* path, int minfilter, int magfilter);
 	~Texture();
 	int Width;
 	int Height;

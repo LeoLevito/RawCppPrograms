@@ -33,6 +33,7 @@ public:
 
 	virtual void SetPosition(glm::vec3 pos);
 	virtual void SetDirection(glm::vec3 dir);
+	virtual void SetLightSpaceMatrix();
 
 	virtual void DrawImgui();
 

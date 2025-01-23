@@ -16,6 +16,7 @@ public:
 	virtual void DrawComponentSpecificImGuiHierarchyAdjustables();
 	virtual void Update();
 	GameObject* owner;
+	bool isMarkedForDeletion;
 private:
 };
 

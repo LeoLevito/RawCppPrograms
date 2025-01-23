@@ -109,7 +109,7 @@ void EditorGUI::HierarchyWindow(Camera& camera, glm::mat4& projection)
 					ImGui::TreePop();
 				}
 
-				if (GameObjectManager::Get().gameObjects.at(objectIndex)->components.size() == componentsSize)//check if vector has changed size, e.g. if we've deleted a game object. If the size hasn't changed we increase the iterator as per usual.
+				if (GameObjectManager::Get().gameObjects.at(objectIndex)->components.size() == componentsSize)//check if vector has changed size, e.g. if we've deleted a component. If the size hasn't changed we increase the iterator as per usual.
 				{
 					componentIndex++;
 				}

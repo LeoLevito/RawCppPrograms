@@ -26,6 +26,8 @@ public:
 
 	Texture* diffuseMap;
 	Texture* specularMap;
+	std::string diffuseMapPath;
+	std::string specularMapPath;
 
 	void DrawComponentSpecificImGuiHierarchyAdjustables() override;
 
@@ -54,6 +56,13 @@ public:
 	};
 
 	TextureChoice textureChoice;
+
+	int selectedMinType;
+	int selectedMagType;
+
+	void ReloadTextures();
+
+
 
 private:
 };

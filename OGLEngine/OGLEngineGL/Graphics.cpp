@@ -45,60 +45,31 @@ void Graphics::Render()
 
 
 //1. depth texture scene from light's perspective.
-			//glm::mat4 lightProjection;
-			//glm::mat4 lightView;
-			//glm::mat4 lightSpaceMatrix;
-			//float near_plane = 1.0f;
-			//float far_plane = 7.5f;
-			//lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-			//lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f)); //should probably put this in light component.
-			//lightSpaceMatrix = lightProjection * lightView;
-	ShaderManager::Get().depthShader->Use();
-			//ShaderManager::Get().depthShader->SetMatrix4(lightSpaceMatrix, "lightSpaceMatrix");
-
+	//glCullFace(GL_FRONT);
 	ShaderManager::Get().depthPass = true;
+	ShaderManager::Get().depthShader->Use();
+
 	glViewport(0, 0, ShaderManager::Get().shadowMap->SHADOW_WIDTH, ShaderManager::Get().shadowMap->SHADOW_HEIGHT);
 	glBindFramebuffer(GL_FRAMEBUFFER, ShaderManager::Get().shadowMap->depthMapFBO);
 	glClear(GL_DEPTH_BUFFER_BIT);
-			//glActiveTexture(GL_TEXTURE0);
-			//glBindTexture(GL_TEXTURE_2D, woodTexture); //is this necessary here?
-			//renderScene(ShaderManager::Get().depthShader);
+
 	for (int i = 0; i < GameObjectManager::Get().gameObjects.size(); i++) //Game.gameObjectVector calls Update() on every game object implementing Update() and that Update() can call Update() in every component implementing Update().
 	{
 		GameObjectManager::Get().gameObjects[i]->Update();
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	ShaderManager::Get().depthPass = false;
-	glViewport(0, 0, myWidth, myHeight);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//glCullFace(GL_BACK);
 
 //2. render scene like usual, now using the generated depth texture/shadowmap.
-			//ShaderManager::Get().shader->SetInt(2, "shadowMap");
+	glViewport(0, 0, myWidth, myHeight);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	ShaderManager::Get().depthPass = false;
 	ShaderManager::Get().shader->Use();
-			//glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f); //already done in Camera
-			//glm::mat4 view = camera.GetViewMatrix(); //already done in Camera
-			//shader.setMat4("projection", projection); //already done in MeshComponent
-			//shader.setMat4("view", view); //already done in MeshComponent
-
-			//shader.setVec3("viewPos", camera.Position); //already done in MeshComponent
-			//shader.setVec3("lightPos", lightPos); //alreadu done in Light subclasses, called in Update() of LightComponent.
-			//shader.setMat4("lightSpaceMatrix", lightSpaceMatrix); 
-			//glActiveTexture(GL_TEXTURE0);
-			//glBindTexture(GL_TEXTURE_2D, woodTexture);
-			//glActiveTexture(GL_TEXTURE1);
-			//glBindTexture(GL_TEXTURE_2D, shadowMap->depthMap);
-			//renderScene(ShaderManager::Get().shader);
-
-
-
 
 	for (int i = 0; i < GameObjectManager::Get().gameObjects.size(); i++) //Game.gameObjectVector calls Update() on every game object implementing Update() and that Update() can call Update() in every component implementing Update().
 	{
 		GameObjectManager::Get().gameObjects[i]->Update();
 	}
-
-	//ExampleCube();
 
 	//we need to swap buffers
 	//glfwSwapBuffers(window); //swap front and back buffers on the window. (Info: our framebuffer has two sides, the back buffer is what we add, the front buffer is what we see. Basically.). So we can see everything that was added before this function was called!

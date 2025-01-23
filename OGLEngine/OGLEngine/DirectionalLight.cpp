@@ -4,6 +4,14 @@ DirectionalLight::DirectionalLight()
 {
 }
 
+DirectionalLight::~DirectionalLight()
+{
+	position = glm::vec3(0, 0, 0);
+	direction = glm::vec3(0, 0, 0);
+	ShaderManager::Get().shader->SetVector3(position, positionString);
+	ShaderManager::Get().shader->SetVector3(direction, directionString);
+}
+
 void DirectionalLight::UpdateIDBasedStrings()
 {
 	IDstring = "directionalLights[";
@@ -76,7 +84,10 @@ void DirectionalLight::SetDirection(glm::vec3 dir)
 	{
 		ShaderManager::Get().shader->SetVector3(direction, directionString);
 	}
+}
 
+void DirectionalLight::SetLightSpaceMatrix()
+{
 	glm::mat4 lightProjection;
 	glm::mat4 lightView;
 	glm::mat4 lightSpaceMatrix;

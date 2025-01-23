@@ -18,8 +18,10 @@
 MeshComponent::MeshComponent()
 {
 	name = "Mesh component";
-	diffuseMap = new Texture("../Textures/Bliss/Bliss.jpg");
-	specularMap = new Texture("../Textures/Bliss/Bliss2.jpg");
+	diffuseMapPath = "../Textures/Bliss/Bliss.jpg";
+	specularMapPath = "../Textures/Bliss/Bliss2.jpg";
+	diffuseMap = new Texture(diffuseMapPath.c_str(), 5, 1);
+	specularMap = new Texture(specularMapPath.c_str(), 5, 1);
 	//mesh = MeshManager::Get().LoadMesh("../Models/TreeTrunk");
 	//mesh->bufferMesh();
 	//mesh->ApplyTexture(myTexture);
@@ -62,6 +64,9 @@ MeshComponent::MeshComponent()
 	ShaderManager::Get().shader->SetVector3(diffuse, "material.diffuse");
 	ShaderManager::Get().shader->SetVector3(specular, "material.specular");
 	ShaderManager::Get().shader->SetFloat(shininess, "material.shininess");
+
+	selectedMinType = 0;
+	selectedMagType = 0;
 }
 
 MeshComponent::~MeshComponent()
@@ -74,6 +79,10 @@ MeshComponent::~MeshComponent()
 void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 {
 	Component::DrawComponentSpecificImGuiHierarchyAdjustables();
+	if (isMarkedForDeletion)
+	{
+		return;
+	}
 
 	//<-----------------MESH SELECTION UI--------------------->
 
@@ -180,6 +189,65 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 		}
 	}
 
+	if (ImGui::Button("Choose texture Min filter"))
+	{
+		ImGui::OpenPopup("Min filter Popup");
+	}
+
+	if (ImGui::Button("Choose texture Mag filter"))
+	{
+		ImGui::OpenPopup("Mag filter Popup");
+	}
+
+	if (ImGui::Button("Reload textures"))
+	{
+		ReloadTextures();
+	}
+
+	const char* minNames[] = { "Nearest", "Linear", "Nearest Mipmap Nearest", "Linear Mipmap Nearest", "Nearest Mipmap Linear", "Linear Mipmap Linear" };
+
+	ImGui::Text("Selected Min Filter:");
+	ImGui::SameLine();
+	ImGui::Text(minNames[selectedMinType]);
+
+	if (ImGui::BeginPopup("Min filter Popup"))
+	{
+		ImGui::SeparatorText("MIN FILTERS:");
+
+		for (int i = 0; i < IM_ARRAYSIZE(minNames); i++)
+		{
+			//ImGui::BeginDisabled();
+			if (ImGui::Selectable(minNames[i]))
+			{
+				selectedMinType = i;
+			}
+			//ImGui::EndDisabled();
+		}
+		ImGui::EndPopup();
+	}
+
+	const char* magNames[] = { "Nearest", "Linear" };
+
+	ImGui::Text("Selected Mag Filter:");
+	ImGui::SameLine();
+	ImGui::Text(magNames[selectedMagType]);
+
+	if (ImGui::BeginPopup("Mag filter Popup"))
+	{
+		ImGui::SeparatorText("MAG FILTERS:");
+
+		for (int i = 0; i < IM_ARRAYSIZE(magNames); i++)
+		{
+			//ImGui::BeginDisabled();
+			if (ImGui::Selectable(magNames[i]))
+			{
+				selectedMagType = i;
+			}
+			//ImGui::EndDisabled();
+		}
+		ImGui::EndPopup();
+	}
+
 	if (ImGui::BeginPopup("Texture Popup"))
 	{
 		ImTextureID texid = diffuseMap->TextureObject;
@@ -214,17 +282,19 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 						{
 						case MeshComponent::choice_diffuse:
 							delete diffuseMap;
-							diffuseMap = new Texture(textureVector[i].path().string().c_str()); //full path with file extension needed for stbi_load to work.
+							diffuseMapPath = textureVector[i].path().string().c_str();
+							diffuseMap = new Texture(diffuseMapPath.c_str(), selectedMinType, selectedMagType); //full path with file extension needed for stbi_load to work.
 							if (ShaderManager::Get().depthPass == false)
 							{
 								ShaderManager::Get().shader->SetInt(0, "material.diffuse"); //why do I need to do this again? time to re-read https://learnopengl.com/Lighting/Lighting-maps
 								mesh->ApplyDiffuseMap(diffuseMap);
 							}
-							
+
 							break;
 						case MeshComponent::choice_specular:
 							delete specularMap;
-							specularMap = new Texture(textureVector[i].path().string().c_str()); //full path with file extension needed for stbi_load to work.
+							specularMapPath = textureVector[i].path().string().c_str();
+							specularMap = new Texture(specularMapPath.c_str(), selectedMinType, selectedMagType); //full path with file extension needed for stbi_load to work.
 							if (ShaderManager::Get().depthPass == false)
 							{
 								ShaderManager::Get().shader->SetInt(1, "material.specular"); //why do I need to do this again? time to re-read https://learnopengl.com/Lighting/Lighting-maps
@@ -234,7 +304,7 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 						default:
 							break;
 						}
-						
+
 					}
 				}
 			}
@@ -242,6 +312,7 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 		}
 		ImGui::EndPopup();
 	}
+
 
 	//if (ImGui::DragFloat3("ambient", &ambient.x, .01f)) //these don't do anything, except for the shininess float, because in the fragment shader the material struct only has diffuse and specular SAMPLER2Ds and not vec3s. And I removed ambient, maybe if I reintroduce it I can get emissive textures?
 	//{
@@ -282,11 +353,11 @@ void MeshComponent::DrawMesh()
 		ShaderManager::Get().shader->SetMatrix4(Camera::Get().projection, "projection");
 		ShaderManager::Get().shader->SetVector3(Camera::Get().myPosition, "viewPos"); //Doesn't really make sense to update this here but whatever.
 	}
-	else 
+	else
 	{
 		ShaderManager::Get().depthShader->SetMatrix4(trans, "transform"); //this is required for meshes to be rendered to depthMap.
 	}
-	
+
 	mesh->Draw();
 }
 
@@ -306,5 +377,23 @@ void MeshComponent::Update()
 	if (mesh != nullptr)
 	{
 		DrawMesh();
+	}
+}
+
+void MeshComponent::ReloadTextures()
+{
+	delete diffuseMap;
+	diffuseMap = new Texture(diffuseMapPath.c_str(), selectedMinType, selectedMagType); //full path with file extension needed for stbi_load to work.
+	if (ShaderManager::Get().depthPass == false)
+	{
+		ShaderManager::Get().shader->SetInt(0, "material.diffuse"); //why do I need to do this again? time to re-read https://learnopengl.com/Lighting/Lighting-maps
+		mesh->ApplyDiffuseMap(diffuseMap);
+	}
+	delete specularMap;
+	specularMap = new Texture(specularMapPath.c_str(), selectedMinType, selectedMagType); //full path with file extension needed for stbi_load to work.
+	if (ShaderManager::Get().depthPass == false)
+	{
+		ShaderManager::Get().shader->SetInt(1, "material.specular"); //why do I need to do this again? time to re-read https://learnopengl.com/Lighting/Lighting-maps
+		mesh->ApplySpecularMap(specularMap);
 	}
 }
