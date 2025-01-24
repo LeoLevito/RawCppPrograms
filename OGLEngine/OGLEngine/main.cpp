@@ -13,9 +13,6 @@
 
 int main()
 {
-	std::thread MeshManagerThread(&MeshManager::Process, &MeshManager::Get()); //make a wrapper function in Thread class that does std::thread t1(func).
-	std::thread GameObjectManagerThread(&GameObjectManager::Process, &GameObjectManager::Get()); //make a wrapper function in Thread class that does std::thread t1(func).
-
 	Graphics* graphics = new Graphics;
 	graphics->Initialize(1280, 720);
 
@@ -23,6 +20,9 @@ int main()
 
 	EditorGUI* editorGUI = new EditorGUI;
 	editorGUI->Initialize(graphics->window, graphics, Camera::Get());
+
+	std::thread MeshManagerThread(&MeshManager::Process, &MeshManager::Get()); //make a wrapper function in Thread class that does std::thread t1(func).
+	std::thread GameObjectManagerThread(&GameObjectManager::Process, &GameObjectManager::Get()); //make a wrapper function in Thread class that does std::thread t1(func).
 
 	float lastTime = 0;
 	float currentTime = 0;

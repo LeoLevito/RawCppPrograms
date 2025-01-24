@@ -8,6 +8,7 @@
 #include <gtc/matrix_transform.hpp>
 #include "ObjectMessage.h"
 #include "Engine.h"
+#include "MeshManager.h"
 
 void EditorGUI::Initialize(GLFWwindow* window, Graphics* graphics, Camera& camera)
 {
@@ -227,6 +228,7 @@ void EditorGUI::MainMenuBar()
 void EditorGUI::QuickGUITesting()
 {
 	ImGui::Begin("Quick GUI testing");
+
 	if (ImGui::Checkbox("Gamma Correction?", &gammaCorrection))
 	{
 		if (gammaCorrection)
@@ -238,6 +240,9 @@ void EditorGUI::QuickGUITesting()
 			glDisable(GL_FRAMEBUFFER_SRGB); //disable gamma correction.
 		}
 	}
+
+	MeshManager::Get().ErrorGUI();
+
 	ImGui::End();
 }
 

@@ -153,6 +153,8 @@
     <ClCompile Include="LightComponent.cpp" />
     <ClCompile Include="LightManager.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MemoryCheckManager.cpp" />
+    <ClCompile Include="MemoryMessage.cpp" />
     <ClCompile Include="MeshComponent.cpp" />
     <ClCompile Include="MeshManager.cpp" />
     <ClCompile Include="MeshMessage.cpp" />
@@ -180,6 +182,8 @@
     <ClInclude Include="Light.h" />
     <ClInclude Include="LightComponent.h" />
     <ClInclude Include="LightManager.h" />
+    <ClInclude Include="MemoryCheckManager.h" />
+    <ClInclude Include="MemoryMessage.h" />
     <ClInclude Include="MeshComponent.h" />
     <ClInclude Include="MeshManager.h" />
     <ClInclude Include="MeshMessage.h" />

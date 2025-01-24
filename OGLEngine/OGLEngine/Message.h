@@ -7,7 +7,8 @@ enum class MessageType {
 	FloatMessage,
 	Raycast,
 	MeshMessage,
-	ObjectMessage
+	ObjectMessage,
+	MemoryMessage
 };
 
 class Message

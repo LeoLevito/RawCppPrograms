@@ -86,10 +86,12 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 
 	//<-----------------MESH SELECTION UI--------------------->
 
+	ImGui::BeginDisabled(MeshManager::Get().currentlyLoadingMesh != false);
 	if (ImGui::Button("Select Mesh"))
 	{
 		ImGui::OpenPopup("Mesh Popup");
 	}
+	ImGui::EndDisabled();
 
 	if (ImGui::BeginPopup("Mesh Popup"))
 	{
@@ -114,17 +116,19 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 				std::string selectableMeshName = loadableMeshName;
 				selectableMeshName.erase(selectableMeshName.begin(), selectableMeshName.begin() + currentDirectoryName.length() + 1);
 
-				if (ImGui::Selectable(selectableMeshName.c_str())) //Display new Selectable for texture files.
+				if (ImGui::Selectable(selectableMeshName.c_str())) //Display new Selectable for mesh files.
 				{
 					lastSelectedMeshName = selectableMeshName;
 					MeshMessage* newMessage = new MeshMessage();
 					newMessage->meshToLoad = loadableMeshName.c_str();
+					newMessage->directoryEntry = meshVector[i];
 					MeshManager::Get().QueueMessage(newMessage);
 				}
 			}
 			ImGui::PopID();
 		}
 		ImGui::EndPopup();
+		
 	}
 
 	if (MeshManager::Get().currentlyLoadingMesh != false)
@@ -133,22 +137,31 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 		ImGui::Text("Loading mesh into memory...");
 	}
 
+	ImGui::BeginDisabled(MeshManager::Get().currentlyLoadingMesh != false);
 	if (ImGui::Button("Apply mesh")) //Not ideal right now, but it was the fastest way to get threaded mesh loading working. Maybe wanna send back a message to this component to change the mesh once the MeshManager is done loading the mesh.
 	{
 		mesh = MeshManager::Get().lastAccessedMesh;
-		if (mesh->meshLoadedCorrectly == false)
+		if (mesh != nullptr)
 		{
-			meshInvalid = true;
-			ImGui::OpenPopup("MeshInvalidPopupModal");
+			if (mesh->meshLoadedCorrectly == false)
+			{
+				meshInvalid = true;
+				ImGui::OpenPopup("MeshInvalidPopupModal");
+			}
+			else
+			{
+				meshInvalid = false;
+				mesh->bufferMesh();
+				mesh->ApplyDiffuseMap(diffuseMap);
+				mesh->ApplySpecularMap(specularMap);
+			}
 		}
 		else
 		{
-			meshInvalid = false;
-			mesh->bufferMesh();
-			mesh->ApplyDiffuseMap(diffuseMap);
-			mesh->ApplySpecularMap(specularMap);
+			std::cout << "MESH IS NULLPTR" << std::endl;
 		}
 	}
+	ImGui::EndDisabled();
 
 	if (ImGui::BeginPopupModal("MeshInvalidPopupModal"))
 	{

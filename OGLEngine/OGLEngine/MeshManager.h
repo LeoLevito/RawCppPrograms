@@ -3,6 +3,7 @@
 #include "Mesh.h"
 #include "Message.h"
 #include <thread>
+#include <filesystem>
 class MeshManager
 {
 private:
@@ -12,7 +13,7 @@ public:
 
 	static MeshManager& Get();
 	
-	Mesh* LoadMesh(const std::string& filename); //include load from file or load from memory if requested mesh has been cached.
+	Mesh* LoadMesh(const std::string& filename, std::filesystem::directory_entry directoryEntry); //include load from file or load from memory if requested mesh has been cached.
 	//I have a question, how do I make it so multiple objects can have the same mesh while effectively only allocating and using memory for one mesh?
 	void CacheMesh(); //isn't this done by adding it to the vector?
 
@@ -32,7 +33,14 @@ public:
 	//std::thread* myThread;
 	bool shouldRun = true;
 	bool currentlyLoadingMesh = false;
+	void ErrorGUI();
 private:
 	void PrintMemoryStatus();
+	bool EnoughAvailableMemory();
+	bool allowLowMemoryErrorPopup;
+	bool allowObjSizeErrorPopup;
+
+	bool IsAvailableMemoryOK;
+	bool IsObjSizeOK;
 };
 
