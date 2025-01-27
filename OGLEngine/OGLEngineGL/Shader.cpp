@@ -80,17 +80,50 @@ unsigned int Shader::LoadFragmentShader(const char* path)
     return shaderObject;
 }
 
-void Shader::Initialize(const char* vertexPath, const char* fragmentPath) //start shader program.
+unsigned int Shader::LoadGeometryShader(const char* path)
+{
+    int result;
+    char Log[512];
+
+    std::string shaderCodeString = LoadShader(path);
+    const char* shaderCode = shaderCodeString.c_str();
+
+    unsigned int shaderObject;
+
+    shaderObject = glCreateShader(GL_GEOMETRY_SHADER); //only difference is GL_GEOMETRY_SHADER, let's hope this works.
+    glShaderSource(shaderObject, 1, &shaderCode, NULL);
+    glCompileShader(shaderObject);
+
+    glGetShaderiv(shaderObject, GL_COMPILE_STATUS, &result);
+
+    if (!result)
+    {
+        glGetShaderInfoLog(shaderObject, 512, NULL, Log);
+        std::cout << "Failed to compile vertex shader \n" << Log << std::endl;
+    }
+    return shaderObject;
+}
+
+void Shader::Initialize(const char* vertexPath, const char* fragmentPath, const char* geometryPath) //start shader program.
 {
     int result;
     char Log[512];
 
     unsigned int VertexShader = LoadVertexShader(vertexPath); //NEED SHADER FILES TO BE INSIDE THE FOLDER, IN EXPLORER, WHERE THE CURRENT PROJECT RUNS. IN THIS CASE: INSIDE OGLENGINE FOLDER IN EXPLORER. https://github.com/JoeyDeVries/LearnOpenGL/issues/146#issuecomment-528748296
     unsigned int FragmentShader = LoadFragmentShader(fragmentPath);
+    unsigned int GeometryShader;
+    if (geometryPath != nullptr)
+    {
+        GeometryShader = LoadGeometryShader(geometryPath);
+    }
 
     myShaderProgram = glCreateProgram(); //we are not deleting any shader programs when deleting objects, so that's something to keep in mind.
     glAttachShader(myShaderProgram, VertexShader);
     glAttachShader(myShaderProgram, FragmentShader);
+    if (geometryPath != nullptr)
+    {
+        glAttachShader(myShaderProgram, GeometryShader);
+    }
     glLinkProgram(myShaderProgram); //might get conflicts here if vertex and fragment shaders have different input and outputs, or whatever. This function creates an executable that will be run on the programmable vertex processor if any shader objects here are of type GL_VERTEX_SHADER.
 
     //check if program compiles or not. Get a log from this.
@@ -104,6 +137,10 @@ void Shader::Initialize(const char* vertexPath, const char* fragmentPath) //star
     //we don't need the shader objects anymore since we now have our shader program!
     glDeleteShader(VertexShader);
     glDeleteShader(FragmentShader);
+    if (geometryPath != nullptr)
+    {
+        glDeleteShader(GeometryShader);
+    }
 
     //NOTE: Martin mentioned that he did this function weirdly since it doesn't return anything, and that it creates two shader objects now.
 }

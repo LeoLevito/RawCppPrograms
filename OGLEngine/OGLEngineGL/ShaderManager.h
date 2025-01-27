@@ -1,6 +1,7 @@
 #pragma once
 #include "Shader.h"
 #include "ShadowMap.h"
+#include "ShadowCubeMap.h"
 
 class ShaderManager
 {
@@ -13,7 +14,9 @@ public:
 	static ShaderManager& Get();
 	Shader* shader;
 	Shader* depthShader;
+	Shader* depthCubeMapShader;
 	ShadowMap* shadowMap;
+	ShadowCubeMap* shadowCubeMap;
 	bool depthPass;
 };
 

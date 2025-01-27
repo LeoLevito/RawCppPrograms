@@ -1,6 +1,7 @@
 #version 330 core
 out vec4 FragColor;
 uniform sampler2D THEshadowMap;
+uniform samplerCube THEshadowCubeMap;
 struct Material 
 {
 	sampler2D diffuse;
@@ -64,12 +65,14 @@ uniform PointLight pointLights[NR_POINT_LIGHTS];
 uniform SpotLight spotLights[NR_SPOT_LIGHTS];
 uniform Material material;
 uniform bool blinn;
+uniform float far_plane;
 
 //forward declare functions so we can define it below the main() function.
 vec3 CalcDirectionalLight(DirectionalLight light, vec3 norm, vec3 viewDir, vec3 fragPos);							
 vec3 CalcPointLight(PointLight light, vec3 norm, vec3 fragPos, vec3 viewDir); 
 vec3 CalcSpotLight(SpotLight light, vec3 norm, vec3 fragPos, vec3 viewDir);
 float CalcShadow(vec4 fragPosLightSpace);
+float CalcShadowForPointLight(vec3 fragPos, vec3 lightPos);
 
 void main()
 {
@@ -158,7 +161,9 @@ vec3 CalcPointLight(PointLight light, vec3 norm, vec3 fragPos, vec3 viewDir)
 	diffuse *= attenuation;
 	specular *= attenuation;
 
+	//float shadow = CalcShadowForPointLight(fragPos, light.position);
 	return (ambient + diffuse + specular);
+	//return (ambient + (1.0f - shadow) * (diffuse + specular));
 }
 
 vec3 CalcSpotLight(SpotLight light, vec3 norm, vec3 fragPos, vec3 viewDir)
@@ -200,7 +205,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 norm, vec3 fragPos, vec3 viewDir)
 
 
 
-float CalcShadow(vec4 fragPosLightSpace) //might have to do a CalcShadow function for each type of light.
+float CalcShadow(vec4 fragPosLightSpace) //might have to do a CalcShadow function for each type of light. In order to specify light position.
 {
 	vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
 
@@ -231,6 +236,22 @@ float CalcShadow(vec4 fragPosLightSpace) //might have to do a CalcShadow functio
 	{
 		shadow = 0.0f;
 	}
+
+	return shadow;
+}
+
+float CalcShadowForPointLight(vec3 fragPos, vec3 lightPos)
+{
+	vec3 fragToLight = fragPos - lightPos;
+
+	float closestDepth = texture(THEshadowCubeMap, fragToLight).r;
+
+	closestDepth *= far_plane;
+
+	float currentDepth = length(fragToLight);
+
+	float bias = 0.05f;
+	float shadow = currentDepth - bias > closestDepth ? 1.0f : 0.0f;
 
 	return shadow;
 }

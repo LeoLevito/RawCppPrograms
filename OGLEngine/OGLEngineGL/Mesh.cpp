@@ -88,11 +88,18 @@ void Mesh::Draw() //Draw mesh;
 		glBindTexture(GL_TEXTURE_2D, specularMap->TextureObject); //so we have a new texture binding in Draw() because otherwise fragment shader would take the last binded texture, this allows us to use different textures for different objects (in the future).
 	}
 
+	//this doesn't feel right, to have this per mesh instance.
 	if (ShaderManager::Get().shadowMap->depthMap != NULL)
 	{
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, ShaderManager::Get().shadowMap->depthMap);
 	}
+
+	//if (ShaderManager::Get().shadowCubeMap->depthCubeMap != NULL)
+	//{
+	//	glActiveTexture(GL_TEXTURE3);
+	//	glBindTexture(GL_TEXTURE_CUBE_MAP, ShaderManager::Get().shadowCubeMap->depthCubeMap);
+	//}
 
 
 

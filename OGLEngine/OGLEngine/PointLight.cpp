@@ -70,6 +70,37 @@ void PointLight::SetPosition(glm::vec3 pos)
 	ShaderManager::Get().shader->SetVector3(position, positionString);
 }
 
+void PointLight::SetLightSpaceMatrix()
+{
+	glm::mat4 lightProjection;
+
+	float aspect = 1.0f;
+	float near_plane = 1.0f;
+	float far_plane = 100.f;
+	lightProjection = glm::perspective(glm::radians(90.f), aspect, near_plane, far_plane);
+	std::vector<glm::mat4> shadowTransforms;
+	shadowTransforms.push_back(lightProjection * glm::lookAt(position, position + glm::vec3( 1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)));
+	shadowTransforms.push_back(lightProjection * glm::lookAt(position, position + glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)));
+	shadowTransforms.push_back(lightProjection * glm::lookAt(position, position + glm::vec3( 0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f)));
+	shadowTransforms.push_back(lightProjection * glm::lookAt(position, position + glm::vec3( 0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)));
+	shadowTransforms.push_back(lightProjection * glm::lookAt(position, position + glm::vec3( 0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f)));
+	shadowTransforms.push_back(lightProjection * glm::lookAt(position, position + glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f)));
+
+	if (ShaderManager::Get().depthPass == false)
+	{
+		//ShaderManager::Get().shader->SetMatrix4(lightSpaceMatrix, "lightSpaceMatrix"); //now what about this? I read that this won't be needed anymore? Let's see.
+	}
+	else
+	{
+		for (unsigned int i = 0; i < 6; i++)
+		{
+			ShaderManager::Get().depthCubeMapShader->SetMatrix4(shadowTransforms[i], "shadowMatrices[" + std::to_string(i) + "]"); //this is not going to work without the geometry shader initialized.
+		}
+		ShaderManager::Get().depthCubeMapShader->SetFloat(far_plane, "far_plane");
+		//ShaderManager::Get().depthCubeMapShader->SetVector3(position, positionString); //not needed because we already do this above.
+	}
+}
+
 void PointLight::DrawImgui()
 {
 	Light::DrawImgui();

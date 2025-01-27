@@ -66,6 +66,9 @@
     <ClCompile Include="ShadowMap.cpp">
       <Filter>Texture</Filter>
     </ClCompile>
+    <ClCompile Include="ShadowCubeMap.cpp">
+      <Filter>Texture</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -102,6 +105,9 @@
       <Filter>Managers</Filter>
     </ClInclude>
     <ClInclude Include="ShadowMap.h">
+      <Filter>Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="ShadowCubeMap.h">
       <Filter>Texture</Filter>
     </ClInclude>
   </ItemGroup>

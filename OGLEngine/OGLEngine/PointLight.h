@@ -34,6 +34,7 @@ public:
 	virtual void SetToZero() override;
 
 	virtual void SetPosition(glm::vec3 pos);
+	virtual void SetLightSpaceMatrix() override;
 
 	virtual void DrawImgui() override;
 private:
