@@ -9,7 +9,7 @@
 #include <iostream>
 #include "MeshManager.h"
 #include "ShaderManager.h"
-
+#include "MemoryCheckManager.h"
 
 int main()
 {
@@ -23,6 +23,7 @@ int main()
 
 	std::thread MeshManagerThread(&MeshManager::Process, &MeshManager::Get()); //make a wrapper function in Thread class that does std::thread t1(func).
 	std::thread GameObjectManagerThread(&GameObjectManager::Process, &GameObjectManager::Get()); //make a wrapper function in Thread class that does std::thread t1(func).
+	std::thread MemoryCheckManagerThread(&MemoryCheckManager::Process, &MemoryCheckManager::Get());
 
 	float lastTime = 0;
 	float currentTime = 0;
@@ -58,6 +59,10 @@ int main()
 	GameObjectManagerThread.join();
 	GameObjectManagerThread.~thread();
 
+	//terminate thread.
+	MemoryCheckManager::Get().shouldRun = false;
+	MemoryCheckManagerThread.join();
+	MemoryCheckManagerThread.~thread();
 
 	editorGUI->CloseImGui();
 	return 0;

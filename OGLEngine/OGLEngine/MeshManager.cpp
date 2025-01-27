@@ -7,7 +7,7 @@
 #include "MeshMessage.h"
 #include <mutex>
 #include "MemoryMessage.h"
-
+#include "MemoryCheckManager.h"
 
 std::mutex myMutex;
 
@@ -29,7 +29,6 @@ MeshManager& MeshManager::Get()
 
 Mesh* MeshManager::LoadMesh(const std::string& filename, std::filesystem::directory_entry directoryEntry)
 {
-
 	for (size_t i = 0; i < CachedMeshes.size(); i++)
 	{
 		if (CachedMeshes[i] == filename) { //since ImGui entry doesn't require proper capitalization, there can be situations where we load the same mesh multiple times when we don't need to. This would be fixed by having a dropdown to choose meshes from instead of a string entry.
@@ -38,13 +37,7 @@ Mesh* MeshManager::LoadMesh(const std::string& filename, std::filesystem::direct
 		}
 	}
 
-
-	float objsize = directoryEntry.file_size();
-	float objsizeInMB = (objsize / 1024.f) / 1024.f;
-	std::cout << "file size of .obj: " << objsizeInMB << " MB" << std::endl;
-
-	PrintMemoryStatus();
-	//will need to move this to a different function so I can stagger it after message processing.
+	//will need to move this to a different function so I can stagger it after message processing. Shit man this will be hard. I need to refactor in the mesh component as well.
 	if (IsAvailableMemoryOK == true) //now I just need to refactor this with a new MemoryCheckManager class.
 	{
 		if (IsObjSizeOK == true)
@@ -64,10 +57,17 @@ Mesh* MeshManager::LoadMesh(const std::string& filename, std::filesystem::direct
 	{
 		allowLowMemoryErrorPopup = true;
 	}
-	PrintMemoryStatus();
+
 	//18 dec 2024: if check for checking maximum memory, return error if requested memory allocation is too large. Could also use messages for this. 
 	// So like, maybe, a memory checker manager where I send a request message and I receive a result message?!?!?!?!?! I think I could do that. That would kill two birds with one stone! As long as I thread that class as well. I would get an extra message subclass, I would communicate between two managers, and it would be threaded AND only communicated through messages.
 	//18 dec 2024: Send message back to some manager telling us that the mesh has been loaded, to fulfill G requirement - Emil.
+}
+
+void MeshManager::RequestMemoryCheck(std::filesystem::directory_entry directoryEntry)
+{
+	MemoryMessage* newMessage = new MemoryMessage();
+	newMessage->directoryEntry = directoryEntry;
+	MemoryCheckManager::Get().QueueMessage(newMessage);
 }
 
 void MeshManager::QueueMessage(Message* message)
@@ -100,15 +100,23 @@ void MeshManager::ProcessMessage(Message* message)
 	case MessageType::String:
 		break;
 	case MessageType::MeshMessage:
+	{
 		MeshMessage& meshmessage = dynamic_cast<MeshMessage&>(*message); //is this bad practice for messaging? RE:(MeshComponent), apparently this dynamic_cast is better than other types of casts, even Emil has used them multiple times. Plus this cast only happens when processing messages, so not too frequently.
+		currentDirectoryEntry = meshmessage.directoryEntry;
+		currentMeshName = meshmessage.meshToLoad;
 		currentlyLoadingMesh = true;
-		LoadMesh(meshmessage.meshToLoad, meshmessage.directoryEntry); //Using data 'meshToLoad' from the message casted to meshmessage. We wouldn't need to cast if we were calling a class function that doesn't need specific data from a message.
-		currentlyLoadingMesh = false;
+		RequestMemoryCheck(currentDirectoryEntry);
 		break;
+	}
 	case MessageType::MemoryMessage:
+	{
 		MemoryMessage& memoryMessage = dynamic_cast<MemoryMessage&>(*message); //is this bad practice for messaging? RE:(MeshComponent), apparently this dynamic_cast is better than other types of casts, even Emil has used them multiple times. Plus this cast only happens when processing messages, so not too frequently.
-
+		IsAvailableMemoryOK = memoryMessage.isAvailableMemoryOK;
+		IsObjSizeOK = memoryMessage.isFileSizeOK;
+		LoadMesh(currentMeshName, currentDirectoryEntry); //Using data 'meshToLoad' from the message casted to meshmessage. We wouldn't need to cast if we were calling a class function that doesn't need specific data from a message.
+		currentlyLoadingMesh = false; //this needs to be moved;
 		break;
+	}
 	default:
 		break;
 	}
@@ -120,37 +128,6 @@ void MeshManager::Process()
 	{
 		ProcessMessages();
 	}
-}
-
-void MeshManager::PrintMemoryStatus()
-{
-	MEMORYSTATUSEX statex;
-	statex.dwLength = sizeof(statex);
-	GlobalMemoryStatusEx(&statex);
-	std::cout << "There is " << statex.ullAvailPhys / (1024 * 1024) << " MB of physical memory available." << std::endl;
-	std::cout << "There is " << statex.ullAvailVirtual / (1024 * 1024) << " MB of virtual memory available." << std::endl;
-}
-
-bool MeshManager::EnoughAvailableMemory()
-{
-	MEMORYSTATUSEX statex;
-	statex.dwLength = sizeof(statex);
-	GlobalMemoryStatusEx(&statex);
-
-	if ((statex.ullAvailPhys / (1024 * 1024)) < 500) //could improve this by checking the size of the requested .obj file, if it's bigger than say 100MB return this error.
-	{
-		std::cout << "There is " << statex.ullAvailPhys / (1024 * 1024) << " MB of physical memory available." << std::endl;
-		std::cout << "There is less than 500 MB of available Physical Memory, cancelling mesh allocation." << std::endl;
-		return false;
-	}
-
-	if ((statex.ullAvailVirtual / (1024 * 1024)) < 100)
-	{
-		std::cout << "There is " << statex.ullAvailVirtual / (1024 * 1024) << " MB of virtual memory available." << std::endl;
-		std::cout << "There is less than 100 MB of available Virtual Memory, cancelling mesh allocation." << std::endl;
-		return false;
-	}
-	return true;
 }
 
 void MeshManager::ErrorGUI()

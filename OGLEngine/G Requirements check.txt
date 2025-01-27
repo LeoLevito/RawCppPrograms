@@ -15,7 +15,7 @@ To pass (G), complete the following tasks:
 
 + Write a small Game Engine Architecture document (2 pages minimum) --> (CHECK, will add to it as times goes on)
 
--++ Implement Message class, including 2 sub-classes, and use them in at least 1 communication pattern between Managers in your project.
+++ Implement Message class, including 2 sub-classes, and use them in at least 1 communication pattern between Managers in your project.
 	//I'm now going to analyse above requirement: Message class. Subclasses of Message class, 
 	//i.e. classes deriving from Message class. Use the subclasses in at least 1 communication pattern, 
 	//observer pattern or mediator pattern I presume, between two managers in your project. Send and receive messages between two managers.
@@ -27,7 +27,7 @@ To pass (G), complete the following tasks:
 
 + Implement serialization (ReadFrom, WriteTo file) for your Mesh class --> (HANDLED IN OBJREADER)
 
--++ Implement Thread and Mutex functionality and run one of your message-supported Managers in its own thread, communicating only with messages.
+++ Implement Thread and Mutex functionality and run one of your message-supported Managers in its own thread, communicating only with messages.
 	//I'm now going to QUESTION above requirement: run one of your message-supported Managers in its own thread; 
 	//when? Only run it in a thread when I need it to, i.e. when calling a function from it, or run it continuously in a thread? 
 	//How would that work? How would I make sure a singleton always runs its functions in its own thread?

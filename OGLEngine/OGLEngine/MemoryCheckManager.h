@@ -16,6 +16,8 @@ public:
 
 	bool CheckEnoughMemoryAvailable();
 	bool CheckFileSizeOK(std::filesystem::directory_entry directoryEntry);
+
+	void PrintMemoryStatus();
 private:
 };
 

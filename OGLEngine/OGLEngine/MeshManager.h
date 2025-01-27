@@ -10,10 +10,10 @@ private:
 	MeshManager();
 	~MeshManager();
 public:
-
 	static MeshManager& Get();
 	
 	Mesh* LoadMesh(const std::string& filename, std::filesystem::directory_entry directoryEntry); //include load from file or load from memory if requested mesh has been cached.
+	void RequestMemoryCheck(std::filesystem::directory_entry directoryEntry);
 	//I have a question, how do I make it so multiple objects can have the same mesh while effectively only allocating and using memory for one mesh?
 	void CacheMesh(); //isn't this done by adding it to the vector?
 
@@ -30,17 +30,19 @@ public:
 	void ProcessMessage(Message* message); //you have to use pointer here since a subclass of Message can be used.
 	std::vector <Message*> queuedMessages;
 	void Process();
-	//std::thread* myThread;
+
+
 	bool shouldRun = true;
 	bool currentlyLoadingMesh = false;
 	void ErrorGUI();
 private:
-	void PrintMemoryStatus();
-	bool EnoughAvailableMemory();
 	bool allowLowMemoryErrorPopup;
 	bool allowObjSizeErrorPopup;
 
 	bool IsAvailableMemoryOK;
 	bool IsObjSizeOK;
+	std::filesystem::directory_entry currentDirectoryEntry;
+	std::string currentMeshName;
+
 };
 

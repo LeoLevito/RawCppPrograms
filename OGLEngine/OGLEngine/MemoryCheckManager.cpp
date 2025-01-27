@@ -43,16 +43,16 @@ void MemoryCheckManager::ProcessMessage(Message* message)
 	switch (message->type)
 	{
 	case MessageType::MemoryMessage:
+	{
 		MemoryMessage& memoryMessage = dynamic_cast<MemoryMessage&>(*message); //is this bad practice for messaging? RE:(MeshComponent), apparently this dynamic_cast is better than other types of casts, even Emil has used them multiple times. Plus this cast only happens when processing messages, so not too frequently.
 		MemoryMessage* newMessage = new MemoryMessage();
 		newMessage->isAvailableMemoryOK = CheckEnoughMemoryAvailable();
-		newMessage->isAvailableMemoryOK = CheckFileSizeOK(memoryMessage.directoryEntry);
+		newMessage->isFileSizeOK = CheckFileSizeOK(memoryMessage.directoryEntry);
 		MeshManager::Get().QueueMessage(newMessage);
-		//call function with memoryMessage.directoryEntry as argument.
-		//function will then call QueueMessage on MeshManager with file size and maybe bool as well (if file is larger than 100MB or not). 
-		//call function that will return bool if we have EnoughAvailableMemory().
-		//function will then call QueueMessage on MeshManager with that bool.
-
+		break;
+	}
+	default:
+		break;
 	}
 }
 
@@ -93,7 +93,7 @@ bool MemoryCheckManager::CheckFileSizeOK(std::filesystem::directory_entry direct
 	float objsizeInMB = (objsize / 1024.f) / 1024.f;
 	std::cout << "file size of .obj: " << objsizeInMB << " MB" << std::endl;
 
-	if (objsizeInMB > 100.f)
+	if (objsizeInMB > 100.f) //could make a comparison here with available memory instead. With a good margin as well since sometimes memory taken up by a mesh is larger than its file size.
 	{
 		return false; //too big file size, not OK.
 	}
@@ -101,4 +101,13 @@ bool MemoryCheckManager::CheckFileSizeOK(std::filesystem::directory_entry direct
 	{
 		return true; //OK file size
 	}
+}
+
+void MemoryCheckManager::PrintMemoryStatus()
+{
+	MEMORYSTATUSEX statex;
+	statex.dwLength = sizeof(statex);
+	GlobalMemoryStatusEx(&statex);
+	std::cout << "There is " << statex.ullAvailPhys / (1024 * 1024) << " MB of physical memory available." << std::endl;
+	std::cout << "There is " << statex.ullAvailVirtual / (1024 * 1024) << " MB of virtual memory available." << std::endl;
 }
