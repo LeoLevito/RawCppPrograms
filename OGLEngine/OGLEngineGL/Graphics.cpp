@@ -45,12 +45,29 @@ void Graphics::Render()
 
 
 //1. depth texture scene from light's perspective.
-	//glCullFace(GL_FRONT);
-	ShaderManager::Get().depthPass = true;
-	ShaderManager::Get().depthShader->Use();
+	////glCullFace(GL_FRONT);
+	//ShaderManager::Get().depthPass = true;
+	//ShaderManager::Get().depthShader->Use();
 
-	glViewport(0, 0, ShaderManager::Get().shadowMap->SHADOW_WIDTH, ShaderManager::Get().shadowMap->SHADOW_HEIGHT);
-	glBindFramebuffer(GL_FRAMEBUFFER, ShaderManager::Get().shadowMap->depthMapFBO);
+	//glViewport(0, 0, ShaderManager::Get().shadowMap->SHADOW_WIDTH, ShaderManager::Get().shadowMap->SHADOW_HEIGHT);
+	//glBindFramebuffer(GL_FRAMEBUFFER, ShaderManager::Get().shadowMap->depthMapFBO);
+	//glClear(GL_DEPTH_BUFFER_BIT);
+
+	//for (int i = 0; i < GameObjectManager::Get().gameObjects.size(); i++) //Game.gameObjectVector calls Update() on every game object implementing Update() and that Update() can call Update() in every component implementing Update().
+	//{
+	//	GameObjectManager::Get().gameObjects[i]->Update();
+	//}
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	////glCullFace(GL_BACK);
+
+
+
+
+	ShaderManager::Get().depthPass = true;
+	ShaderManager::Get().depthCubeMapShader->Use();
+
+	glViewport(0, 0, ShaderManager::Get().shadowCubeMap->SHADOW_WIDTH, ShaderManager::Get().shadowCubeMap->SHADOW_HEIGHT);
+	glBindFramebuffer(GL_FRAMEBUFFER, ShaderManager::Get().shadowCubeMap->depthCubeMapFBO);
 	glClear(GL_DEPTH_BUFFER_BIT);
 
 	for (int i = 0; i < GameObjectManager::Get().gameObjects.size(); i++) //Game.gameObjectVector calls Update() on every game object implementing Update() and that Update() can call Update() in every component implementing Update().
@@ -58,7 +75,12 @@ void Graphics::Render()
 		GameObjectManager::Get().gameObjects[i]->Update();
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	//glCullFace(GL_BACK);
+
+
+	// do I even need to do if(ShaderManager::Get().depthPass == false)? Can you set values for a shader without the shader currently being in 'Use()'? Maybe not?
+
+
+
 
 //2. render scene like usual, now using the generated depth texture/shadowmap.
 	glViewport(0, 0, myWidth, myHeight);

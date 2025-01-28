@@ -95,11 +95,11 @@ void Mesh::Draw() //Draw mesh;
 		glBindTexture(GL_TEXTURE_2D, ShaderManager::Get().shadowMap->depthMap);
 	}
 
-	//if (ShaderManager::Get().shadowCubeMap->depthCubeMap != NULL)
-	//{
-	//	glActiveTexture(GL_TEXTURE3);
-	//	glBindTexture(GL_TEXTURE_CUBE_MAP, ShaderManager::Get().shadowCubeMap->depthCubeMap);
-	//}
+	if (ShaderManager::Get().shadowCubeMap->depthCubeMap != NULL)
+	{
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, ShaderManager::Get().shadowCubeMap->depthCubeMap);
+	}
 
 
 

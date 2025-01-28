@@ -36,4 +36,5 @@ void ShadowMap::CreateDepthTexture()
 	ShaderManager::Get().shader->SetInt(0, "material.diffuse");
 	ShaderManager::Get().shader->SetInt(1, "material.specular");
 	ShaderManager::Get().shader->SetInt(2, "THEshadowMap");
+	ShaderManager::Get().shader->SetInt(3, "THEshadowCubeMap");
 }

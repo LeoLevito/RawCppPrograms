@@ -63,7 +63,7 @@ MeshComponent::MeshComponent()
 	ShaderManager::Get().shader->SetVector3(ambient, "material.ambient");
 	ShaderManager::Get().shader->SetVector3(diffuse, "material.diffuse");
 	ShaderManager::Get().shader->SetVector3(specular, "material.specular");
-	ShaderManager::Get().shader->SetFloat(shininess, "material.shininess");
+	ShaderManager::Get().shader->SetFloat(shininess, "material.shininess"); //Emil said I should make the shininess property dependent on the specular map, for example it's RED values, like other people have done.
 
 	selectedMinType = 0;
 	selectedMagType = 0;
@@ -193,7 +193,7 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 		ImGui::OpenPopup("Texture Popup");
 	}
 
-	if (ImGui::Button("Choose shadow map"))
+	if (ImGui::Button("Choose shadow map")) //do I even need this anymore?
 	{
 		if (ShaderManager::Get().depthPass == false)
 		{
@@ -368,7 +368,8 @@ void MeshComponent::DrawMesh()
 	}
 	else
 	{
-		ShaderManager::Get().depthShader->SetMatrix4(trans, "transform"); //this is required for meshes to be rendered to depthMap.
+		//ShaderManager::Get().depthShader->SetMatrix4(trans, "transform"); //this is required for meshes to be rendered to depthMap.
+		ShaderManager::Get().depthCubeMapShader->SetMatrix4(trans, "transform"); //this is required for meshes to be rendered to depthMap.
 	}
 
 	mesh->Draw();

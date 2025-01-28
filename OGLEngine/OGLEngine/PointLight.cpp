@@ -72,23 +72,23 @@ void PointLight::SetPosition(glm::vec3 pos)
 
 void PointLight::SetLightSpaceMatrix()
 {
-	glm::mat4 lightProjection;
-
-	float aspect = 1.0f;
-	float near_plane = 1.0f;
+	glm::mat4 shadowProj;
+	glm::vec3 lightPos = position;
+	float aspect = (float)ShaderManager::Get().shadowCubeMap->SHADOW_WIDTH / (float)ShaderManager::Get().shadowCubeMap->SHADOW_HEIGHT;
+	float near_plane = 0.001f;
 	float far_plane = 100.f;
-	lightProjection = glm::perspective(glm::radians(90.f), aspect, near_plane, far_plane);
+	shadowProj = glm::perspective(glm::radians(90.f), (float)ShaderManager::Get().shadowCubeMap->SHADOW_WIDTH / (float)ShaderManager::Get().shadowCubeMap->SHADOW_HEIGHT, near_plane, far_plane);
 	std::vector<glm::mat4> shadowTransforms;
-	shadowTransforms.push_back(lightProjection * glm::lookAt(position, position + glm::vec3( 1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)));
-	shadowTransforms.push_back(lightProjection * glm::lookAt(position, position + glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)));
-	shadowTransforms.push_back(lightProjection * glm::lookAt(position, position + glm::vec3( 0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f)));
-	shadowTransforms.push_back(lightProjection * glm::lookAt(position, position + glm::vec3( 0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)));
-	shadowTransforms.push_back(lightProjection * glm::lookAt(position, position + glm::vec3( 0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f)));
-	shadowTransforms.push_back(lightProjection * glm::lookAt(position, position + glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f)));
+	shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3( 1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)));
+	shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)));
+	shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3( 0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f)));
+	shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3( 0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)));
+	shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3( 0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f)));
+	shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f)));
 
 	if (ShaderManager::Get().depthPass == false)
 	{
-		//ShaderManager::Get().shader->SetMatrix4(lightSpaceMatrix, "lightSpaceMatrix"); //now what about this? I read that this won't be needed anymore? Let's see.
+		ShaderManager::Get().shader->SetFloat(far_plane, "far_plane");
 	}
 	else
 	{

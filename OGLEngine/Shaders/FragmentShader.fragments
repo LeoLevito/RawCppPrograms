@@ -65,7 +65,7 @@ uniform PointLight pointLights[NR_POINT_LIGHTS];
 uniform SpotLight spotLights[NR_SPOT_LIGHTS];
 uniform Material material;
 uniform bool blinn;
-uniform float far_plane;
+uniform float far_plane; //wait a minute, this also exists in the cubemap fragment shader, could I be confused by which one to assign to and when?
 
 //forward declare functions so we can define it below the main() function.
 vec3 CalcDirectionalLight(DirectionalLight light, vec3 norm, vec3 viewDir, vec3 fragPos);							
@@ -98,7 +98,7 @@ void main()
 	}
 
 
-	FragColor = vec4(result, 1.0f);
+	//FragColor = vec4(result, 1.0f);
 }
 
 
@@ -161,9 +161,9 @@ vec3 CalcPointLight(PointLight light, vec3 norm, vec3 fragPos, vec3 viewDir)
 	diffuse *= attenuation;
 	specular *= attenuation;
 
-	//float shadow = CalcShadowForPointLight(fragPos, light.position);
-	return (ambient + diffuse + specular);
-	//return (ambient + (1.0f - shadow) * (diffuse + specular));
+	float shadow = CalcShadowForPointLight(fragPos, light.position);
+	//return (ambient + diffuse + specular);
+	return (ambient + (1.0f - shadow) * (diffuse + specular));
 }
 
 vec3 CalcSpotLight(SpotLight light, vec3 norm, vec3 fragPos, vec3 viewDir)
@@ -242,7 +242,7 @@ float CalcShadow(vec4 fragPosLightSpace) //might have to do a CalcShadow functio
 
 float CalcShadowForPointLight(vec3 fragPos, vec3 lightPos)
 {
-	vec3 fragToLight = fragPos - lightPos;
+	vec3 fragToLight = fragPos - lightPos; //THERE'S SOMETHING WEIRD GOING ON WITH THE LIGHT POSITION: Moving the light anywhere else than 0,0,0 offsets the depth cube map against the world, making shadows not map correctly to the world. The shadows do work as intended as long as the light is at 0,0,0!
 
 	float closestDepth = texture(THEshadowCubeMap, fragToLight).r;
 
@@ -253,5 +253,6 @@ float CalcShadowForPointLight(vec3 fragPos, vec3 lightPos)
 	float bias = 0.05f;
 	float shadow = currentDepth - bias > closestDepth ? 1.0f : 0.0f;
 
+	FragColor = vec4(vec3(closestDepth / far_plane), 1.0f); //debug depth information to frag color.
 	return shadow;
 }

@@ -150,9 +150,11 @@ void Shader::Use() //think of the state machine again, set the current state's s
     glUseProgram(myShaderProgram); 
 }
 
-void Shader::SetMatrix4(glm::mat4 matrix, const std::string& name) //Set Matrix 4 uniform variables inside vertex shader during runtime.
+void Shader::SetMatrix4(glm::mat4& matrix, const std::string& name) //Set Matrix 4 uniform variables inside vertex shader during runtime.
 {
-    glUniformMatrix4fv(glGetUniformLocation(myShaderProgram, name.c_str()), 1, GL_FALSE, glm::value_ptr(matrix));
+    //int location = glGetUniformLocation(myShaderProgram, name.c_str());
+    //std::cout << "location: " << location << " name: " << name << " this is my location, if this is -1 it's invalid!!!" << std::endl;
+    glUniformMatrix4fv(glGetUniformLocation(myShaderProgram, name.c_str()), 1, GL_FALSE, &matrix[0][0]);
 }
 
 void Shader::SetVector3(glm::vec3 vector3, const std::string& name)

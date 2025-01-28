@@ -28,9 +28,6 @@ To pass (G), complete the following tasks:
 + Implement serialization (ReadFrom, WriteTo file) for your Mesh class --> (HANDLED IN OBJREADER)
 
 ++ Implement Thread and Mutex functionality and run one of your message-supported Managers in its own thread, communicating only with messages.
-	//I'm now going to QUESTION above requirement: run one of your message-supported Managers in its own thread; 
-	//when? Only run it in a thread when I need it to, i.e. when calling a function from it, or run it continuously in a thread? 
-	//How would that work? How would I make sure a singleton always runs its functions in its own thread?
 
 + Implement a Camera class and UI to configure it for rendering your scene --> (CHECK, UI PART IN EDITORGUI)
 
@@ -58,7 +55,7 @@ GRAPHICS (module 3):
 To pass (G), complete the following tasks:
 + Update Obj loader to support loading and buffering UVs and Normals to OpenGL --> (CHECK, modifications to ObjReader and addition of vboindexer, also BufferMesh() in Mesh class.)
 
-+ Implement usage of Diffuse/Albedo maps and Specular (shininess) maps, including UI to set per entity and using in shader --> (CHECK)
++ Implement usage of Diffuse/Albedo maps and Specular (shininess) maps, including UI to set per entity and using in shader --> (CHECK) //take ex red value for shininess.
 
 + Add MipMap settings (scene-wide, or per entity) --> (CHECK, per entity with MeshComponent)
 
@@ -68,7 +65,7 @@ To pass (G), complete the following tasks:
 
 + Add UI to configure all light properties, Create and Delete --> (CHECK, create and delete happens when I add/remove a LightComponent and also when I change the light type in its properties.)
 
--+ Implement either: Shadow mapping, or Deferred Rendering --> (CHECK, shadowmapping being worked on)
++ Implement either: Shadow mapping, or Deferred Rendering --> (CHECK, shadowmapping being worked on)
 
 
 REMEMBER TO UPDATE GAME ENGINE ARCHITECTURE DOCUMENT BEFORE MONDAY 27 JANUARY.
