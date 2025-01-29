@@ -116,7 +116,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opengl32.lib;$(SolutionDir)Dependencies\GLFW\glfw3.lib;$(SolutionDir)\$(Configuration)\OGLEngineGL.lib;$(SolutionDir)\$(Configuration)\OGLEngineEditor.lib;$(SolutionDir)\$(Configuration)\Game.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;$(SolutionDir)Dependencies\GLFW\glfw3.lib;$(SolutionDir)$(Configuration)\OGLEngineGL.lib;$(SolutionDir)$(Configuration)\OGLEngineEditor.lib;$(SolutionDir)$(Configuration)\Game.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
