@@ -76,13 +76,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)OGLEngineGL;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLAD\include;$(SolutionDir)Dependencies\glm;$(SolutionDir)OGLEngine;$(SolutionDir)Dependencies;$(SolutionDir)imgui;$(SolutionDir)OGLEngineEditor</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)OGLEngineGL;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLAD\include;$(SolutionDir)Dependencies\glm;$(SolutionDir)OGLEngine;$(SolutionDir)Dependencies;$(SolutionDir)imgui;$(SolutionDir)OGLEngineEditor;$(SolutionDir)OGLEnginePhysics</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opengl32.lib;$(SolutionDir)Dependencies\GLFW\glfw3.lib;$(SolutionDir)\$(Configuration)\OGLEngineGL.lib;$(SolutionDir)\$(Configuration)\OGLEngineEditor.lib;$(SolutionDir)\$(Configuration)\Game.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;$(SolutionDir)Dependencies\GLFW\glfw3.lib;$(SolutionDir)$(Configuration)\OGLEngineGL.lib;$(SolutionDir)$(Configuration)\OGLEngineEditor.lib;$(SolutionDir)$(Configuration)\Game.lib;$(SolutionDir)$(Configuration)\OGLEnginePhysics.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -93,7 +93,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)OGLEngineGL;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLAD\include;$(SolutionDir)Dependencies\glm;$(SolutionDir)OGLEngine;$(SolutionDir)Dependencies;$(SolutionDir)imgui;$(SolutionDir)OGLEngineEditor</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)OGLEngineGL;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLAD\include;$(SolutionDir)Dependencies\glm;$(SolutionDir)OGLEngine;$(SolutionDir)Dependencies;$(SolutionDir)imgui;$(SolutionDir)OGLEngineEditor;$(SolutionDir)OGLEnginePhysics</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -101,7 +101,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opengl32.lib;$(SolutionDir)Dependencies\GLFW\glfw3.lib;$(SolutionDir)\$(Configuration)\OGLEngineGL.lib;$(SolutionDir)\$(Configuration)\OGLEngineEditor.lib;$(SolutionDir)\$(Configuration)\Game.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;$(SolutionDir)Dependencies\GLFW\glfw3.lib;$(SolutionDir)$(Configuration)\OGLEngineGL.lib;$(SolutionDir)$(Configuration)\OGLEngineEditor.lib;$(SolutionDir)$(Configuration)\Game.lib;$(SolutionDir)$(Configuration)\OGLEnginePhysics.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -110,13 +110,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)OGLEngineGL;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLAD\include;$(SolutionDir)Dependencies\glm;$(SolutionDir)OGLEngine;$(SolutionDir)Dependencies;$(SolutionDir)imgui;$(SolutionDir)OGLEngineEditor</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)OGLEngineGL;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLAD\include;$(SolutionDir)Dependencies\glm;$(SolutionDir)OGLEngine;$(SolutionDir)Dependencies;$(SolutionDir)imgui;$(SolutionDir)OGLEngineEditor;$(SolutionDir)OGLEnginePhysics</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opengl32.lib;$(SolutionDir)Dependencies\GLFW\glfw3.lib;$(SolutionDir)$(Configuration)\OGLEngineGL.lib;$(SolutionDir)$(Configuration)\OGLEngineEditor.lib;$(SolutionDir)$(Configuration)\Game.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;$(SolutionDir)Dependencies\GLFW\glfw3.lib;$(SolutionDir)$(Configuration)\OGLEngineGL.lib;$(SolutionDir)$(Configuration)\OGLEngineEditor.lib;$(SolutionDir)$(Configuration)\Game.lib;$(SolutionDir)$(Configuration)\OGLEnginePhysics.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -127,7 +127,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)OGLEngineGL;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLAD\include;$(SolutionDir)Dependencies\glm;$(SolutionDir)OGLEngine;$(SolutionDir)Dependencies;$(SolutionDir)imgui;$(SolutionDir)OGLEngineEditor</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)OGLEngineGL;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLAD\include;$(SolutionDir)Dependencies\glm;$(SolutionDir)OGLEngine;$(SolutionDir)Dependencies;$(SolutionDir)imgui;$(SolutionDir)OGLEngineEditor;$(SolutionDir)OGLEnginePhysics</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -135,10 +135,11 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opengl32.lib;$(SolutionDir)Dependencies\GLFW\glfw3.lib;$(SolutionDir)\$(Configuration)\OGLEngineGL.lib;$(SolutionDir)\$(Configuration)\OGLEngineEditor.lib;$(SolutionDir)\$(Configuration)\Game.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;$(SolutionDir)Dependencies\GLFW\glfw3.lib;$(SolutionDir)$(Configuration)\OGLEngineGL.lib;$(SolutionDir)$(Configuration)\OGLEngineEditor.lib;$(SolutionDir)$(Configuration)\Game.lib;$(SolutionDir)$(Configuration)\OGLEnginePhysics.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ColliderComponent.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="DirectionalLight.cpp" />
     <ClCompile Include="Engine.cpp" />
@@ -169,6 +170,7 @@
     <ClCompile Include="TransformComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ColliderComponent.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="Engine.h" />

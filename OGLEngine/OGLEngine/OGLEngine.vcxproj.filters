@@ -114,6 +114,9 @@
     <ClCompile Include="MemoryMessage.cpp">
       <Filter>Messaging</Filter>
     </ClCompile>
+    <ClCompile Include="ColliderComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Component.h">
@@ -196,6 +199,9 @@
     </ClInclude>
     <ClInclude Include="MemoryMessage.h">
       <Filter>Messaging</Filter>
+    </ClInclude>
+    <ClInclude Include="ColliderComponent.h">
+      <Filter>Components</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

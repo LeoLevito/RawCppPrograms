@@ -98,7 +98,7 @@ void main()
 	}
 
 
-	//FragColor = vec4(result, 1.0f);
+	FragColor = vec4(result, 1.0f);
 }
 
 
@@ -253,6 +253,6 @@ float CalcShadowForPointLight(vec3 fragPos, vec3 lightPos)
 	float bias = 0.05f;
 	float shadow = currentDepth - bias > closestDepth ? 1.0f : 0.0f;
 
-	FragColor = vec4(vec3(closestDepth / far_plane), 1.0f); //debug depth information to frag color.
+	//FragColor = vec4(vec3(closestDepth / far_plane), 1.0f); //debug depth information to frag color.
 	return shadow;
 }

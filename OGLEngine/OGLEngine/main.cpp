@@ -10,6 +10,7 @@
 #include "MeshManager.h"
 #include "ShaderManager.h"
 #include "MemoryCheckManager.h"
+#include "CollisionManager.h"
 
 int main()
 {
@@ -24,6 +25,7 @@ int main()
 	std::thread MeshManagerThread(&MeshManager::Process, &MeshManager::Get()); //make a wrapper function in Thread class that does std::thread t1(func).
 	std::thread GameObjectManagerThread(&GameObjectManager::Process, &GameObjectManager::Get()); //make a wrapper function in Thread class that does std::thread t1(func).
 	std::thread MemoryCheckManagerThread(&MemoryCheckManager::Process, &MemoryCheckManager::Get());
+	std::thread CollisionManagerThread(&CollisionManager::Process, &CollisionManager::Get());
 
 	float lastTime = 0;
 	float currentTime = 0;
@@ -63,6 +65,11 @@ int main()
 	MemoryCheckManager::Get().shouldRun = false;
 	MemoryCheckManagerThread.join();
 	MemoryCheckManagerThread.~thread();
+
+	//terminate thread.
+	CollisionManager::Get().shouldRun = false;
+	CollisionManagerThread.join();
+	CollisionManagerThread.~thread();
 
 	editorGUI->CloseImGui();
 	return 0;
