@@ -2,6 +2,8 @@
 #include <vector>
 #include "Collider.h"
 #include "SphereCollider.h"
+#include "BoxCollider.h"
+
 
 class CollisionManager
 {
@@ -26,7 +28,11 @@ public:
 	//also need some kind of tagging (like the game named tag) system where we only need to do a collision test between two colliders once per interval. Ruling out pairs if they've already been checked.
 
 	std::vector<SphereCollider*> sphereColliderVector;
+	std::vector<BoxCollider*> boxColliderVector;
 	void SphereSphereTest();
+	void SphereBoxTest();
+	void BoxBoxTest();
+
 private:
 };
 
