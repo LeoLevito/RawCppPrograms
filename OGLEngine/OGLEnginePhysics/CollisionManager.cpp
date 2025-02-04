@@ -109,7 +109,7 @@ void CollisionManager::BoxBoxTest()
 		{
 			//do collision test.
 			//but how to do collision test with two boxes that are rotated?
-			bool colliding;
+			bool colliding = false;
 
 
 
