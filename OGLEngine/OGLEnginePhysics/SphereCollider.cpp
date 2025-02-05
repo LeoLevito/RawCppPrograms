@@ -1,5 +1,9 @@
 #include "SphereCollider.h"
 
+SphereCollider::SphereCollider(ColliderComponent& componentRef)
+{
+}
+
 void SphereCollider::SetPosition(glm::vec3 pos)
 {
 	position = pos;

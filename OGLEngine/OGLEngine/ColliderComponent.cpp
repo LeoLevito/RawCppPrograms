@@ -11,8 +11,7 @@
 ColliderComponent::ColliderComponent()
 {
 	name = "Collider component";
-	myCollider = CollisionManager::Get().AddNewCollider(ColliderType::SphereType);
-
+	myCollider = CollisionManager::Get().AddNewCollider(ColliderType::SphereType, *this);
 
 }
 
@@ -34,7 +33,7 @@ void ColliderComponent::Update()
 			rotation = dynamic_cast<TransformComponent*>(owner->components[i])->rotation;
 			scale = dynamic_cast<TransformComponent*>(owner->components[i])->scale;
 
-			myCollider->SetPosition(position);
+			//myCollider->SetPosition(position);
 		}
 	}
 
@@ -73,10 +72,11 @@ void ColliderComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 				{
 				case 0:
 					CollisionManager::Get().DeleteCollider(myCollider->type, myCollider);
-					myCollider = CollisionManager::Get().AddNewCollider(ColliderType::SphereType);
+					myCollider = CollisionManager::Get().AddNewCollider(ColliderType::SphereType, *this);
 					break;
 				case 1:
-
+					CollisionManager::Get().DeleteCollider(myCollider->type, myCollider);
+					myCollider = CollisionManager::Get().AddNewCollider(ColliderType::BoxType, *this);
 					break;
 				case 2:
 

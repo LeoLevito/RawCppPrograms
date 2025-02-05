@@ -2,6 +2,8 @@
 #include "Component.h"
 #include "Collider.h"
 
+//class Collider;
+
 class ColliderComponent : public Component
 {
 public:

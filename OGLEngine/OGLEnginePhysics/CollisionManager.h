@@ -4,6 +4,19 @@
 #include "SphereCollider.h"
 #include "BoxCollider.h"
 
+struct MinMax
+{
+public:
+	float Min;
+	float Max;
+
+	MinMax(float min, float max)
+	{
+		Min = min;
+		Max = max;
+	}
+private:
+};
 
 class CollisionManager
 {
@@ -16,7 +29,7 @@ public:
 
 	//add, 
 	//remove
-	Collider* AddNewCollider(ColliderType type);
+	Collider* AddNewCollider(ColliderType type, ColliderComponent& componentRef);
 	void DeleteCollider(ColliderType type, Collider* collider);
 
 
@@ -32,7 +45,9 @@ public:
 	void SphereSphereTest();
 	void SphereBoxTest();
 	void BoxBoxTest();
-
+	MinMax FindMaxMinProjection(BoxCollider& box, glm::vec3 axis);
+	int runFindAmount2 = 0;
+	int runFindAmount1 = 0;
 private:
 };
 

@@ -15,20 +15,20 @@ CollisionManager& CollisionManager::Get()
 	return instance;
 }
 
-Collider* CollisionManager::AddNewCollider(ColliderType type)
+Collider* CollisionManager::AddNewCollider(ColliderType type, ColliderComponent& componentRef)
 {
 	switch (type)
 	{
 	case ColliderType::SphereType:
 	{ //curious thing with switch cases, if you wanna initialize a new object, like directionalLight here, you need to have explicit scopes ({}), since otherwise we'd get an uninitialized variable if this case isn't hit. Best to just put this stuff in a function and call that instead. 
-		SphereCollider* sphereCollider = new SphereCollider();
+		SphereCollider* sphereCollider = new SphereCollider(componentRef);
 		sphereColliderVector.push_back(sphereCollider);
 		sphereCollider->type = type;
 		return sphereCollider;
 	}
 	case ColliderType::BoxType:
 	{
-		BoxCollider* boxCollider = new BoxCollider();
+		BoxCollider* boxCollider = new BoxCollider(componentRef);
 		boxColliderVector.push_back(boxCollider);
 		boxCollider->type = type;
 		return boxCollider;
@@ -66,7 +66,13 @@ void CollisionManager::Process()
 	while (shouldRun)
 	{
 		//ProcessMessages();
-		SphereSphereTest();
+		//SphereSphereTest();
+
+		for (auto box : boxColliderVector) //need to call this here to avoid random threading related error due to clearing of vectors in the function inside this scope.
+		{
+			//box->SetPosition(box->compRef.); //BRUH WHAT IS THIS!!!! Maybe the compRef goes infinitely deep, like the box has a component reference which has a reference to the box which has a reference to the component...... and so on...
+		}
+
 		BoxBoxTest();
 	}
 }
@@ -101,22 +107,66 @@ void CollisionManager::SphereBoxTest()
 	//}
 }
 
+//https://textbooks.cs.ksu.edu/cis580/04-collisions/04-separating-axis-theorem/
 void CollisionManager::BoxBoxTest()
 {
 	for (int i = 0; i < boxColliderVector.size(); i++)
 	{
 		for (int j = i + 1; j < boxColliderVector.size(); j++)
 		{
-			//do collision test.
-			//but how to do collision test with two boxes that are rotated?
-			bool colliding = false;
-
-
-
-			if (colliding)
+			for(auto normal : boxColliderVector[i]->normalVector)
 			{
-				std::cout << " two boxes currently colliding." << std::endl;
+				auto mm1 = FindMaxMinProjection(*boxColliderVector[i], normal);
+				auto mm2 = FindMaxMinProjection(*boxColliderVector[j], normal);
+
+				if (mm1.Max < mm2.Min || mm2.Max < mm1.Min) 
+				{
+					//not colliding;
+					//return false;
+					std::cout << "first boxcollider is not colliding" << std::endl;
+				}
 			}
+
+			for (auto normal : boxColliderVector[j]->normalVector)
+			{
+				auto mm1 = FindMaxMinProjection(*boxColliderVector[i], normal);
+				auto mm2 = FindMaxMinProjection(*boxColliderVector[j], normal);
+
+				if (mm1.Max < mm2.Min || mm2.Max < mm1.Min)
+				{
+					//not colliding;
+					//return false;
+					std::cout << "second boxcollider is not colliding" << std::endl;
+				}
+			}
+
+			//colliding
+			//return true;
+			std::cout << "collision detected?" << std::endl;
 		}
 	}
+}
+
+MinMax CollisionManager::FindMaxMinProjection(BoxCollider& box, glm::vec3 axis)
+{
+	auto projection = glm::dot(box.corners[0], axis);
+	auto min = projection;
+	auto max = projection;
+	runFindAmount1++;
+	//std::cout << "Function call: " << runFindAmount1 << 
+	//	" corners size: " << box.corners.size() <<
+	//	std::endl;
+	for (int i = 1; i < box.corners.size(); i++)
+	{
+		runFindAmount2++;
+		//std::cout << "For loop: " << runFindAmount2 << 
+		//	" corner: " << box.corners[i].x << " " << box.corners[i].y << " " << box.corners[i].z <<
+		//	" axis: " << axis.x << " " << axis.y << " " << axis.z <<
+		//	" index i: " << i <<
+		//	std::endl;
+		projection = glm::dot(box.corners[i], axis);
+		max = max > projection ? max : projection;
+		min = min < projection ? min : projection;
+	}
+	return MinMax(min, max);
 }
