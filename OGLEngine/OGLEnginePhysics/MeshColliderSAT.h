@@ -1,13 +1,16 @@
 #pragma once
 #include "Collider.h"
-#include <glm.hpp>
 #include <vector>
+#include "MeshComponent.h"
 
+class MeshComponent;
 
-class BoxCollider : public Collider
+class Mesh;
+
+class MeshColliderSAT : public Collider
 {
 public:
-	BoxCollider();
+	MeshColliderSAT();
 	virtual void SetPosition(glm::vec3 pos) override;
 	virtual void SetRotation(glm::vec3 rot) override;
 	virtual void SetScale(glm::vec3 scaleIn) override;
@@ -21,6 +24,7 @@ public:
 	glm::vec3 scale;
 	std::vector<glm::vec3> corners; //corners of box in relation to position
 	std::vector<glm::vec3> normalVector; //normals of each corner.
+	std::vector<glm::vec3> vertices;
 private:
 };
 

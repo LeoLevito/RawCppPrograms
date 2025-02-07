@@ -21,6 +21,9 @@
     <ClCompile Include="BoxCollider.cpp">
       <Filter>Colliders</Filter>
     </ClCompile>
+    <ClCompile Include="MeshColliderSAT.cpp">
+      <Filter>Colliders</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Collider.h">
@@ -33,6 +36,9 @@
       <Filter>Managers</Filter>
     </ClInclude>
     <ClInclude Include="BoxCollider.h">
+      <Filter>Colliders</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshColliderSAT.h">
       <Filter>Colliders</Filter>
     </ClInclude>
   </ItemGroup>

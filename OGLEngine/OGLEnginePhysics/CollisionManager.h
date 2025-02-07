@@ -3,6 +3,7 @@
 #include "Collider.h"
 #include "SphereCollider.h"
 #include "BoxCollider.h"
+#include "MeshColliderSAT.h"
 
 struct MinMax
 {
@@ -29,7 +30,7 @@ public:
 
 	//add, 
 	//remove
-	Collider* AddNewCollider(ColliderType type, ColliderComponent& componentRef);
+	Collider* AddNewCollider(ColliderType type, GameObject& owner);
 	void DeleteCollider(ColliderType type, Collider* collider);
 
 
@@ -42,10 +43,14 @@ public:
 
 	std::vector<SphereCollider*> sphereColliderVector;
 	std::vector<BoxCollider*> boxColliderVector;
+	std::vector<MeshColliderSAT*> meshColliderSATVector;
 	void SphereSphereTest();
 	void SphereBoxTest();
 	void BoxBoxTest();
+	void MeshMeshTest();
 	MinMax FindMaxMinProjection(BoxCollider& box, glm::vec3 axis);
+	MinMax FindMaxMinProjection(MeshColliderSAT& mesh, glm::vec3 axis);
+
 	int runFindAmount2 = 0;
 	int runFindAmount1 = 0;
 private:

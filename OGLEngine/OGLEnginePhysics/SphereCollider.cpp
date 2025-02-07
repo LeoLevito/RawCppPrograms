@@ -1,6 +1,6 @@
 #include "SphereCollider.h"
 
-SphereCollider::SphereCollider(ColliderComponent& componentRef)
+SphereCollider::SphereCollider()
 {
 }
 
