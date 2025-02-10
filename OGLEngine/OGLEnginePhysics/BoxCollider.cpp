@@ -1,7 +1,9 @@
 #include "BoxCollider.h"
 #include <gtx/hash.hpp> //required for the unordered set
+#include <gtx/polar_coordinates.hpp> //required for the unordered set
 #include <unordered_set>
 #include <string>
+#include <iostream>
 
 
 //https://textbooks.cs.ksu.edu/cis580/04-collisions/04-separating-axis-theorem/
@@ -33,18 +35,103 @@ void BoxCollider::UpdateBounds()
 	std::vector<glm::vec3> edges;
 	std::vector<glm::vec3> normals;
 
-	corners.clear(); //this HAD a random chance of happening right when collisionmanager is in the process of accessing it, which would cause a vector subscript out of range error. I've fixed this by only running this function in the collision manager's Process() function.
-	
-	//specify vertices of cube.
-	corners.push_back(position + (glm::vec3(-1.0f, -1.0f,  1.0f) * scale));
-	corners.push_back(position + (glm::vec3( 1.0f, -1.0f,  1.0f) * scale));
-	corners.push_back(position + (glm::vec3( 1.0f,  1.0f,  1.0f) * scale));
-	corners.push_back(position + (glm::vec3(-1.0f,  1.0f,  1.0f) * scale));
+	glm::mat4 trans = glm::mat4(1.0f);
+	trans = glm::translate(trans, position); //translate first so that each object rotates independently.
+	trans = glm::rotate(trans, rotation.x, glm::vec3(1, 0, 0)); //matrix, angle, axis.
+	trans = glm::rotate(trans, rotation.y, glm::vec3(0, 1, 0));
+	trans = glm::rotate(trans, rotation.z, glm::vec3(0, 0, 1));
+	trans = glm::scale(trans, scale);
 
-	corners.push_back(position + (glm::vec3(-1.0f, -1.0f, -1.0f) * scale));
-	corners.push_back(position + (glm::vec3( 1.0f, -1.0f, -1.0f) * scale));
-	corners.push_back(position + (glm::vec3( 1.0f,  1.0f, -1.0f) * scale));
-	corners.push_back(position + (glm::vec3(-1.0f,  1.0f, -1.0f) * scale));
+	
+
+	//glm::rotate(trans, rotation.x, glm::vec3(1, 0, 0)
+	//glm::rotate(trans, rotation.y, glm::vec3(0, 1, 0));
+	//glm::rotate(trans, rotation.z, glm::vec3(0, 0, 1));
+	//ShaderManager::Get().shader->SetMatrix4(trans, "transform"); //apperently there's a better way to do this compared to using a Uniform type variable inside the vertex shader, Shader Buffer Storage Object, something like that, where we can have even more variables inside the shader and update them.
+	//ShaderManager::Get().shader->SetMatrix4(Camera::Get().myView, "view");
+	//ShaderManager::Get().shader->SetMatrix4(Camera::Get().projection, "projection");
+	//ShaderManager::Get().shader->SetVector3(Camera::Get().myPosition, "viewPos"); //Doesn't really make sense to update this here but whatever.
+
+	//gl_Position = projection * view * transform * vec4(aPos, 1.0f);
+
+
+	//glm::vec3 rotatedpoint = position + (rotation * (glm::vec3(-1.0f, -1.0f, 1.0f) - position));
+
+
+	corners.clear(); //this HAD a random chance of happening right when collisionmanager is in the process of accessing it, which would cause a vector subscript out of range error. I've fixed this by only running this function in the collision manager's Process() function.
+
+
+	//glm::vec3 xAxis = glm::vec3(1, 0, 0);
+	//glm::vec3 yAxis = glm::vec3(0, 1, 0);
+	//glm::vec3 zAxis = glm::vec3(0, 0, 1);
+
+	//specify vertices of cube.
+	glm::vec3 corner1 = glm::vec3(-1.0f, -1.0f, 1.0f);
+	glm::vec3 corner2 = glm::vec3(1.0f, -1.0f, 1.0f);
+	glm::vec3 corner3 = glm::vec3(1.0f, 1.0f, 1.0f);
+	glm::vec3 corner4 = glm::vec3(-1.0f, 1.0f, 1.0f);
+
+	glm::vec3 corner5 = glm::vec3(-1.0f, -1.0f, -1.0f);
+	glm::vec3 corner6 = glm::vec3(1.0f, -1.0f, -1.0f);
+	glm::vec3 corner7 = glm::vec3(1.0f, 1.0f, -1.0f);
+	glm::vec3 corner8 = glm::vec3(-1.0f, 1.0f, -1.0f);
+
+	//https://stackoverflow.com/questions/36358621/multiply-vec3-with-mat4-using-glm oh my god this came in clutch. This one here is good for fundamental understanding of rotating one point around another: https://stackoverflow.com/questions/45357715/how-to-rotate-point-around-another-one
+	corner1 = glm::vec3(trans * glm::vec4(corner1, 1.0f));
+	corner2 = glm::vec3(trans * glm::vec4(corner2, 1.0f));
+	corner3 = glm::vec3(trans * glm::vec4(corner3, 1.0f));
+	corner4 = glm::vec3(trans * glm::vec4(corner4, 1.0f));
+
+	corner5 = glm::vec3(trans * glm::vec4(corner5, 1.0f));
+	corner6 = glm::vec3(trans * glm::vec4(corner6, 1.0f));
+	corner7 = glm::vec3(trans * glm::vec4(corner7, 1.0f));
+	corner8 = glm::vec3(trans * glm::vec4(corner8, 1.0f));
+
+	//glm::vec3 pos1;
+	//glm::vec3 pos2;
+	//glm::vec3 pos3;
+	//glm::vec3 pos4;
+
+	//glm::vec3 pos5;
+	//glm::vec3 pos6;
+	//glm::vec3 pos7;
+	//glm::vec3 pos8;
+
+	//pos1.x = corner1.x * xAxis.x + corner1.y * yAxis.x + corner1.z * zAxis.x + position.x;
+	//pos1.y = corner1.x * xAxis.y + corner1.y * yAxis.y + corner1.z * zAxis.y + position.y;
+	//pos1.z = corner1.x * xAxis.z + corner1.y * yAxis.z + corner1.z * zAxis.z + position.z;
+
+	//corner1 = (corner1 - position) * glm::polar(rotation) + position;
+	//corner2 = (corner2 - position) * glm::polar(rotation) + position;
+	//corner3 = (corner3 - position) * glm::polar(rotation) + position;
+	//corner4 = (corner4 - position) * glm::polar(rotation) + position;
+
+	//corner5 = (corner5 - position) * glm::polar(rotation) + position;
+	//corner6 = (corner6 - position) * glm::polar(rotation) + position;
+	//corner7 = (corner7 - position) * glm::polar(rotation) + position;
+	//corner8 = (corner8 - position) * glm::polar(rotation) + position;
+
+	std::cout << corner1.x << " " << corner1.y << " " << corner1.z << std::endl;
+
+	corners.push_back(corner1);
+	corners.push_back(corner2);
+	corners.push_back(corner3);
+	corners.push_back(corner4);
+
+	corners.push_back(corner5);
+	corners.push_back(corner6);
+	corners.push_back(corner7);
+	corners.push_back(corner8);
+
+	//corners.push_back(position + (glm::vec3(-1.0f, -1.0f,  1.0f) * scale));
+	//corners.push_back(position + (glm::vec3( 1.0f, -1.0f,  1.0f) * scale));
+	//corners.push_back(position + (glm::vec3( 1.0f,  1.0f,  1.0f) * scale));
+	//corners.push_back(position + (glm::vec3(-1.0f,  1.0f,  1.0f) * scale));
+
+	//corners.push_back(position + (glm::vec3(-1.0f, -1.0f, -1.0f) * scale));
+	//corners.push_back(position + (glm::vec3( 1.0f, -1.0f, -1.0f) * scale));
+	//corners.push_back(position + (glm::vec3( 1.0f,  1.0f, -1.0f) * scale));
+	//corners.push_back(position + (glm::vec3(-1.0f,  1.0f, -1.0f) * scale));
 
 
 
