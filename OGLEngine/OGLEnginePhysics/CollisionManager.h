@@ -47,9 +47,7 @@ public:
 	void SphereSphereTest();
 	void SphereBoxTest();
 	void BoxBoxTest();
-	void MeshMeshTest();
-	MinMax FindMaxMinProjection(BoxCollider& box, glm::vec3 axis);
-	MinMax FindMaxMinProjection(MeshColliderSAT& mesh, glm::vec3 axis);
+	bool FindMaxMinProjectionAB(BoxCollider& boxA, BoxCollider& boxB);
 
 	int runFindAmount2 = 0;
 	int runFindAmount1 = 0;

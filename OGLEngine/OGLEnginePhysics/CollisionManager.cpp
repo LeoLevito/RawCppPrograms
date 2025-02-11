@@ -89,7 +89,6 @@ void CollisionManager::Process()
 			mesh->UpdateBounds();
 		}
 		BoxBoxTest();
-		MeshMeshTest();
 	}
 }
 
@@ -123,135 +122,88 @@ void CollisionManager::SphereBoxTest()
 	//}
 }
 
-//https://textbooks.cs.ksu.edu/cis580/04-collisions/04-separating-axis-theorem/
+//https://textbooks.cs.ksu.edu/cis580/04-collisions/04-separating-axis-theorem/ is good for 2D, but not 3D!
 void CollisionManager::BoxBoxTest()
 {
 	for (int i = 0; i < boxColliderVector.size(); i++)
 	{
 		for (int j = i + 1; j < boxColliderVector.size(); j++)
 		{
-			if (!boxColliderVector[j]->corners.size() > 0)
-			{
+			if (!boxColliderVector[j]->corners.size() > 0) //takes a little while for a new box collider to fill the corners vector, this if check prevents a vector out of range error that's caused by this function running on a different thread compared to the box collider bounds update.
+			{											   //Hmm, maybe I should set it to check if corners.size() == 8, just to be sure?
+														   //Or maybe this isn't needed anymore because I run the UpdateBounds function before this one inside the Process() loop of this class?
 				return;
 			}
-			bool colliding = true;
 
-			for(auto normal : boxColliderVector[i]->normalVector)
-			{
-				auto mm1 = FindMaxMinProjection(*boxColliderVector[i], normal);
-				auto mm2 = FindMaxMinProjection(*boxColliderVector[j], normal);
+			bool colliding = FindMaxMinProjectionAB(*boxColliderVector[i], *boxColliderVector[j]);
 
-				if (mm1.Max < mm2.Min || mm2.Max < mm1.Min) 
-				{
-					//not colliding;
-					//return false;
-					colliding = false;
-					//std::cout << "first boxcollider is not colliding" << std::endl;
-				}
-			}
-
-			for (auto normal : boxColliderVector[j]->normalVector)
-			{
-				auto mm1 = FindMaxMinProjection(*boxColliderVector[i], normal);
-				auto mm2 = FindMaxMinProjection(*boxColliderVector[j], normal);
-
-				if (mm1.Max < mm2.Min || mm2.Max < mm1.Min)
-				{
-					//not colliding;
-					//return false;
-					colliding = false;
-					//std::cout << "second boxcollider is not colliding" << std::endl;
-				}
-			}
-
-			//colliding
-			//return true;
 			if (colliding == true)
 			{
 				std::cout << "collision detected!!" << std::endl;
 			}
 		}
 	}
-
-	
 }
 
-void CollisionManager::MeshMeshTest()
+//https://gamedev.stackexchange.com/questions/44500/how-many-and-which-axes-to-use-for-3d-obb-collision-with-sat/
+//helpful code answers from Acegikmo (Freya Holmér!!) and Bas Smit!
+bool CollisionManager::FindMaxMinProjectionAB(BoxCollider& boxA, BoxCollider& boxB)
 {
-	for (int i = 0; i < meshColliderSATVector.size(); i++)
+	std::vector<glm::vec3> axes;
+	axes.push_back(boxA.right);
+	axes.push_back(boxA.up);
+	axes.push_back(boxA.forward);
+
+	axes.push_back(boxB.right);
+	axes.push_back(boxB.up);
+	axes.push_back(boxB.forward);
+
+	axes.push_back(glm::cross(boxA.right, boxB.right));
+	axes.push_back(glm::cross(boxA.right, boxB.up));
+	axes.push_back(glm::cross(boxA.right, boxB.forward));
+	axes.push_back(glm::cross(boxA.up, boxB.right));
+	axes.push_back(glm::cross(boxA.up, boxB.up));
+	axes.push_back(glm::cross(boxA.up, boxB.forward));
+	axes.push_back(glm::cross(boxA.forward, boxB.right));
+	axes.push_back(glm::cross(boxA.forward, boxB.up));
+	axes.push_back(glm::cross(boxA.forward, boxB.forward));
+
+	for (const auto& axis : axes)
 	{
-		for (int j = i + 1; j < meshColliderSATVector.size(); j++)
+		if (axis.x == 0 && axis.y == 0 && axis.z == 0) //if cross product is (0,0,0), do early out. A head-on face-to-face collision has occured between the two box colliders.
 		{
-			if (!meshColliderSATVector[j]->corners.size() > 0)
-			{
-				return;
-			}
-			bool colliding = true;
+			//https://gamedev.stackexchange.com/questions/191240/how-do-i-resolve-a-collision-in-sat-3d-when-the-projection-axis-is-zero
+			//The answer in this question helped me try returning true here, which fixed my issue with face to face head on collisions not working. 
+			//Though I believe the answer says that he had to do the opposite. Oh well, Box-Box collision testing finally works now!
+			return true;
+		}
 
-			for (auto normal : meshColliderSATVector[i]->normalVector)
-			{
-				auto mm1 = FindMaxMinProjection(*meshColliderSATVector[i], normal);
-				auto mm2 = FindMaxMinProjection(*meshColliderSATVector[j], normal);
+		float projectionA = glm::dot(boxA.corners[0], axis);
+		float minA = projectionA;
+		float maxA = projectionA;
 
-				if (mm1.Max < mm2.Min || mm2.Max < mm1.Min)
-				{
-					//not colliding;
-					//return false;
-					colliding = false;
-					//std::cout << "first boxcollider is not colliding" << std::endl;
-				}
-			}
+		float projectionB = glm::dot(boxB.corners[0], axis);
+		float minB = projectionB;
+		float maxB = projectionB;
 
-			for (auto normal : meshColliderSATVector[j]->normalVector)
-			{
-				auto mm1 = FindMaxMinProjection(*meshColliderSATVector[i], normal);
-				auto mm2 = FindMaxMinProjection(*meshColliderSATVector[j], normal);
+		for (int i = 1; i < 8; i++) //i starts from 1 because we need to (and have already) set min and max first. We also know every box collider has 8 corners/vertices, hence we iterate i up to 8. 
+		{
+			projectionA = glm::dot(boxA.corners[i], axis);
+			maxA = maxA > projectionA ? maxA : projectionA;
+			minA = minA < projectionA ? minA : projectionA;
 
-				if (mm1.Max < mm2.Min || mm2.Max < mm1.Min)
-				{
-					//not colliding;
-					//return false;
-					colliding = false;
-					//std::cout << "second boxcollider is not colliding" << std::endl;
-				}
-			}
+			projectionB = glm::dot(boxB.corners[i], axis);
+			maxB = maxB > projectionB ? maxB : projectionB;
+			minB = minB < projectionB ? minB : projectionB;
+		}
+		MinMax mm1{ minA,maxA };
+		MinMax mm2{ minB,maxB };
 
-			//colliding
-			//return true;
-			if (colliding == true)
-			{
-				std::cout << "collision detected!!" << std::endl;
-			}
+		if (mm1.Max < mm2.Min || mm2.Max < mm1.Min) //separation check, do early out if condition is met.
+		{
+			//not colliding, we've found the separating axis / separating plane!
+			return false;
 		}
 	}
-}
-
-MinMax CollisionManager::FindMaxMinProjection(BoxCollider& box, glm::vec3 axis)
-{
-	auto projection = glm::dot(box.corners[0], axis);
-	auto min = projection;
-	auto max = projection;
-
-	for (int i = 1; i < box.corners.size(); i++)
-	{
-		projection = glm::dot(box.corners[i], axis);
-		max = max > projection ? max : projection;
-		min = min < projection ? min : projection;
-	}
-	return MinMax(min, max);
-}
-
-MinMax CollisionManager::FindMaxMinProjection(MeshColliderSAT& mesh, glm::vec3 axis)
-{
-	auto projection = glm::dot(mesh.corners[0], axis);
-	auto min = projection;
-	auto max = projection;
-
-	for (int i = 1; i < mesh.corners.size(); i++)
-	{
-		projection = glm::dot(mesh.corners[i], axis);
-		max = max > projection ? max : projection;
-		min = min < projection ? min : projection;
-	}
-	return MinMax(min, max);
+	return true; //we didn't find a separating axis / separating plane, the two box colliders must be colliding!
 }
