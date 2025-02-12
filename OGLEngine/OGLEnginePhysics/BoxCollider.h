@@ -21,6 +21,7 @@ public:
 	glm::vec3 scale;
 	std::vector<glm::vec3> corners; //corners of box in relation to position
 	std::vector<glm::vec3> normalVector; //normals of each corner.
+	std::vector<glm::vec3> averageVector; //vertex averages of each face.
 
 	glm::vec3 right;
 	glm::vec3 up;

@@ -78,7 +78,7 @@ void CollisionManager::Process()
 	while (shouldRun)
 	{
 		//ProcessMessages();
-		//SphereSphereTest();
+
 
 		for (auto box : boxColliderVector) //need to call this here to avoid random threading related error due to clearing of vectors in the function inside this scope.
 		{
@@ -88,7 +88,9 @@ void CollisionManager::Process()
 		{
 			mesh->UpdateBounds();
 		}
+		SphereSphereTest();
 		BoxBoxTest();
+		SphereBoxTest();
 	}
 }
 
@@ -112,14 +114,64 @@ void CollisionManager::SphereSphereTest()
 
 void CollisionManager::SphereBoxTest()
 {
-	//for (int i = 0; i < sphereColliderVector.size(); i++)
-	//{
-	//	for (int j = 0; j < boxColliderVector.size(); j++) //is this how you're supposed to do it with different collider types?
-	//	{
-	//		//do collision test.
+	for (int i = 0; i < sphereColliderVector.size(); i++)
+	{
+		for (int j = 0; j < boxColliderVector.size(); j++) //is this how you're supposed to do it with different collider types?
+		{
+			if (!boxColliderVector[j]->corners.size() > 0) //takes a little while for a new box collider to fill the corners vector, this if check prevents a vector out of range error that's caused by this function running on a different thread compared to the box collider bounds update.
+			{											   //Hmm, maybe I should set it to check if corners.size() == 8, just to be sure?
+														   //Or maybe this isn't needed anymore because I run the UpdateBounds function before this one inside the Process() loop of this class?
+				return;
+			}
 
-	//	}
-	//}
+			//https://www.youtube.com/watch?v=wVhSQHKvBW4
+			//https://gamedeveloperjourney.blogspot.com/2009/04/point-plane-collision-detection.html
+			bool insideVertex = false;
+			bool insideFace = false;
+			bool insideEdge = false;
+			bool inside = false;
+			//may need to translate sphere position so its position is in the Box's local space.
+			//glm::vec3 closestCornerOnBoxInRelationToSpherePosition;
+			float lastClosestDistance = 99999999.0f;
+			for(glm::vec3 corner : boxColliderVector[j]->corners)
+			{
+				float currentDistance = glm::distance(sphereColliderVector[i]->position, corner);
+				if (currentDistance < lastClosestDistance)
+				{
+					//closestCornerOnBoxInRelationToSpherePosition = corner;
+					lastClosestDistance = currentDistance;
+				}
+			}
+
+			if (lastClosestDistance < sphereColliderVector[i]->radius) //this only covers corners and not faces or edges. 
+			{
+				//could swap > to < for return false early out.
+				insideVertex = true;
+				std::cout << "Sphere and Box are colliding at a vertex!" << std::endl;
+			}
+
+			SphereCollider* currentSphereCollider = sphereColliderVector[i];
+			for (int i = 0; i < 6; i++) //we know box has 6 face normals.
+			{
+				float planeDistance = -glm::dot(boxColliderVector[j]->averageVector[i], boxColliderVector[j]->normalVector[i]);
+
+				float ppd = glm::dot(boxColliderVector[j]->normalVector[i], currentSphereCollider->position) + planeDistance;
+
+				if (ppd > currentSphereCollider->radius) //could be other way around.
+				{
+					//do early out
+					//return false
+					insideFace = false; //false actually
+					std::cout << "Sphere and Box are NOT colliding at a face!" << std::endl;   
+				}
+				else 
+				{
+					insideFace = true; //true??
+					std::cout << "Sphere and Box are colliding at a face!" << std::endl;
+				}
+			}
+		}
+	}
 }
 
 //https://textbooks.cs.ksu.edu/cis580/04-collisions/04-separating-axis-theorem/ is good for 2D, but not 3D!

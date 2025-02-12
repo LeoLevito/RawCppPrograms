@@ -87,50 +87,64 @@ void BoxCollider::UpdateBounds()
 
 
 	corners.clear(); //this HAD a random chance of happening right when collisionmanager is in the process of accessing it, which would cause a vector subscript out of range error. I've fixed this by only running this function in the collision manager's Process() function.
-
-	corners.push_back(corner1);
-	corners.push_back(corner2);
-	corners.push_back(corner3);
-	corners.push_back(corner4);
-
-	corners.push_back(corner5);
-	corners.push_back(corner6);
-	corners.push_back(corner7);
-	corners.push_back(corner8);
-
-
-	////Not needed anymore. But could still be nice to have.
-	//										  
-	////Calculate edges										  
-	//std::vector<glm::vec3> edges;
-
-	////front edges							  //NOTE: these comments may or may not be correct, the top edge of the front face may actually be the right or bottom one. This is just a way for me to keep track of the edges in a clockwise convention.
-	//edges.push_back(corners[0] - corners[1]); //0 top edge of front face
-	//edges.push_back(corners[1] - corners[2]); //1 right edge of front face
-	//edges.push_back(corners[2] - corners[3]); //2 bottom edge of front face
-	//edges.push_back(corners[3] - corners[0]); //3 left edge of front face
-
-	////back edges
-	//edges.push_back(corners[4] - corners[5]); //4 top edge of back face
-	//edges.push_back(corners[5] - corners[6]); //5 right edge of back face
-	//edges.push_back(corners[6] - corners[7]); //6 bottom edge of back face
-	//edges.push_back(corners[7] - corners[4]); //7 left edge of back face
-
-	////inbetween edges / rest of edges
-	//edges.push_back(corners[0] - corners[4]); //8 top edge of left face
-	//edges.push_back(corners[1] - corners[5]); //9 top edge of right face
-	//edges.push_back(corners[2] - corners[6]); //10 bottom edge of right face
-	//edges.push_back(corners[3] - corners[7]); //11 bottom edge of left face
+	//front corners
+	corners.push_back(corner1); //top left front
+	corners.push_back(corner2); //top right front
+	corners.push_back(corner3); //bottom right front
+	corners.push_back(corner4); //bottom left front
+	//back corners
+	corners.push_back(corner5); //top left back
+	corners.push_back(corner6); //top right back
+	corners.push_back(corner7); //bottom right back
+	corners.push_back(corner8); //bottom left back
 
 
-	////Calculate face normals
-	//std::vector<glm::vec3> normals;
-	//normals.push_back(glm::cross(edges[0], edges[1])); //front face
-	//normals.push_back(glm::cross(edges[4], edges[5])); //back face
-	//normals.push_back(glm::cross(edges[0], edges[8])); //top face
-	//normals.push_back(glm::cross(edges[2], edges[10])); //bottom face
-	//normals.push_back(glm::cross(edges[1], edges[9])); //right face
-	//normals.push_back(glm::cross(edges[3], edges[11])); //left face
+	//Not needed anymore. But could still be nice to have.
+											  
+	//Calculate edges										  
+	std::vector<glm::vec3> edges;
+
+	//front edges							  //NOTE: these comments may or may not be correct, the top edge of the front face may actually be the right or bottom one. This is just a way for me to keep track of the edges in a clockwise convention.
+	edges.push_back(corners[0] - corners[1]); //0 top edge of front face
+	edges.push_back(corners[1] - corners[2]); //1 right edge of front face
+	edges.push_back(corners[2] - corners[3]); //2 bottom edge of front face
+	edges.push_back(corners[3] - corners[0]); //3 left edge of front face
+
+	//back edges
+	edges.push_back(corners[4] - corners[5]); //4 top edge of back face
+	edges.push_back(corners[5] - corners[6]); //5 right edge of back face
+	edges.push_back(corners[6] - corners[7]); //6 bottom edge of back face
+	edges.push_back(corners[7] - corners[4]); //7 left edge of back face
+
+	//inbetween edges / rest of edges
+	edges.push_back(corners[0] - corners[4]); //8 top edge of left face
+	edges.push_back(corners[1] - corners[5]); //9 top edge of right face
+	edges.push_back(corners[2] - corners[6]); //10 bottom edge of right face
+	edges.push_back(corners[3] - corners[7]); //11 bottom edge of left face
+
+
+	//Calculate face normals
+	//https://www.euclideanspace.com/maths/algebra/vectors/applications/normals/index.htm
+	std::vector<glm::vec3> normals;
+	normals.push_back(glm::normalize(glm::cross(edges[0], edges[1]))); //front face
+	normals.push_back(glm::normalize(glm::cross(edges[4], edges[5]))); //back face
+	normals.push_back(glm::normalize(glm::cross(edges[0], edges[8]))); //top face
+	normals.push_back(glm::normalize(glm::cross(edges[2], edges[10]))); //bottom face
+	normals.push_back(glm::normalize(glm::cross(edges[1], edges[9]))); //right face
+	normals.push_back(glm::normalize(glm::cross(edges[3], edges[11]))); //left face
+
+	normalVector = normals;
+
+	//we can do an average of these now and make an adjascent std::vector for the normals vector.
+	std::vector<glm::vec3> faceNormalVerticesAverages;
+	faceNormalVerticesAverages.push_back((corner1 + corner2 + corner3 + corner4) / 4.0f); //front corners
+	faceNormalVerticesAverages.push_back((corner5 + corner6 + corner7 + corner8) / 4.0f); //back corners
+	faceNormalVerticesAverages.push_back((corner1 + corner2 + corner5 + corner6) / 4.0f); //top corners
+	faceNormalVerticesAverages.push_back((corner3 + corner4 + corner7 + corner8) / 4.0f); //bottom corners
+	faceNormalVerticesAverages.push_back((corner1 + corner4 + corner5 + corner8) / 4.0f); //left corners
+	faceNormalVerticesAverages.push_back((corner2 + corner3 + corner6 + corner7) / 4.0f); //right corners
+
+	averageVector = faceNormalVerticesAverages;
 }
 
 void BoxCollider::DrawImgui()
