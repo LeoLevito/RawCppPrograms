@@ -102,8 +102,55 @@ void BoxCollider::UpdateBounds()
 	extents = glm::vec3(trans * glm::vec4(normalizedVector, 1.0f)); //okay my extents are wrong.
 	extents = scale;
 
-	extentsMax = corner3;
-	extentsMin = corner5;
+	//extentsMax = corner3; //maybe corner3 isn't certain to be the maximum every time. Maybe I need to recalculate this each tick.
+	//extentsMin = corner5;
+
+	float extentsMaxX = -99999999;
+	float extentsMaxY = -99999999;
+	float extentsMaxZ = -99999999;
+
+	float extentsMinX = 99999999;
+	float extentsMinY = 99999999;
+	float extentsMinZ = 99999999;
+
+	for (glm::vec3 corner : corners) //recalculating max and min corners each tick.
+	{
+		float currentMaxX = glm::max(corner.x, extentsMaxX);
+		float currentMaxY = glm::max(corner.y, extentsMaxY);
+		float currentMaxZ = glm::max(corner.z, extentsMaxZ);
+		if (extentsMaxX != currentMaxX)
+		{
+			extentsMaxX = currentMaxX;
+		}
+		if (extentsMaxY != currentMaxY)
+		{
+			extentsMaxY = currentMaxY;
+		}
+		if (extentsMaxZ != currentMaxZ)
+		{
+			extentsMaxZ = currentMaxZ;
+		}
+
+		float currentMinX = glm::min(corner.x, extentsMinX);
+		float currentMinY = glm::min(corner.y, extentsMinY);
+		float currentMinZ = glm::min(corner.z, extentsMinZ);
+		if (extentsMinX != currentMinX)
+		{
+			extentsMinX = currentMinX;
+		}
+		if (extentsMinY != currentMinY)
+		{
+			extentsMinY = currentMinY;
+		}
+		if (extentsMinZ != currentMinZ)
+		{
+			extentsMinZ = currentMinZ;
+		}
+	}
+
+	extentsMax = { extentsMaxX , extentsMaxY , extentsMaxZ }; //maybe corner3 isn't certain to be the maximum every time. Maybe I need to recalculate this each tick.
+	extentsMin = { extentsMinX , extentsMinY , extentsMinZ };
+
 
 	//std::cout << extents.x << " " << extents.y << " " << extents.z << std::endl;
 

@@ -132,6 +132,21 @@ void CollisionManager::SphereBoxTest()
 				return;
 			}
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 			//BRUH HOW DO I CONVERT SPHERE WORLD POSITION TO BOX LOCAL SPACE? OR PROJECT SPHERE POSITION COORDINATES TO EACH AXIS OF BOX EXTENTS?
 			//this is literally the only thing that I need for it to work unless Martin has actually written something wrong with the clamp part.
 			glm::vec3 currentSphereCenter = sphereColliderVector[i]->position;
@@ -139,7 +154,7 @@ void CollisionManager::SphereBoxTest()
 			transinv = glm::inverse(boxColliderVector[j]->trans); //inverse
 
 			glm::vec3 localSphereCenter = glm::vec3(transinv * glm::vec4(sphereColliderVector[i]->position, 1.0f));
-			std::cout << localSphereCenter.x << " " << localSphereCenter.y << " " << localSphereCenter.z << " position of sphere in box local space. Right?" << std::endl;
+			//std::cout << localSphereCenter.x << " " << localSphereCenter.y << " " << localSphereCenter.z << " position of sphere in box local space. Right?" << std::endl;
 		
 			glm::vec3 closestPointOnCubeSurface = glm::clamp(localSphereCenter, boxColliderVector[j]->extentsMin, boxColliderVector[j]->extentsMax); 
 			glm::vec3 mama = glm::max(boxColliderVector[j]->extentsMin - localSphereCenter, localSphereCenter - boxColliderVector[j]->extentsMax);
@@ -149,10 +164,10 @@ void CollisionManager::SphereBoxTest()
 			glm::vec3 result = { dx, dy, dz };
 			//glm::vec3 closestPointOnCubeSurface = glm::clamp(boxColliderVector[j]->extentsMin, -boxColliderVector[j]->extents, boxColliderVector[j]->extents);
 
-			float distanceToClosestPoint = glm::distance(localSphereCenter, closestPointOnCubeSurface);
+			float distanceToClosestPoint = glm::distance(sphereColliderVector[i]->position, closestPointOnCubeSurface);
 			if (distanceToClosestPoint < sphereColliderVector[i]->radius)
 			{
-				std::cout << "Sphere-Box collision detected!!" << std::endl;
+				//std::cout << "Sphere-Box collision detected!!" << std::endl;
 			}
 
 
@@ -172,7 +187,11 @@ void CollisionManager::SphereBoxTest()
 				if (v > boxColliderVector[j]->extentsMax[i]) v = boxColliderVector[j]->extentsMax[i]; // v = min( v, b.max[i] )
 				q[i] = v; //cursed, x when i = 0, y when i = 1, z when i = 2.
 			}
-			float qDistance = glm::distance(localSphereCenter, q);
+			float qDistance = glm::distance(sphereColliderVector[i]->position, q);
+			if (qDistance < sphereColliderVector[i]->radius) //POSITION AND SCALE OF BOX WORKS! BUT NOT ROTATION!
+			{
+				std::cout << "Sphere-Box collision detected!!" << std::endl; 
+			}
 			std::cout << "old distance result:" << distanceToClosestPoint <<std::endl;
 			std::cout << "NEW distance result:" << qDistance << std::endl;
 
@@ -180,7 +199,11 @@ void CollisionManager::SphereBoxTest()
 
 
 
-
+			auto xyz = glm::max(boxColliderVector[j]->extentsMin, glm::min(localSphereCenter, boxColliderVector[j]->extentsMax));
+			auto xyzdistance = glm::sqrt((xyz.x - localSphereCenter.x) * (xyz.x - localSphereCenter.x) +
+										 (xyz.y - localSphereCenter.y) * (xyz.y - localSphereCenter.y) +
+										 (xyz.z - localSphereCenter.z) * (xyz.z - localSphereCenter.z));
+			std::cout << "Nin distance result:" << xyzdistance << std::endl;
 
 
 
