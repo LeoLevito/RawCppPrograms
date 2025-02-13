@@ -1,6 +1,5 @@
 #include "BoxCollider.h"
-#include <gtx/hash.hpp> //required for the unordered set
-#include <gtx/polar_coordinates.hpp> //required for the unordered set
+#include <gtc/matrix_transform.hpp>
 #include <unordered_set>
 #include <string>
 #include <iostream>
@@ -65,7 +64,7 @@ void BoxCollider::UpdateBounds()
 
 
 	//set up transformation for rotation and scale
-	glm::mat4 trans = glm::mat4(1.0f);
+	trans = glm::mat4(1.0f);
 	trans = glm::translate(trans, position); //translate first so that each object rotates independently.
 	trans = glm::rotate(trans, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f)); //matrix, angle, axis.
 	trans = glm::rotate(trans, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -99,6 +98,16 @@ void BoxCollider::UpdateBounds()
 	corners.push_back(corner8); //bottom left back
 
 
+	glm::vec3 normalizedVector{ 1.0f,1.0f,1.0f };
+	extents = glm::vec3(trans * glm::vec4(normalizedVector, 1.0f)); //okay my extents are wrong.
+	extents = scale;
+
+	extentsMax = corner3;
+	extentsMin = corner5;
+
+	//std::cout << extents.x << " " << extents.y << " " << extents.z << std::endl;
+
+
 	//Not needed anymore. But could still be nice to have.
 											  
 	//Calculate edges										  
@@ -122,6 +131,9 @@ void BoxCollider::UpdateBounds()
 	edges.push_back(corners[2] - corners[6]); //10 bottom edge of right face
 	edges.push_back(corners[3] - corners[7]); //11 bottom edge of left face
 
+	//extents.x = edges[0];
+	//extents.y = edges[1];
+	//extents.z = edges[9];
 
 	//Calculate face normals
 	//https://www.euclideanspace.com/maths/algebra/vectors/applications/normals/index.htm
@@ -145,6 +157,52 @@ void BoxCollider::UpdateBounds()
 	faceNormalVerticesAverages.push_back((corner2 + corner3 + corner6 + corner7) / 4.0f); //right corners
 
 	averageVector = faceNormalVerticesAverages;
+
+	std::vector<glm::vec3> faceVertices1;
+	std::vector<glm::vec3> faceVertices2;
+	std::vector<glm::vec3> faceVertices3;
+	std::vector<glm::vec3> faceVertices4;
+	std::vector<glm::vec3> faceVertices5;
+	std::vector<glm::vec3> faceVertices6;
+	//front corners
+	faceVertices1.push_back(corner1);
+	faceVertices1.push_back(corner2);
+	faceVertices1.push_back(corner3);
+	faceVertices1.push_back(corner4);
+	//back corners
+	faceVertices2.push_back(corner5);
+	faceVertices2.push_back(corner6);
+	faceVertices2.push_back(corner7);
+	faceVertices2.push_back(corner8);
+	//top corners
+	faceVertices3.push_back(corner1);
+	faceVertices3.push_back(corner2);
+	faceVertices3.push_back(corner5);
+	faceVertices3.push_back(corner6);
+	//bottom corners
+	faceVertices4.push_back(corner3);
+	faceVertices4.push_back(corner4);
+	faceVertices4.push_back(corner7);
+	faceVertices4.push_back(corner8);
+	//left corners
+	faceVertices5.push_back(corner1);
+	faceVertices5.push_back(corner4);
+	faceVertices5.push_back(corner5);
+	faceVertices5.push_back(corner8);
+	//right corners
+	faceVertices6.push_back(corner2);
+	faceVertices6.push_back(corner3);
+	faceVertices6.push_back(corner6);
+	faceVertices6.push_back(corner7);
+
+	faceCornerVector.clear();
+
+	faceCornerVector.push_back(faceVertices1);
+	faceCornerVector.push_back(faceVertices2);
+	faceCornerVector.push_back(faceVertices3);
+	faceCornerVector.push_back(faceVertices4);
+	faceCornerVector.push_back(faceVertices5);
+	faceCornerVector.push_back(faceVertices6);
 }
 
 void BoxCollider::DrawImgui()
