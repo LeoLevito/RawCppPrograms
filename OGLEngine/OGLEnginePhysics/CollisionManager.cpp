@@ -132,205 +132,28 @@ void CollisionManager::SphereBoxTest()
 				return;
 			}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-			//BRUH HOW DO I CONVERT SPHERE WORLD POSITION TO BOX LOCAL SPACE? OR PROJECT SPHERE POSITION COORDINATES TO EACH AXIS OF BOX EXTENTS?
-			//this is literally the only thing that I need for it to work unless Martin has actually written something wrong with the clamp part.
-			glm::vec3 currentSphereCenter = sphereColliderVector[i]->position;
 			glm::mat4 transinv = glm::mat4(1.0f);
-			transinv = glm::inverse(boxColliderVector[j]->trans); //inverse
-
-			glm::vec3 localSphereCenter = glm::vec3(transinv * glm::vec4(sphereColliderVector[i]->position, 1.0f));
-			//std::cout << localSphereCenter.x << " " << localSphereCenter.y << " " << localSphereCenter.z << " position of sphere in box local space. Right?" << std::endl;
-		
-			glm::vec3 closestPointOnCubeSurface = glm::clamp(localSphereCenter, boxColliderVector[j]->extentsMin, boxColliderVector[j]->extentsMax); 
-			glm::vec3 mama = glm::max(boxColliderVector[j]->extentsMin - localSphereCenter, localSphereCenter - boxColliderVector[j]->extentsMax);
-			float dx = glm::clamp(boxColliderVector[j]->extentsMin.x - localSphereCenter.x, 0.0f, localSphereCenter.x - boxColliderVector[j]->extentsMax.x); //clamp is wrong.
-			float dy = glm::clamp(boxColliderVector[j]->extentsMin.y - localSphereCenter.y, 0.0f, localSphereCenter.y - boxColliderVector[j]->extentsMax.y);
-			float dz = glm::clamp(boxColliderVector[j]->extentsMin.z - localSphereCenter.z, 0.0f, localSphereCenter.z - boxColliderVector[j]->extentsMax.z);
-			glm::vec3 result = { dx, dy, dz };
-			//glm::vec3 closestPointOnCubeSurface = glm::clamp(boxColliderVector[j]->extentsMin, -boxColliderVector[j]->extents, boxColliderVector[j]->extents);
-
-			float distanceToClosestPoint = glm::distance(sphereColliderVector[i]->position, closestPointOnCubeSurface);
-			if (distanceToClosestPoint < sphereColliderVector[i]->radius)
-			{
-				//std::cout << "Sphere-Box collision detected!!" << std::endl;
-			}
-
-
-			float sqDist = 0.0f;
-			for (int i = 0; i < 3; i++)
-			{
-				float v = localSphereCenter[i]; //Cursed but I kinda like it.
-				if (v < boxColliderVector[j]->extentsMin[i]) sqDist += (boxColliderVector[j]->extentsMin[i] - v) * (boxColliderVector[j]->extentsMin[i] - v); //the extents are still so wrong.
-				if (v > boxColliderVector[j]->extentsMax[i]) sqDist += (v - boxColliderVector[j]->extentsMax[i]) * (v - boxColliderVector[j]->extentsMax[i]);
-			}
-
+			transinv = glm::inverse(boxColliderVector[j]->transWithoutScale); 
+			glm::vec3 localSphereCenter = glm::vec3(transinv * glm::vec4(sphereColliderVector[i]->position, 1.0f)); //put sphere collider's position into box collider's local space using the inverse transform.
+			
+			//https://gamedev.stackexchange.com/questions/157100/why-does-this-implementation-of-aabb-sphere-collision-ghost-collide-and-how-can
+			//https://gamedev.stackexchange.com/questions/156870/how-do-i-implement-a-aabb-sphere-collision
+			//helpful answers from DrewAtWork.
 			glm::vec3 q;
-			for (int i = 0; i < 3; i++) 
-			{
-				float v = currentSphereCenter[i];
+			for (int i = 0; i < 3; i++) //find the closest point on box collider in relation to	the sphere's local position.
+			{							//could also square the values here as per DrewAtWork's answers to optimize calculations.
+				float v = localSphereCenter[i]; 
 				if (v < boxColliderVector[j]->extentsMin[i]) v = boxColliderVector[j]->extentsMin[i]; // v = max( v, b.min[i] )
 				if (v > boxColliderVector[j]->extentsMax[i]) v = boxColliderVector[j]->extentsMax[i]; // v = min( v, b.max[i] )
-				q[i] = v; //cursed, x when i = 0, y when i = 1, z when i = 2.
+				q[i] = v; //cursed, or I mean, that's one way to do it: set x when i = 0, y when i = 1, z when i = 2.
 			}
-			float qDistance = glm::distance(sphereColliderVector[i]->position, q);
-			if (qDistance < sphereColliderVector[i]->radius) //POSITION AND SCALE OF BOX WORKS! BUT NOT ROTATION!
+			//glm::vec3 closestPointOnCubeSurface = glm::clamp(localSphereCenter, boxColliderVector[j]->extentsMin, boxColliderVector[j]->extentsMax); //essentialy does the same thing as for loop above.
+
+			float qDistance = glm::distance(localSphereCenter, q);
+			if (qDistance < sphereColliderVector[i]->radius) //POSITION AND SCALE OF BOX WORKS! BUT NOT ROTATION! are the min and max values only axis aligned? And that's why rotation doesn't work properly?
 			{
 				std::cout << "Sphere-Box collision detected!!" << std::endl; 
 			}
-			std::cout << "old distance result:" << distanceToClosestPoint <<std::endl;
-			std::cout << "NEW distance result:" << qDistance << std::endl;
-
-			//BRUH WHY DO I I HAVE TO WORK WITH EXTENTS!!!! Nothing fucking works, no one tells you how to set up extents.
-
-
-
-			auto xyz = glm::max(boxColliderVector[j]->extentsMin, glm::min(localSphereCenter, boxColliderVector[j]->extentsMax));
-			auto xyzdistance = glm::sqrt((xyz.x - localSphereCenter.x) * (xyz.x - localSphereCenter.x) +
-										 (xyz.y - localSphereCenter.y) * (xyz.y - localSphereCenter.y) +
-										 (xyz.z - localSphereCenter.z) * (xyz.z - localSphereCenter.z));
-			std::cout << "Nin distance result:" << xyzdistance << std::endl;
-
-
-
-
-
-			////https://www.youtube.com/watch?v=wVhSQHKvBW4
-			////https://gamedeveloperjourney.blogspot.com/2009/04/point-plane-collision-detection.html
-			//bool insideVertex = false;
-			//bool insideFace = false;
-			//bool insideEdge = false;
-			//bool inside = false;
-			////may need to translate sphere position so its position is in the Box's local space.
-			////glm::vec3 closestCornerOnBoxInRelationToSpherePosition;
-			//float lastClosestDistance = 99999999.0f;
-			//for(glm::vec3 corner : boxColliderVector[j]->corners)
-			//{
-			//	float currentDistance = glm::distance(sphereColliderVector[i]->position, corner);
-			//	if (currentDistance < lastClosestDistance)
-			//	{
-			//		//closestCornerOnBoxInRelationToSpherePosition = corner;
-			//		lastClosestDistance = currentDistance;
-			//	}
-			//}
-
-			//if (lastClosestDistance < sphereColliderVector[i]->radius) //this only covers corners and not faces or edges. 
-			//{
-			//	//could swap > to < for return false early out.
-			//	insideVertex = true;
-			//	std::cout << "Sphere and Box are colliding at a vertex!" << std::endl;
-			//}
-
-			//SphereCollider* currentSphereCollider = sphereColliderVector[i];
-			//for (int i = 0; i < 6; i++) //we know box has 6 face normals.
-			//{
-			//	float planeDistance = -glm::dot(boxColliderVector[j]->averageVector[i], boxColliderVector[j]->normalVector[i]);
-
-			//	//float ppd = glm::dot(boxColliderVector[j]->normalVector[i], currentSphereCollider->position) + planeDistance; //maybe this should take into account the radius, and we swap this to be the end point.
-			//	float ppdstart = glm::dot(boxColliderVector[j]->normalVector[i], boxColliderVector[j]->position) + planeDistance; //maybe this should take into account the radius, and we swap this to be the end point.
-
-			//	int PlaneFront = 0;
-			//	int PlaneBack = 1;
-			//	int OnPlane = 2;
-
-			//	int pStartLoc = -1;
-			//	int pDestLoc = -1;
-			//	//The trick is realizing that a collision only occurs if these two positions have different locations in relation to the plane -- 
-			//	//if they're both in front of or both behind the plane, no collision occurred and we can return from the function.
-			//	if (ppdstart > 0.0f)
-			//	{
-			//		pStartLoc = PlaneFront;
-			//	}
-			//	else if (ppdstart < 0.0f)
-			//	{
-			//		pStartLoc = PlaneBack;
-			//	}
-			//	else
-			//	{
-			//		pStartLoc = OnPlane;
-			//	}
-
-			//	float ppddest = glm::dot(boxColliderVector[j]->normalVector[i], currentSphereCollider->position) + planeDistance;
-
-			//	if (ppddest > 0.0f)
-			//	{
-			//		pDestLoc = PlaneFront;
-			//	}
-			//	else if (ppddest < 0.0f)
-			//	{
-			//		pDestLoc = PlaneBack;
-			//	}
-			//	else
-			//	{
-			//		pDestLoc = OnPlane;
-			//	}
-
-			//	if (pStartLoc == pDestLoc) // if these have the same value, i.e. both being in front or both being behind or both being exactly on the plane, no collision has occured.
-			//	{
-			//		//std::cout << "no collision has occured between the start and end points!" << std::endl;
-			//		//return false; //no collision occured.
-			//	}
-			//	else
-			//	{
-			//		//std::cout << "A collision has occured between the start and end points!" << std::endl;
-
-			//	}
-
-			//	glm::vec3 ray = glm::normalize(boxColliderVector[j]->position - currentSphereCollider->position);
-
-			//	auto t = -(planeDistance + glm::dot(boxColliderVector[j]->normalVector[i], currentSphereCollider->position)) / glm::dot(boxColliderVector[j]->normalVector[i], ray);
-			//	glm::vec3 intersect = currentSphereCollider->position + (ray * t);
-
-			//	glm::vec3 v1 = glm::normalize(intersect - boxColliderVector[j]->faceCornerVector[i][0]); //vector within vector is cursed.
-			//	glm::vec3 v2 = glm::normalize(intersect - boxColliderVector[j]->faceCornerVector[i][1]); //vector within vector is cursed.
-			//	glm::vec3 v3 = glm::normalize(intersect - boxColliderVector[j]->faceCornerVector[i][2]); //vector within vector is cursed.
-			//	glm::vec3 v4 = glm::normalize(intersect - boxColliderVector[j]->faceCornerVector[i][3]); //vector within vector is cursed.
-
-			//	float thetaSum = glm::acos(glm::dot(v1, v2))
-			//		+ glm::acos(glm::dot(v2, v3))
-			//		+ glm::acos(glm::dot(v3, v4))
-			//		+ glm::acos(glm::dot(v4, v1));
-
-			//	float threeSixty = fabs(thetaSum - (2 * myPi));
-			//	if (threeSixty < 0.1f) //glm::atan(1)*4 = pi.
-			//	{
-			//		//return true;
-			//		std::cout << "A collision has occured inside the plane!" << std::endl;
-			//	}
-			//	else
-			//	{
-			//		//return false;
-			//	}
-
-			//	//std::cout << intersect.x << " " << intersect.y << " " << intersect.z << std::endl;
-
-			//	if (ppdstart > currentSphereCollider->radius) //could be other way around.
-			//	{
-			//		//do early out
-			//		//return false
-			//		insideFace = false; //false actually
-			//		//std::cout << "Sphere and Box are NOT colliding at a face!" << std::endl;   
-			//	}
-			//	else 
-			//	{
-			//		insideFace = true; //true??
-			//		//std::cout << "Sphere and Box are colliding at a face!" << std::endl;
-			//	}
-			//}
 		}
 	}
 }
@@ -360,7 +183,7 @@ void CollisionManager::BoxBoxTest()
 
 //https://gamedev.stackexchange.com/questions/44500/how-many-and-which-axes-to-use-for-3d-obb-collision-with-sat/
 //helpful code answers from Acegikmo (Freya Holmér!!) and Bas Smit!
-bool CollisionManager::FindMaxMinProjectionAB(BoxCollider& boxA, BoxCollider& boxB)
+bool CollisionManager::FindMaxMinProjectionAB(BoxCollider& boxA, BoxCollider& boxB) //I gotta rename this.
 {
 	std::vector<glm::vec3> axes;
 	axes.push_back(boxA.right);
