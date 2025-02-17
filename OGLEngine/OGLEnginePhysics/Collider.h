@@ -5,6 +5,8 @@
 #include <glm.hpp>
 #include "GameObject.h"
 
+
+
 class ColliderComponent;
 
 enum class ColliderType
@@ -27,7 +29,9 @@ public:
 
 	GameObject* topParent = nullptr;
 
+	virtual void Update();
 	virtual void DrawImgui();
+
 private:
 };
 

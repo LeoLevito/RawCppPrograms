@@ -16,6 +16,10 @@ void Collider::SetScale(glm::vec3 scaleIn)
 {
 }
 
+void Collider::Update()
+{
+}
+
 void Collider::DrawImgui()
 {
 }

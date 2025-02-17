@@ -3,6 +3,7 @@
 #include "Collider.h"
 #include "SphereCollider.h"
 #include "BoxCollider.h"
+#include "RaycastCollider.h"
 #include "MeshColliderSAT.h"
 
 struct MinMax
@@ -43,10 +44,13 @@ public:
 
 	std::vector<SphereCollider*> sphereColliderVector;
 	std::vector<BoxCollider*> boxColliderVector;
+	std::vector<RaycastCollider*> raycastColliderVector;
 	std::vector<MeshColliderSAT*> meshColliderSATVector;
 	void SphereSphereTest();
 	void SphereBoxTest();
 	void BoxBoxTest();
+	void RaySphereTest();
+	void RayBoxTest();
 	bool FindMaxMinProjectionAB(BoxCollider& boxA, BoxCollider& boxB);
 
 	int runFindAmount2 = 0;

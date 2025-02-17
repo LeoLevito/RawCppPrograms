@@ -1,6 +1,5 @@
 #pragma once
 #include "Collider.h"
-#include <glm.hpp>
 
 class SphereCollider : public Collider
 {

@@ -36,7 +36,7 @@ void ColliderComponent::Update()
 			myCollider->SetPosition(position);
 			myCollider->SetRotation(rotation);
 			myCollider->SetScale(scale);
-
+			myCollider->Update();
 		}
 	}
 
@@ -51,7 +51,7 @@ void ColliderComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 		return;
 	}
 
-	const char* typeNames[] = { "Sphere collider", "Box collider", "Mesh collider SAT" };
+	const char* typeNames[] = { "Sphere collider", "Box collider", "Mesh collider SAT", "Raycast collider"};
 
 	ImGui::Text("Current type:");
 	ImGui::SameLine();
@@ -84,6 +84,10 @@ void ColliderComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 				case 2:
 					CollisionManager::Get().DeleteCollider(myCollider->type, myCollider);
 					myCollider = CollisionManager::Get().AddNewCollider(ColliderType::MeshType, *owner);
+					break;
+				case 3:
+					CollisionManager::Get().DeleteCollider(myCollider->type, myCollider);
+					myCollider = CollisionManager::Get().AddNewCollider(ColliderType::RaycastType, *owner);
 					break;
 				default:
 					break;

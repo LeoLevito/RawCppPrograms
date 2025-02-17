@@ -7,6 +7,9 @@
     <Filter Include="Managers">
       <UniqueIdentifier>{01ea5509-f59d-477b-9cc0-18eb03a4ed61}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GLAD">
+      <UniqueIdentifier>{fcd680f5-fbd8-4a11-9401-4b22b2981595}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Collider.cpp">
@@ -24,6 +27,9 @@
     <ClCompile Include="MeshColliderSAT.cpp">
       <Filter>Colliders</Filter>
     </ClCompile>
+    <ClCompile Include="RaycastCollider.cpp">
+      <Filter>Colliders</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Collider.h">
@@ -39,6 +45,9 @@
       <Filter>Colliders</Filter>
     </ClInclude>
     <ClInclude Include="MeshColliderSAT.h">
+      <Filter>Colliders</Filter>
+    </ClInclude>
+    <ClInclude Include="RaycastCollider.h">
       <Filter>Colliders</Filter>
     </ClInclude>
   </ItemGroup>

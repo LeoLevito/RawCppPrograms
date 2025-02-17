@@ -49,6 +49,9 @@ Collider* CollisionManager::AddNewCollider(ColliderType type, GameObject& owner)
 	}
 	case ColliderType::RaycastType:
 	{
+		RaycastCollider* raycastCollider = new RaycastCollider();
+		raycastColliderVector.push_back(raycastCollider);
+		raycastCollider->type = type;
 		break;
 	}
 	default:
@@ -70,6 +73,7 @@ void CollisionManager::DeleteCollider(ColliderType type, Collider* collider)
 		meshColliderSATVector.erase(std::remove(meshColliderSATVector.begin(), meshColliderSATVector.end(), collider));
 		break;
 	case ColliderType::RaycastType:
+		raycastColliderVector.erase(std::remove(raycastColliderVector.begin(), raycastColliderVector.end(), collider));
 
 		break;
 	default:
@@ -99,6 +103,8 @@ void CollisionManager::Process()
 		SphereSphereTest();
 		BoxBoxTest();
 		SphereBoxTest();
+		RaySphereTest();
+		RayBoxTest();
 	}
 }
 
@@ -150,7 +156,7 @@ void CollisionManager::SphereBoxTest()
 			//glm::vec3 closestPointOnCubeSurface = glm::clamp(localSphereCenter, boxColliderVector[j]->extentsMin, boxColliderVector[j]->extentsMax); //essentialy does the same thing as for loop above.
 
 			float qDistance = glm::distance(localSphereCenter, q);
-			if (qDistance < sphereColliderVector[i]->radius) //POSITION AND SCALE OF BOX WORKS! BUT NOT ROTATION! are the min and max values only axis aligned? And that's why rotation doesn't work properly?
+			if (qDistance < sphereColliderVector[i]->radius) 
 			{
 				std::cout << "Sphere-Box collision detected!!" << std::endl; 
 			}
@@ -177,6 +183,74 @@ void CollisionManager::BoxBoxTest()
 			{
 				std::cout << "Box-Box collision detected!!" << std::endl;
 			}
+		}
+	}
+}
+
+void CollisionManager::RaySphereTest()
+{
+	for (int i = 0; i < raycastColliderVector.size(); i++)
+	{
+		for (int j = 0; j < sphereColliderVector.size(); j++) //is this how you're supposed to do it with different collider types?
+		{
+			glm::vec3 rayDir = glm::normalize(raycastColliderVector[i]->endPoint - raycastColliderVector[i]->startPoint);
+			float rayLength = glm::length(raycastColliderVector[i]->endPoint - raycastColliderVector[i]->startPoint); //is this right?
+			float projectionLength = glm::clamp(glm::dot(sphereColliderVector[j]->position - raycastColliderVector[i]->startPoint, rayDir), 0.0f, rayLength);
+
+			glm::vec3 closestPointOnLine = raycastColliderVector[i]->startPoint + rayDir * projectionLength;
+
+			float distanceBetweenSphereAndClosestPoint = glm::distance(sphereColliderVector[j]->position, closestPointOnLine);
+			if (distanceBetweenSphereAndClosestPoint < sphereColliderVector[j]->radius)
+			{
+				std::cout << "Ray-Sphere collision detected!!" << std::endl;
+
+			}
+		}
+	}
+}
+
+void CollisionManager::RayBoxTest() //a mix between the Sphere-Box test and the Ray-Sphere test. Or am I not thinking far enough ahead with this one?
+{
+	for (int i = 0; i < raycastColliderVector.size(); i++)
+	{
+		for (int j = 0; j < boxColliderVector.size(); j++) 
+		{
+			if (!boxColliderVector[j]->corners.size() > 0) //takes a little while for a new box collider to fill the corners vector, this if check prevents a vector out of range error that's caused by this function running on a different thread compared to the box collider bounds update.
+			{											   //Hmm, maybe I should set it to check if corners.size() == 8, just to be sure?
+														   //Or maybe this isn't needed anymore because I run the UpdateBounds function before this one inside the Process() loop of this class?
+				return;
+			}
+
+			//find closest point on Box.
+			glm::mat4 transinv = glm::mat4(1.0f);
+			transinv = glm::inverse(boxColliderVector[j]->transWithoutScale);
+			glm::vec3 localSphereCenter = glm::vec3(transinv * glm::vec4(sphereColliderVector[i]->position, 1.0f)); //put sphere collider's position into box collider's local space using the inverse transform.
+
+			//https://gamedev.stackexchange.com/questions/157100/why-does-this-implementation-of-aabb-sphere-collision-ghost-collide-and-how-can
+			//https://gamedev.stackexchange.com/questions/156870/how-do-i-implement-a-aabb-sphere-collision
+			//helpful answers from DrewAtWork.
+			glm::vec3 q;
+			for (int i = 0; i < 3; i++) //find the closest point on box collider in relation to	the sphere's local position.
+			{							//could also square the values here as per DrewAtWork's answers to optimize calculations.
+				float v = localSphereCenter[i];
+				if (v < boxColliderVector[j]->extentsMin[i]) v = boxColliderVector[j]->extentsMin[i]; // v = max( v, b.min[i] )
+				if (v > boxColliderVector[j]->extentsMax[i]) v = boxColliderVector[j]->extentsMax[i]; // v = min( v, b.max[i] )
+				q[i] = v; //cursed, or I mean, that's one way to do it: set x when i = 0, y when i = 1, z when i = 2.
+			}
+			//glm::vec3 closestPointOnCubeSurface = glm::clamp(localSphereCenter, boxColliderVector[j]->extentsMin, boxColliderVector[j]->extentsMax); //essentialy does the same thing as for loop above.
+
+			float qDistance = glm::distance(localSphereCenter, q);
+			if (qDistance < sphereColliderVector[i]->radius) 
+			{
+				std::cout << "Sphere-Box collision detected!!" << std::endl;
+			}
+
+			//find closest point on line compared to closest point on box.
+
+			//I feel like this might be a little difficult because the closest point on the line can change as the Box's transform changes,
+			//and we can't use a fixed point to find the closest point on the Box as well, right? Need to think through this further.
+			std::cout << "Ray-Box collision detected!!" << std::endl;
+
 		}
 	}
 }
