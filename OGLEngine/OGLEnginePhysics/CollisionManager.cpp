@@ -104,7 +104,10 @@ void CollisionManager::Process()
 		BoxBoxTest();
 		SphereBoxTest();
 		RaySphereTest();
-		RayBoxTest();
+		if (RayBoxTest())
+		{
+			std::cout << "Ray-Box collision detected!!" << std::endl;
+		}
 	}
 }
 
@@ -209,7 +212,8 @@ void CollisionManager::RaySphereTest()
 	}
 }
 
-void CollisionManager::RayBoxTest() //a mix between the Sphere-Box test and the Ray-Sphere test. Or am I not thinking far enough ahead with this one?
+//https://www.opengl-tutorial.org/miscellaneous/clicking-on-objects/picking-with-custom-ray-obb-function/
+bool CollisionManager::RayBoxTest() //a mix between the Sphere-Box test and the Ray-Sphere test. Or am I not thinking far enough ahead with this one?
 {
 	for (int i = 0; i < raycastColliderVector.size(); i++)
 	{
@@ -218,39 +222,160 @@ void CollisionManager::RayBoxTest() //a mix between the Sphere-Box test and the 
 			if (!boxColliderVector[j]->corners.size() > 0) //takes a little while for a new box collider to fill the corners vector, this if check prevents a vector out of range error that's caused by this function running on a different thread compared to the box collider bounds update.
 			{											   //Hmm, maybe I should set it to check if corners.size() == 8, just to be sure?
 														   //Or maybe this isn't needed anymore because I run the UpdateBounds function before this one inside the Process() loop of this class?
-				return;
+				return false;
+			}
+			glm::vec3 rayOrigin = raycastColliderVector[i]->startPoint;
+			glm::vec3 rayDirection = glm::normalize(raycastColliderVector[i]->endPoint - raycastColliderVector[i]->startPoint);
+			float rayDistance = glm::distance(raycastColliderVector[i]->startPoint, raycastColliderVector[i]->endPoint);
+			glm::vec3 aabbMin = boxColliderVector[j]->extentsMin;
+			glm::vec3 aabbMax = boxColliderVector[j]->extentsMax;
+			glm::mat4 modelMatrix = boxColliderVector[j]->transWithoutScale; //scale would mess things up, just like with the SphereBoxTest().
+			float intersectionDistance;
+
+			float tMin = 0.0f;
+			float tMax = 100000.0f;
+
+			glm::vec3 OBBpositionWorldSpace = boxColliderVector[j]->position;
+			glm::vec3 OBBpositionWorldSpace2 = { modelMatrix[3].x, modelMatrix[3].y, modelMatrix[3].z };
+			glm::vec3 delta = OBBpositionWorldSpace - rayOrigin;
+
+			{ //WOAH!! you can scope variables with the same name in the same function by having extra brackets!!
+				glm::vec3 xaxis(modelMatrix[0].x, modelMatrix[0].y, modelMatrix[0].z); //wat.
+				float e = glm::dot(xaxis, delta);
+				float f = glm::dot(rayDirection, xaxis);
+
+				if (glm::abs(f) > 0.001f)
+				{
+					float t1 = (e + aabbMin.x) / f; //beware: don't do division if f is nearly 0.
+					float t2 = (e + aabbMax.x) / f; //beware: don't do division if f is nearly 0.
+
+					if (t1 > t2)
+					{
+						float w = t1;
+						t1 = t2;
+						t2 = w; //swap t1 and t2 if they're in the wrong order.
+					}
+
+					if (t2 < tMax)
+					{
+						tMax = t2;
+					}
+
+					if (t1 > tMin)
+					{
+						tMin = t1;
+					}
+
+					if (tMax < tMin)
+					{
+						//Not intersecting
+						return false;
+					}
+				}
+				else
+				{
+					if (-e + aabbMin.x > 0.0f || -e + aabbMax.x < 0.0f)
+					{
+						// "Not intersecting"...
+						return false;
+					}
+				}
+			}
+			{ //WOAH!! you can scope variables with the same name in the same function by having extra brackets!!
+				glm::vec3 yaxis(modelMatrix[1].x, modelMatrix[1].y, modelMatrix[1].z); //wat.
+				float e = glm::dot(yaxis, delta);
+				float f = glm::dot(rayDirection, yaxis);
+
+				if (glm::abs(f) > 0.001f)
+				{
+					float t1 = (e + aabbMin.y) / f; //beware: don't do division if f is nearly 0.
+					float t2 = (e + aabbMax.y) / f; //beware: don't do division if f is nearly 0.
+
+					if (t1 > t2)
+					{
+						float w = t1;
+						t1 = t2;
+						t2 = w; //swap t1 and t2 if they're in the wrong order.
+					}
+
+					if (t2 < tMax)
+					{
+						tMax = t2;
+					}
+
+					if (t1 > tMin)
+					{
+						tMin = t1;
+					}
+
+					if (tMax < tMin)
+					{
+						//Not intersecting
+						return false;
+					}
+				}
+				else
+				{
+					if (-e + aabbMin.y > 0.0f || -e + aabbMax.y < 0.0f)
+					{
+						// "Not intersecting"...
+						return false;
+					}
+				}
+			}
+			{ //WOAH!! you can scope variables with the same name in the same function by having extra brackets!!
+				glm::vec3 zaxis(modelMatrix[2].x, modelMatrix[2].y, modelMatrix[2].z); //wat.
+				float e = glm::dot(zaxis, delta);
+				float f = glm::dot(rayDirection, zaxis);
+
+				if (glm::abs(f) > 0.001f)
+				{
+					float t1 = (e + aabbMin.z) / f; //beware: don't do division if f is nearly 0.
+					float t2 = (e + aabbMax.z) / f; //beware: don't do division if f is nearly 0.
+
+					if (t1 > t2)
+					{
+						float w = t1;
+						t1 = t2;
+						t2 = w; //swap t1 and t2 if they're in the wrong order.
+					}
+
+					if (t2 < tMax)
+					{
+						tMax = t2;
+					}
+
+					if (t1 > tMin)
+					{
+						tMin = t1;
+					}
+
+					if (tMax < tMin)
+					{
+						//Not intersecting
+						return false;
+					}
+				}
+				else
+				{
+					if (-e + aabbMin.z > 0.0f || -e + aabbMax.z < 0.0f)
+					{
+						// "Not intersecting"...
+						return false;
+					}
+				}
 			}
 
-			//find closest point on Box.
-			glm::mat4 transinv = glm::mat4(1.0f);
-			transinv = glm::inverse(boxColliderVector[j]->transWithoutScale);
-			glm::vec3 localSphereCenter = glm::vec3(transinv * glm::vec4(sphereColliderVector[i]->position, 1.0f)); //put sphere collider's position into box collider's local space using the inverse transform.
-
-			//https://gamedev.stackexchange.com/questions/157100/why-does-this-implementation-of-aabb-sphere-collision-ghost-collide-and-how-can
-			//https://gamedev.stackexchange.com/questions/156870/how-do-i-implement-a-aabb-sphere-collision
-			//helpful answers from DrewAtWork.
-			glm::vec3 q;
-			for (int i = 0; i < 3; i++) //find the closest point on box collider in relation to	the sphere's local position.
-			{							//could also square the values here as per DrewAtWork's answers to optimize calculations.
-				float v = localSphereCenter[i];
-				if (v < boxColliderVector[j]->extentsMin[i]) v = boxColliderVector[j]->extentsMin[i]; // v = max( v, b.min[i] )
-				if (v > boxColliderVector[j]->extentsMax[i]) v = boxColliderVector[j]->extentsMax[i]; // v = min( v, b.max[i] )
-				q[i] = v; //cursed, or I mean, that's one way to do it: set x when i = 0, y when i = 1, z when i = 2.
-			}
-			//glm::vec3 closestPointOnCubeSurface = glm::clamp(localSphereCenter, boxColliderVector[j]->extentsMin, boxColliderVector[j]->extentsMax); //essentialy does the same thing as for loop above.
-
-			float qDistance = glm::distance(localSphereCenter, q);
-			if (qDistance < sphereColliderVector[i]->radius) 
+			//actually intersecting
+			intersectionDistance = tMin; //should check this, if I can use this to check if it's less than ray distance. Maybe I also need to calculate ray distance here, like I'm doing with ray direction.
+			if (intersectionDistance < rayDistance) //collision!
 			{
-				std::cout << "Sphere-Box collision detected!!" << std::endl;
+				return true; //okay so RayBoxTest() now works! Everything from different positions on both Ray and Box, as well as rotation and scale on Box. Just one problem, the line that's being tested is infinite in length from the startPoint.
 			}
-
-			//find closest point on line compared to closest point on box.
-
-			//I feel like this might be a little difficult because the closest point on the line can change as the Box's transform changes,
-			//and we can't use a fixed point to find the closest point on the Box as well, right? Need to think through this further.
-			std::cout << "Ray-Box collision detected!!" << std::endl;
-
+			else
+			{
+				return false;
+			}
 		}
 	}
 }

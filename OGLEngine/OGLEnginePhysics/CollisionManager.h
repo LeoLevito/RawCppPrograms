@@ -5,6 +5,7 @@
 #include "BoxCollider.h"
 #include "RaycastCollider.h"
 #include "MeshColliderSAT.h"
+#include <glm.hpp>
 
 struct MinMax
 {
@@ -50,7 +51,7 @@ public:
 	void SphereBoxTest();
 	void BoxBoxTest();
 	void RaySphereTest();
-	void RayBoxTest();
+	bool RayBoxTest();
 	bool FindMaxMinProjectionAB(BoxCollider& boxA, BoxCollider& boxB);
 
 	int runFindAmount2 = 0;

@@ -61,9 +61,7 @@ void RaycastCollider::Update()
 		ShaderManager::Get().shader->SetVector3(Camera::Get().myPosition, "viewPos"); //Doesn't really make sense to update this here but whatever.
 	}
 
-	//mesh->Draw();
-
-	if (drawDebugLine) //MEMORY LEAK!!!
+	if (drawDebugLine)
 	{
 		glm::vec3 vert1 = startPoint;
 		glm::vec3 vert2 = endPoint;
@@ -116,7 +114,7 @@ void RaycastCollider::DrawImgui()
 		{
 			if (ImGui::DragFloat3("Specify direction", &direction.x, .01f));
 		}
-		CalculateStartAndEndPoints();
+		CalculateStartAndEndPoints(); //Issue with this is that it only updates if we have the collider component open in the hierarchy ImGui window. Should just move this to update.
 	}
 	if (!usePositionAsStartPoint)
 	{
