@@ -190,6 +190,7 @@ void CollisionManager::BoxBoxTest()
 	}
 }
 
+//https://stackoverflow.com/a/62872782
 void CollisionManager::RaySphereTest()
 {
 	for (int i = 0; i < raycastColliderVector.size(); i++)
