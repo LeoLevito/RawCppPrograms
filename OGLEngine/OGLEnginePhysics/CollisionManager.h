@@ -32,7 +32,7 @@ public:
 
 	//add, 
 	//remove
-	Collider* AddNewCollider(ColliderType type, GameObject& owner);
+	Collider* AddNewCollider(ColliderType type, GameObject& topParent, ColliderComponent& parent);
 	void DeleteCollider(ColliderType type, Collider* collider);
 
 
@@ -58,6 +58,8 @@ public:
 	int runFindAmount1 = 0;
 
 	float myPi = glm::atan(1) * 4;
+
+	bool doOnce = false;
 private:
 };
 

@@ -9,6 +9,7 @@
 #include "MeshComponent.h"
 #include "LightComponent.h"
 #include "ColliderComponent.h"
+#include "RigidbodyComponent.h"
 
 
 GameObject::GameObject()
@@ -53,7 +54,7 @@ void GameObject::DrawObjectSpecificImGuiHierarchyAdjustables(std::vector<GameObj
 	}
 
 	static int selectedComponent = -1;
-	const char* componentNames[] = { "Transform component", "Mesh component", "Light component", "Collider component"};
+	const char* componentNames[] = { "Transform component", "Mesh component", "Light component", "Collider component", "Rigidbody component"};
 	if (ImGui::Button("Add component"))
 	{
 		ImGui::OpenPopup("Component popup");
@@ -84,6 +85,10 @@ void GameObject::DrawObjectSpecificImGuiHierarchyAdjustables(std::vector<GameObj
 				else if (i == 3)
 				{
 					AddComponent(new ColliderComponent);
+				}
+				else if (i == 4)
+				{
+					AddComponent(new RigidbodyComponent);
 				}
 			}
 			//ImGui::EndDisabled();

@@ -11,7 +11,7 @@
 ColliderComponent::ColliderComponent()
 {
 	name = "Collider component";
-	myCollider = CollisionManager::Get().AddNewCollider(ColliderType::SphereType, *owner);
+	myCollider = CollisionManager::Get().AddNewCollider(ColliderType::SphereType, *owner, *this);
 
 }
 
@@ -75,19 +75,19 @@ void ColliderComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 				{
 				case 0:
 					CollisionManager::Get().DeleteCollider(myCollider->type, myCollider);
-					myCollider = CollisionManager::Get().AddNewCollider(ColliderType::SphereType, *owner);
+					myCollider = CollisionManager::Get().AddNewCollider(ColliderType::SphereType, *owner, *this);
 					break;
 				case 1:
 					CollisionManager::Get().DeleteCollider(myCollider->type, myCollider);
-					myCollider = CollisionManager::Get().AddNewCollider(ColliderType::BoxType, *owner);
+					myCollider = CollisionManager::Get().AddNewCollider(ColliderType::BoxType, *owner, *this);
 					break;
 				case 2:
 					CollisionManager::Get().DeleteCollider(myCollider->type, myCollider);
-					myCollider = CollisionManager::Get().AddNewCollider(ColliderType::MeshType, *owner);
+					myCollider = CollisionManager::Get().AddNewCollider(ColliderType::MeshType, *owner, *this);
 					break;
 				case 3:
 					CollisionManager::Get().DeleteCollider(myCollider->type, myCollider);
-					myCollider = CollisionManager::Get().AddNewCollider(ColliderType::RaycastType, *owner);
+					myCollider = CollisionManager::Get().AddNewCollider(ColliderType::RaycastType, *owner, *this);
 					break;
 				default:
 					break;

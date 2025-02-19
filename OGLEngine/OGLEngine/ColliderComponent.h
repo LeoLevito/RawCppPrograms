@@ -1,6 +1,7 @@
 #pragma once
 #include "Component.h"
 #include "Collider.h"
+#include "RigidbodyComponent.h"
 
 //class Collider;
 
@@ -20,6 +21,7 @@ public:
 	int selectedType = 0;
 
 	Collider* myCollider;
+	RigidbodyComponent* myRigidbody;
 private:
 
 };

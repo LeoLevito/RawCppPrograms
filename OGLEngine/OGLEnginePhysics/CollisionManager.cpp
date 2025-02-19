@@ -4,7 +4,9 @@
 #include <numbers> //for getting pi.
 #include <cmath> //for getting pi.
 #include <gtc/matrix_transform.hpp>
-
+#include <GameObject.h>
+#include "RigidbodyComponent.h"
+#include "ColliderComponent.h"
 
 CollisionManager::CollisionManager()
 {
@@ -20,7 +22,7 @@ CollisionManager& CollisionManager::Get()
 	return instance;
 }
 
-Collider* CollisionManager::AddNewCollider(ColliderType type, GameObject& owner)
+Collider* CollisionManager::AddNewCollider(ColliderType type, GameObject& topParent, ColliderComponent& parent)
 {
 	switch (type)
 	{
@@ -29,6 +31,7 @@ Collider* CollisionManager::AddNewCollider(ColliderType type, GameObject& owner)
 		SphereCollider* sphereCollider = new SphereCollider();
 		sphereColliderVector.push_back(sphereCollider);
 		sphereCollider->type = type;
+		sphereCollider->parent = &parent;
 		return sphereCollider;
 	}
 	case ColliderType::BoxType:
@@ -43,7 +46,7 @@ Collider* CollisionManager::AddNewCollider(ColliderType type, GameObject& owner)
 		MeshColliderSAT* meshCollider = new MeshColliderSAT();
 		meshColliderSATVector.push_back(meshCollider);
 		meshCollider->type = type;
-		meshCollider->topParent = &owner;
+		meshCollider->topParent = &topParent;
 		return meshCollider;
 		break;
 	}
@@ -74,7 +77,6 @@ void CollisionManager::DeleteCollider(ColliderType type, Collider* collider)
 		break;
 	case ColliderType::RaycastType:
 		raycastColliderVector.erase(std::remove(raycastColliderVector.begin(), raycastColliderVector.end(), collider));
-
 		break;
 	default:
 		break;
@@ -104,10 +106,7 @@ void CollisionManager::Process()
 		BoxBoxTest();
 		SphereBoxTest();
 		RaySphereTest();
-		if (RayBoxTest())
-		{
-			std::cout << "Ray-Box collision detected!!" << std::endl;
-		}
+		RayBoxTest();
 	}
 }
 
@@ -117,13 +116,35 @@ void CollisionManager::SphereSphereTest()
 	{
 		for (int j = i + 1; j < sphereColliderVector.size(); j++)
 		{
+			
 			//do collision test.
 			float distance = glm::distance(sphereColliderVector[i]->position, sphereColliderVector[j]->position); //apparently you can save a square root by calculating the squared distance and comparing it with a squared radius. I don't think i've done this right now. Might do it in the future.
 			float margin = sphereColliderVector[i]->radius + sphereColliderVector[j]->radius;
 
 			if (distance < margin)
 			{
-				std::cout << "Distance: " << distance << " margin: " << margin << " two spheres currently colliding." << std::endl;
+
+				if (doOnce == false) //why do I need to do this?
+				{
+					//https://www.youtube.com/watch?v=1L2g4ZqmFLQ
+					glm::vec3 collisionNormal = glm::normalize(sphereColliderVector[i]->position - sphereColliderVector[j]->position); //are we sure this is the actual normal?
+					glm::vec3 relativeVelocity = sphereColliderVector[i]->parent->myRigidbody->velocity - sphereColliderVector[j]->parent->myRigidbody->velocity;
+					float restitution = 1.5f; //something is not right with the restitution, should be only 0-1. as per the video.
+
+					float impulseMagnitude = ((-(1 + restitution) * glm::dot(relativeVelocity, collisionNormal)) / ((1.0f / sphereColliderVector[i]->parent->myRigidbody->mass) + (1.0f / sphereColliderVector[j]->parent->myRigidbody->mass)));
+					glm::vec3 impulseDirection = collisionNormal;
+
+					glm::vec3 impulse = impulseDirection * impulseMagnitude;
+
+					sphereColliderVector[i]->parent->myRigidbody->velocity += impulse;
+					sphereColliderVector[j]->parent->myRigidbody->velocity -= impulse;
+					std::cout << "Sphere-Box collision detected!!" << std::endl;
+					doOnce = true;
+				}
+			}
+			else 
+			{
+				doOnce = false;
 			}
 		}
 	}
@@ -207,7 +228,6 @@ void CollisionManager::RaySphereTest()
 			if (distanceBetweenSphereAndClosestPoint < sphereColliderVector[j]->radius)
 			{
 				std::cout << "Ray-Sphere collision detected!!" << std::endl;
-
 			}
 		}
 	}
@@ -371,6 +391,7 @@ bool CollisionManager::RayBoxTest() //a mix between the Sphere-Box test and the 
 			intersectionDistance = tMin; //should check this, if I can use this to check if it's less than ray distance. Maybe I also need to calculate ray distance here, like I'm doing with ray direction.
 			if (intersectionDistance < rayDistance) //collision!
 			{
+				std::cout << "Ray-Box collision detected!!" << std::endl;
 				return true; //okay so RayBoxTest() now works! Everything from different positions on both Ray and Box, as well as rotation and scale on Box. Just one problem, the line that's being tested is infinite in length from the startPoint.
 			}
 			else

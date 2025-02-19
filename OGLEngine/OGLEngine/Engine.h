@@ -11,16 +11,18 @@ public:
 	static Engine& Get();
 
 	void Initialize(GLFWwindow* window, Camera* camera);
-	void Update(GLFWwindow* window, float deltaTime);
+	void Update(GLFWwindow* window, float inDeltaTime);
 	float lastX;
 	float lastY;
 	FlyingCamera* myFlyingCamera;
+	float deltaTime;
 private:
 	Graphics* graphics;
 	Engine* engine;
 	Input* myInput;
 
 	EngineTime* myEngineTime;
+
 	bool DoOnce = false;
 
 };

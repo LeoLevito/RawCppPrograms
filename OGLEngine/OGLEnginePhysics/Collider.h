@@ -28,6 +28,7 @@ public:
 	virtual void SetScale(glm::vec3 scaleIn);
 
 	GameObject* topParent = nullptr;
+	ColliderComponent* parent = nullptr;
 
 	virtual void Update();
 	virtual void DrawImgui();

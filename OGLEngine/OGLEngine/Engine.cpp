@@ -14,7 +14,7 @@ void Engine::Initialize(GLFWwindow* window, Camera* camera)
 	myFlyingCamera->RotateCamera(true);
 }
 
-void Engine::Update(GLFWwindow* window, float deltaTime)
+void Engine::Update(GLFWwindow* window, float inDeltaTime)
 {
 	if (myInput->IsMouseButtonDown(GLFW_MOUSE_BUTTON_2))
 	{
@@ -35,4 +35,5 @@ void Engine::Update(GLFWwindow* window, float deltaTime)
 	}
 	myFlyingCamera->Update();
 	myEngineTime->UpdateDeltaTime(deltaTime);
+	deltaTime = inDeltaTime;
 }

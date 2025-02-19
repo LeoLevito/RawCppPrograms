@@ -9,7 +9,7 @@ public:
 
 	virtual void DrawImgui() override;
 
-	glm::vec3 position{ glm::vec3(0.0f,0.0f,0.0f) };
+	glm::vec3 position{ 0.0f,0.0f,0.0f };
 	float radius{ 1.0f };
 private:
 };

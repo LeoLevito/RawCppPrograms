@@ -117,6 +117,9 @@
     <ClCompile Include="ColliderComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
+    <ClCompile Include="RigidbodyComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Component.h">
@@ -201,6 +204,9 @@
       <Filter>Messaging</Filter>
     </ClInclude>
     <ClInclude Include="ColliderComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="RigidbodyComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
   </ItemGroup>
