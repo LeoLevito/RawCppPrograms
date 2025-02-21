@@ -22,7 +22,8 @@ public:
 	float gravityMultiplier = 1.0f;
 	bool useGravity;
 	bool isKinematic;
-	float mass = 1.0f;;
+	float mass = 1.0f;
+	float restitution = 0.1f; //this is just supposed to be between 0 and one.
 
 	bool setupMyRigidbody = false;
 private:

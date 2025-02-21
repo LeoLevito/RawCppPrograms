@@ -20,7 +20,7 @@ RigidbodyComponent::~RigidbodyComponent()
 
 void RigidbodyComponent::Update()
 {
-	if (useGravity)
+	if (useGravity) //move this check somewhere else, we should be checking isKinematic first, apply any velocities to the position and then do the gravity check and if it's true then we also apply gravity to the velocities.
 	{
 		for (size_t i = 0; i < owner->components.size(); i++)
 		{
@@ -54,7 +54,12 @@ void RigidbodyComponent::Update()
 void RigidbodyComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 {
 	Component::DrawComponentSpecificImGuiHierarchyAdjustables();
-	if (ImGui::Checkbox("Use Gravity", &useGravity))
+
+	if (ImGui::Checkbox("Is kinematic", &isKinematic))
+	{
+	}
+
+	if (ImGui::Checkbox("Use gravity", &useGravity))
 	{
 	}
 
@@ -64,6 +69,14 @@ void RigidbodyComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 	}
 
 	if (ImGui::DragFloat("Gravity multiplier", &gravityMultiplier, .01f))
+	{
+	}
+
+	if (ImGui::DragFloat("Mass", &mass, .01f))
+	{
+	}
+
+	if (ImGui::DragFloat("Restitution", &restitution, .01f))
 	{
 	}
 }

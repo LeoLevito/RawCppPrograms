@@ -36,7 +36,7 @@ void GameObject::AddComponent(Component* component)
 	components.push_back(component);
 }
 
-void GameObject::Update() 
+void GameObject::Update()
 {
 	for (int i = 0; i < components.size(); i++)
 	{
@@ -54,7 +54,7 @@ void GameObject::DrawObjectSpecificImGuiHierarchyAdjustables(std::vector<GameObj
 	}
 
 	static int selectedComponent = -1;
-	const char* componentNames[] = { "Transform component", "Mesh component", "Light component", "Collider component", "Rigidbody component"};
+	const char* componentNames[] = { "Transform component", "Mesh component", "Light component", "Collider component", "Rigidbody component" };
 	if (ImGui::Button("Add component"))
 	{
 		ImGui::OpenPopup("Component popup");
@@ -67,14 +67,14 @@ void GameObject::DrawObjectSpecificImGuiHierarchyAdjustables(std::vector<GameObj
 		for (int i = 0; i < IM_ARRAYSIZE(componentNames); i++)
 		{
 			//ImGui::BeginDisabled();
-			if (ImGui::Selectable(componentNames[i])) 
+			if (ImGui::Selectable(componentNames[i]))
 			{
 				selectedComponent = i;
 				if (i == 0) // need to streamline this.
 				{
 					AddComponent(new TransformComponent);
 				}
-				else if (i == 1) 
+				else if (i == 1)
 				{
 					AddComponent(new MeshComponent);
 				}
@@ -94,6 +94,15 @@ void GameObject::DrawObjectSpecificImGuiHierarchyAdjustables(std::vector<GameObj
 			//ImGui::EndDisabled();
 		}
 		ImGui::EndPopup();
+	}
+
+	if (ImGui::Button("Add EVERY component"))
+	{
+		AddComponent(new TransformComponent);
+		AddComponent(new MeshComponent);
+		AddComponent(new LightComponent);
+		AddComponent(new ColliderComponent);
+		AddComponent(new RigidbodyComponent);
 	}
 
 

@@ -6,6 +6,10 @@ SphereCollider::SphereCollider()
 
 void SphereCollider::SetPosition(glm::vec3 pos)
 {
+	if (hasGotFirstPosition == false) 
+	{
+		hasGotFirstPosition = true;
+	}
 	position = pos;
 }
 

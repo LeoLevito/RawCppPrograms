@@ -39,6 +39,7 @@ Collider* CollisionManager::AddNewCollider(ColliderType type, GameObject& topPar
 		BoxCollider* boxCollider = new BoxCollider();
 		boxColliderVector.push_back(boxCollider);
 		boxCollider->type = type;
+		boxCollider->parent = &parent;
 		return boxCollider;
 	}
 	case ColliderType::MeshType:
@@ -116,35 +117,41 @@ void CollisionManager::SphereSphereTest()
 	{
 		for (int j = i + 1; j < sphereColliderVector.size(); j++)
 		{
-			
+			if (!sphereColliderVector[j]->hasGotFirstPosition) //takes a little while for a new box collider to fill the corners vector, this if check prevents a vector out of range error that's caused by this function running on a different thread compared to the box collider bounds update.
+			{											   //Hmm, maybe I should set it to check if corners.size() == 8, just to be sure?
+														   //Or maybe this isn't needed anymore because I run the UpdateBounds function before this one inside the Process() loop of this class?
+				return;
+			}
 			//do collision test.
 			float distance = glm::distance(sphereColliderVector[i]->position, sphereColliderVector[j]->position); //apparently you can save a square root by calculating the squared distance and comparing it with a squared radius. I don't think i've done this right now. Might do it in the future.
-			float margin = sphereColliderVector[i]->radius + sphereColliderVector[j]->radius;
+			float margin = sphereColliderVector[i]->radius + sphereColliderVector[j]->radius; //multithreading error here, when changing one of two sphere colliders to a box collider, this line will try to access the now deleted sphere collider thus causing an error. May be worsened with higher framerates.
 
 			if (distance < margin)
 			{
+				std::cout << "Sphere-Box collision detected!!" << std::endl;
 
-				if (doOnce == false) //why do I need to do this?
+				//https://www.youtube.com/watch?v=1L2g4ZqmFLQ, and Engine Physics lecture 4 by Martin.
+				glm::vec3 collisionNormal = glm::normalize(sphereColliderVector[i]->position - sphereColliderVector[j]->position); //are we sure this is the actual normal?
+				glm::vec3 relativeVelocity = sphereColliderVector[i]->parent->myRigidbody->velocity - sphereColliderVector[j]->parent->myRigidbody->velocity;
+				//float dotVelocityAlongNormal = glm::dot(relativeVelocity, collisionNormal);
+
+				float restitution = glm::min(sphereColliderVector[i]->parent->myRigidbody->restitution, sphereColliderVector[j]->parent->myRigidbody->restitution); //something is not right with the restitution, should be only 0-1. as per the video.
+
+				float impulseMagnitude = -(1 + restitution) * glm::dot(relativeVelocity, collisionNormal) / (1.0f / sphereColliderVector[i]->parent->myRigidbody->mass) + (1.0f / sphereColliderVector[j]->parent->myRigidbody->mass);
+				glm::vec3 impulseDirection = collisionNormal;
+
+				glm::vec3 impulse = impulseDirection * impulseMagnitude;
+
+				if (!sphereColliderVector[i]->parent->myRigidbody->isKinematic)
 				{
-					//https://www.youtube.com/watch?v=1L2g4ZqmFLQ
-					glm::vec3 collisionNormal = glm::normalize(sphereColliderVector[i]->position - sphereColliderVector[j]->position); //are we sure this is the actual normal?
-					glm::vec3 relativeVelocity = sphereColliderVector[i]->parent->myRigidbody->velocity - sphereColliderVector[j]->parent->myRigidbody->velocity;
-					float restitution = 1.5f; //something is not right with the restitution, should be only 0-1. as per the video.
-
-					float impulseMagnitude = ((-(1 + restitution) * glm::dot(relativeVelocity, collisionNormal)) / ((1.0f / sphereColliderVector[i]->parent->myRigidbody->mass) + (1.0f / sphereColliderVector[j]->parent->myRigidbody->mass)));
-					glm::vec3 impulseDirection = collisionNormal;
-
-					glm::vec3 impulse = impulseDirection * impulseMagnitude;
-
 					sphereColliderVector[i]->parent->myRigidbody->velocity += impulse;
-					sphereColliderVector[j]->parent->myRigidbody->velocity -= impulse;
-					std::cout << "Sphere-Box collision detected!!" << std::endl;
-					doOnce = true;
 				}
-			}
-			else 
-			{
-				doOnce = false;
+
+				if (!sphereColliderVector[j]->parent->myRigidbody->isKinematic)
+				{
+					sphereColliderVector[j]->parent->myRigidbody->velocity -= impulse;
+				}
+
 			}
 		}
 	}
@@ -163,16 +170,16 @@ void CollisionManager::SphereBoxTest()
 			}
 
 			glm::mat4 transinv = glm::mat4(1.0f);
-			transinv = glm::inverse(boxColliderVector[j]->transWithoutScale); 
+			transinv = glm::inverse(boxColliderVector[j]->transWithoutScale);
 			glm::vec3 localSphereCenter = glm::vec3(transinv * glm::vec4(sphereColliderVector[i]->position, 1.0f)); //put sphere collider's position into box collider's local space using the inverse transform.
-			
+
 			//https://gamedev.stackexchange.com/questions/157100/why-does-this-implementation-of-aabb-sphere-collision-ghost-collide-and-how-can
 			//https://gamedev.stackexchange.com/questions/156870/how-do-i-implement-a-aabb-sphere-collision
 			//helpful answers from DrewAtWork.
 			glm::vec3 q;
 			for (int i = 0; i < 3; i++) //find the closest point on box collider in relation to	the sphere's local position.
 			{							//could also square the values here as per DrewAtWork's answers to optimize calculations.
-				float v = localSphereCenter[i]; 
+				float v = localSphereCenter[i];
 				if (v < boxColliderVector[j]->extentsMin[i]) v = boxColliderVector[j]->extentsMin[i]; // v = max( v, b.min[i] )
 				if (v > boxColliderVector[j]->extentsMax[i]) v = boxColliderVector[j]->extentsMax[i]; // v = min( v, b.max[i] )
 				q[i] = v; //cursed, or I mean, that's one way to do it: set x when i = 0, y when i = 1, z when i = 2.
@@ -180,9 +187,36 @@ void CollisionManager::SphereBoxTest()
 			//glm::vec3 closestPointOnCubeSurface = glm::clamp(localSphereCenter, boxColliderVector[j]->extentsMin, boxColliderVector[j]->extentsMax); //essentialy does the same thing as for loop above.
 
 			float qDistance = glm::distance(localSphereCenter, q);
-			if (qDistance < sphereColliderVector[i]->radius) 
+			if (qDistance < sphereColliderVector[i]->radius)
 			{
-				std::cout << "Sphere-Box collision detected!!" << std::endl; 
+				std::cout << "Sphere-Box collision detected!!" << std::endl;
+				
+				glm::vec3 qInWorldSpace = glm::vec3(boxColliderVector[j]->transWithoutScale * glm::vec4(q, 1.0f)); //(?);
+
+				//https://www.youtube.com/watch?v=1L2g4ZqmFLQ, and Engine Physics lecture 4 by Martin.
+				glm::vec3 collisionNormal = glm::normalize(sphereColliderVector[i]->position - qInWorldSpace);
+				glm::vec3 relativeVelocity = sphereColliderVector[i]->parent->myRigidbody->velocity - boxColliderVector[j]->parent->myRigidbody->velocity;
+				float dotVelocityAlongNormal = glm::dot(relativeVelocity, collisionNormal);
+				if (dotVelocityAlongNormal < 0)
+				{
+					float restitution = glm::min(sphereColliderVector[i]->parent->myRigidbody->restitution, boxColliderVector[j]->parent->myRigidbody->restitution); //something is not right with the restitution, should be only 0-1. as per the video.
+
+					float impulseMagnitude = -(1 + restitution) * glm::dot(relativeVelocity, collisionNormal) / (1.0f / sphereColliderVector[i]->parent->myRigidbody->mass) + (1.0f / boxColliderVector[j]->parent->myRigidbody->mass);
+					glm::vec3 impulseDirection = collisionNormal;
+
+					glm::vec3 impulse = impulseDirection * impulseMagnitude;
+
+					if (!sphereColliderVector[i]->parent->myRigidbody->isKinematic)
+					{
+						sphereColliderVector[i]->parent->myRigidbody->velocity += impulse;
+					}
+
+					if (!boxColliderVector[j]->parent->myRigidbody->isKinematic)
+					{
+						boxColliderVector[j]->parent->myRigidbody->velocity -= impulse;
+					}
+				}
+
 			}
 		}
 	}
@@ -238,7 +272,7 @@ bool CollisionManager::RayBoxTest() //a mix between the Sphere-Box test and the 
 {
 	for (int i = 0; i < raycastColliderVector.size(); i++)
 	{
-		for (int j = 0; j < boxColliderVector.size(); j++) 
+		for (int j = 0; j < boxColliderVector.size(); j++)
 		{
 			if (!boxColliderVector[j]->corners.size() > 0) //takes a little while for a new box collider to fill the corners vector, this if check prevents a vector out of range error that's caused by this function running on a different thread compared to the box collider bounds update.
 			{											   //Hmm, maybe I should set it to check if corners.size() == 8, just to be sure?
@@ -463,4 +497,5 @@ bool CollisionManager::FindMaxMinProjectionAB(BoxCollider& boxA, BoxCollider& bo
 		}
 	}
 	return true; //we didn't find a separating axis / separating plane, the two box colliders must be colliding!
+	//But where are we colliding?
 }
