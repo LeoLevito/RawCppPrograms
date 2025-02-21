@@ -11,7 +11,7 @@
 RigidbodyComponent::RigidbodyComponent()
 {
 	name = "Rigidbody component";
-	
+
 }
 
 RigidbodyComponent::~RigidbodyComponent()
@@ -20,23 +20,6 @@ RigidbodyComponent::~RigidbodyComponent()
 
 void RigidbodyComponent::Update()
 {
-	if (useGravity) //move this check somewhere else, we should be checking isKinematic first, apply any velocities to the position and then do the gravity check and if it's true then we also apply gravity to the velocities.
-	{
-		for (size_t i = 0; i < owner->components.size(); i++)
-		{
-			if (dynamic_cast<TransformComponent*>(owner->components[i])) //checking if owner has a component of type TransformComponent. Is of-type correct word-use in this case?
-			{
-				//multiple casts, in UPDATE()? not sure how efficient this is. EDIT 5 dec 2024, apparently this dynamic_cast is better than other types of casts, even Emil has used them multiple times.
-				velocity += gravity * gravityMultiplier * Engine::Get().deltaTime;
-				dynamic_cast<TransformComponent*>(owner->components[i])->position += velocity * Engine::Get().deltaTime; //multiplying again with delta time results in the proper acceleration of gravity... in theory.
-			}
-		}
-	}
-	else 
-	{
-		velocity = { 0,0,0 };
-	}
-
 	if (owner != nullptr && setupMyRigidbody == false)
 	{
 		for (size_t i = 0; i < owner->components.size(); i++) //too early.
@@ -78,5 +61,43 @@ void RigidbodyComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 
 	if (ImGui::DragFloat("Restitution", &restitution, .01f))
 	{
+	}
+}
+
+void RigidbodyComponent::ApplyVelocity(float deltaTime, glm::vec3 velocityToAdd)
+{
+	if (isKinematic)
+	{
+		velocity = { 0,0,0 };
+	}
+	else
+	{
+		velocity += velocityToAdd;
+		//for (size_t i = 0; i < owner->components.size(); i++)
+		//{
+		//	if (dynamic_cast<TransformComponent*>(owner->components[i])) //checking if owner has a component of type TransformComponent. Is of-type correct word-use in this case?
+		//	{
+		//		//multiple casts, in UPDATE()? not sure how efficient this is. EDIT 5 dec 2024, apparently this dynamic_cast is better than other types of casts, even Emil has used them multiple times.
+
+		//		dynamic_cast<TransformComponent*>(owner->components[i])->position += velocity * deltaTime; //multiplying again with delta time results in the proper acceleration of gravity... in theory.
+		//	}
+		//}
+	}
+}
+
+void RigidbodyComponent::ApplyGravity(float deltaTime)
+{
+	if (useGravity) //move this check somewhere else, we should be checking isKinematic first, apply any velocities to the position and then do the gravity check and if it's true then we also apply gravity to the velocities.
+	{
+		velocity += gravity * gravityMultiplier * deltaTime;
+		for (size_t i = 0; i < owner->components.size(); i++)
+		{
+			if (dynamic_cast<TransformComponent*>(owner->components[i])) //checking if owner has a component of type TransformComponent. Is of-type correct word-use in this case?
+			{
+				//multiple casts, in UPDATE()? not sure how efficient this is. EDIT 5 dec 2024, apparently this dynamic_cast is better than other types of casts, even Emil has used them multiple times.
+
+				dynamic_cast<TransformComponent*>(owner->components[i])->position += velocity * deltaTime; //multiplying again with delta time results in the proper acceleration of gravity... in theory.
+			}
+		}
 	}
 }

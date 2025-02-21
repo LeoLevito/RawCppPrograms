@@ -10,6 +10,9 @@ public:
 	void Update() override;
 	void DrawComponentSpecificImGuiHierarchyAdjustables() override;
 
+	void ApplyVelocity(float deltaTime, glm::vec3 velocityToAdd);
+	void ApplyGravity(float deltaTime);
+
 
 	glm::vec3 position;
 	glm::vec3 rotation;

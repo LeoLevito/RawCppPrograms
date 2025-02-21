@@ -7,6 +7,7 @@
 #include <GameObject.h>
 #include "RigidbodyComponent.h"
 #include "ColliderComponent.h"
+#include <thread>
 
 CollisionManager::CollisionManager()
 {
@@ -87,8 +88,9 @@ void CollisionManager::DeleteCollider(ColliderType type, Collider* collider)
 
 void CollisionManager::Process()
 {
-	while (shouldRun)
+	while (shouldRun) //what happens if I limit this to say every 50th of a second?
 	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(20));
 		//ProcessMessages();
 
 		if (boxColliderVector.size() > 0)
@@ -108,6 +110,16 @@ void CollisionManager::Process()
 		SphereBoxTest();
 		RaySphereTest();
 		RayBoxTest();
+
+		for (int i = 0; i < sphereColliderVector.size(); i++)
+		{
+			sphereColliderVector[i]->parent->myRigidbody->ApplyGravity(0.02f);
+		}
+
+		for (int i = 0; i < boxColliderVector.size(); i++)
+		{
+			boxColliderVector[i]->parent->myRigidbody->ApplyGravity(0.02f);
+		}
 	}
 }
 
@@ -133,25 +145,28 @@ void CollisionManager::SphereSphereTest()
 				//https://www.youtube.com/watch?v=1L2g4ZqmFLQ, and Engine Physics lecture 4 by Martin.
 				glm::vec3 collisionNormal = glm::normalize(sphereColliderVector[i]->position - sphereColliderVector[j]->position); //are we sure this is the actual normal?
 				glm::vec3 relativeVelocity = sphereColliderVector[i]->parent->myRigidbody->velocity - sphereColliderVector[j]->parent->myRigidbody->velocity;
-				//float dotVelocityAlongNormal = glm::dot(relativeVelocity, collisionNormal);
-
-				float restitution = glm::min(sphereColliderVector[i]->parent->myRigidbody->restitution, sphereColliderVector[j]->parent->myRigidbody->restitution); //something is not right with the restitution, should be only 0-1. as per the video.
-
-				float impulseMagnitude = -(1 + restitution) * glm::dot(relativeVelocity, collisionNormal) / (1.0f / sphereColliderVector[i]->parent->myRigidbody->mass) + (1.0f / sphereColliderVector[j]->parent->myRigidbody->mass);
-				glm::vec3 impulseDirection = collisionNormal;
-
-				glm::vec3 impulse = impulseDirection * impulseMagnitude;
-
-				if (!sphereColliderVector[i]->parent->myRigidbody->isKinematic)
+				float dotVelocityAlongNormal = glm::dot(relativeVelocity, collisionNormal);
+				if (dotVelocityAlongNormal < 0) //if moving toward each other.
 				{
-					sphereColliderVector[i]->parent->myRigidbody->velocity += impulse;
-				}
+					float restitution = glm::min(sphereColliderVector[i]->parent->myRigidbody->restitution, sphereColliderVector[j]->parent->myRigidbody->restitution); //something is not right with the restitution, should be only 0-1. as per the video.
 
-				if (!sphereColliderVector[j]->parent->myRigidbody->isKinematic)
-				{
-					sphereColliderVector[j]->parent->myRigidbody->velocity -= impulse;
-				}
+					float impulseMagnitude = -(1 + restitution) * glm::dot(relativeVelocity, collisionNormal) / (1.0f / sphereColliderVector[i]->parent->myRigidbody->mass) + (1.0f / sphereColliderVector[j]->parent->myRigidbody->mass);
+					glm::vec3 impulseDirection = collisionNormal;
 
+					glm::vec3 impulse = impulseDirection * impulseMagnitude;
+
+					if (!sphereColliderVector[i]->parent->myRigidbody->isKinematic)
+					{
+						sphereColliderVector[i]->parent->myRigidbody->ApplyVelocity(0.02f, impulse);
+						//sphereColliderVector[i]->parent->myRigidbody->velocity += impulse;
+					}
+
+					if (!sphereColliderVector[j]->parent->myRigidbody->isKinematic)
+					{
+						sphereColliderVector[j]->parent->myRigidbody->ApplyVelocity(0.02f, -impulse);
+						//sphereColliderVector[j]->parent->myRigidbody->velocity -= impulse;
+					}
+				}
 			}
 		}
 	}
@@ -197,7 +212,7 @@ void CollisionManager::SphereBoxTest()
 				glm::vec3 collisionNormal = glm::normalize(sphereColliderVector[i]->position - qInWorldSpace);
 				glm::vec3 relativeVelocity = sphereColliderVector[i]->parent->myRigidbody->velocity - boxColliderVector[j]->parent->myRigidbody->velocity;
 				float dotVelocityAlongNormal = glm::dot(relativeVelocity, collisionNormal);
-				if (dotVelocityAlongNormal < 0)
+				if (dotVelocityAlongNormal < 0) //if moving toward each other.
 				{
 					float restitution = glm::min(sphereColliderVector[i]->parent->myRigidbody->restitution, boxColliderVector[j]->parent->myRigidbody->restitution); //something is not right with the restitution, should be only 0-1. as per the video.
 
@@ -208,12 +223,14 @@ void CollisionManager::SphereBoxTest()
 
 					if (!sphereColliderVector[i]->parent->myRigidbody->isKinematic)
 					{
-						sphereColliderVector[i]->parent->myRigidbody->velocity += impulse;
+						sphereColliderVector[i]->parent->myRigidbody->ApplyVelocity(0.02f, impulse);
+						//sphereColliderVector[i]->parent->myRigidbody->velocity += impulse;
 					}
 
 					if (!boxColliderVector[j]->parent->myRigidbody->isKinematic)
 					{
-						boxColliderVector[j]->parent->myRigidbody->velocity -= impulse;
+						boxColliderVector[j]->parent->myRigidbody->ApplyVelocity(0.02f, -impulse);
+						//boxColliderVector[j]->parent->myRigidbody->velocity -= impulse;
 					}
 				}
 
