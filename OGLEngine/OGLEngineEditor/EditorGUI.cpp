@@ -9,6 +9,7 @@
 #include "ObjectMessage.h"
 #include "Engine.h"
 #include "MeshManager.h"
+#include "CollisionManager.h"
 
 void EditorGUI::Initialize(GLFWwindow* window, Graphics* graphics, Camera& camera)
 {
@@ -242,6 +243,7 @@ void EditorGUI::QuickGUITesting()
 	}
 
 	MeshManager::Get().ErrorGUI();
+	CollisionManager::Get().DebugGUI();
 
 	ImGui::End();
 }

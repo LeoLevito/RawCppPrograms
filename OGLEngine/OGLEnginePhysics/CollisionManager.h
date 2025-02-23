@@ -58,6 +58,10 @@ public:
 	int runFindAmount1 = 0;
 
 	float myPi = glm::atan(1) * 4;
+
+	void DebugGUI();
+
+	bool simulate;
 private:
 };
 

@@ -8,6 +8,8 @@
 #include "RigidbodyComponent.h"
 #include "ColliderComponent.h"
 #include <thread>
+#include <GLFW/glfw3.h>
+
 
 CollisionManager::CollisionManager()
 {
@@ -30,33 +32,33 @@ Collider* CollisionManager::AddNewCollider(ColliderType type, GameObject& topPar
 	case ColliderType::SphereType:
 	{ //curious thing with switch cases, if you wanna initialize a new object, like directionalLight here, you need to have explicit scopes ({}), since otherwise we'd get an uninitialized variable if this case isn't hit. Best to just put this stuff in a function and call that instead. 
 		SphereCollider* sphereCollider = new SphereCollider();
-		sphereColliderVector.push_back(sphereCollider);
 		sphereCollider->type = type;
 		sphereCollider->parent = &parent;
+		sphereColliderVector.push_back(sphereCollider);
 		return sphereCollider;
 	}
 	case ColliderType::BoxType:
 	{
 		BoxCollider* boxCollider = new BoxCollider();
-		boxColliderVector.push_back(boxCollider);
 		boxCollider->type = type;
 		boxCollider->parent = &parent;
+		boxColliderVector.push_back(boxCollider);
 		return boxCollider;
 	}
 	case ColliderType::MeshType:
 	{
 		MeshColliderSAT* meshCollider = new MeshColliderSAT();
-		meshColliderSATVector.push_back(meshCollider);
 		meshCollider->type = type;
 		meshCollider->topParent = &topParent;
+		meshColliderSATVector.push_back(meshCollider);
 		return meshCollider;
 		break;
 	}
 	case ColliderType::RaycastType:
 	{
 		RaycastCollider* raycastCollider = new RaycastCollider();
-		raycastColliderVector.push_back(raycastCollider);
 		raycastCollider->type = type;
+		raycastColliderVector.push_back(raycastCollider);
 		break;
 	}
 	default:
@@ -88,9 +90,17 @@ void CollisionManager::DeleteCollider(ColliderType type, Collider* collider)
 
 void CollisionManager::Process()
 {
+	double lastTime = 0;
+	double currentTime = 0;
+	double deltaTime = 0;
+
 	while (shouldRun) //what happens if I limit this to say every 50th of a second?
 	{
-		std::this_thread::sleep_for(std::chrono::milliseconds(20));
+		currentTime = glfwGetTime(); //May or may not be super accurate at the moment.
+		deltaTime = currentTime - lastTime;
+		lastTime = currentTime;
+
+		//std::this_thread::sleep_for(std::chrono::milliseconds(20));
 		//ProcessMessages();
 
 		if (boxColliderVector.size() > 0)
@@ -113,12 +123,18 @@ void CollisionManager::Process()
 
 		for (int i = 0; i < sphereColliderVector.size(); i++)
 		{
-			sphereColliderVector[i]->parent->myRigidbody->ApplyGravity(0.02f);
+			if (sphereColliderVector[i]->parent->myRigidbody != nullptr) //man these checks are slowly getting ridiculous.
+			{
+				sphereColliderVector[i]->parent->myRigidbody->ApplyGravity(deltaTime);
+			}
 		}
 
 		for (int i = 0; i < boxColliderVector.size(); i++)
 		{
-			boxColliderVector[i]->parent->myRigidbody->ApplyGravity(0.02f);
+			if (boxColliderVector[i]->parent->myRigidbody != nullptr)
+			{
+				boxColliderVector[i]->parent->myRigidbody->ApplyGravity(deltaTime);
+			}
 		}
 	}
 }
@@ -515,4 +531,11 @@ bool CollisionManager::FindMaxMinProjectionAB(BoxCollider& boxA, BoxCollider& bo
 	}
 	return true; //we didn't find a separating axis / separating plane, the two box colliders must be colliding!
 	//But where are we colliding?
+}
+
+void CollisionManager::DebugGUI()
+{
+	if (ImGui::Checkbox("Simulate physics", &simulate))
+	{
+	}
 }

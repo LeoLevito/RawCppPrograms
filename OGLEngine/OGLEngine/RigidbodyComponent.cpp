@@ -7,11 +7,11 @@
 #include "imgui_impl_opengl3.h"
 #include <iostream>
 #include <ColliderComponent.h>
+#include <CollisionManager.h>
 
 RigidbodyComponent::RigidbodyComponent()
 {
 	name = "Rigidbody component";
-
 }
 
 RigidbodyComponent::~RigidbodyComponent()
@@ -66,7 +66,7 @@ void RigidbodyComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 
 void RigidbodyComponent::ApplyVelocity(float deltaTime, glm::vec3 velocityToAdd)
 {
-	if (isKinematic)
+	if (isKinematic) //not needed since we already do the check in CollisionManager, but in the future doing this here would clean up the CollisionManager.
 	{
 		velocity = { 0,0,0 };
 	}
@@ -87,17 +87,24 @@ void RigidbodyComponent::ApplyVelocity(float deltaTime, glm::vec3 velocityToAdd)
 
 void RigidbodyComponent::ApplyGravity(float deltaTime)
 {
-	if (useGravity) //move this check somewhere else, we should be checking isKinematic first, apply any velocities to the position and then do the gravity check and if it's true then we also apply gravity to the velocities.
+	if (CollisionManager::Get().simulate)
 	{
-		velocity += gravity * gravityMultiplier * deltaTime;
-		for (size_t i = 0; i < owner->components.size(); i++)
+		if (useGravity) //move this check somewhere else, we should be checking isKinematic first, apply any velocities to the position and then do the gravity check and if it's true then we also apply gravity to the velocities.
 		{
-			if (dynamic_cast<TransformComponent*>(owner->components[i])) //checking if owner has a component of type TransformComponent. Is of-type correct word-use in this case?
+			velocity += gravity * gravityMultiplier * deltaTime;
+			for (size_t i = 0; i < owner->components.size(); i++)
 			{
-				//multiple casts, in UPDATE()? not sure how efficient this is. EDIT 5 dec 2024, apparently this dynamic_cast is better than other types of casts, even Emil has used them multiple times.
+				if (dynamic_cast<TransformComponent*>(owner->components[i])) //checking if owner has a component of type TransformComponent. Is of-type correct word-use in this case?
+				{
+					//multiple casts, in UPDATE()? not sure how efficient this is. EDIT 5 dec 2024, apparently this dynamic_cast is better than other types of casts, even Emil has used them multiple times.
 
-				dynamic_cast<TransformComponent*>(owner->components[i])->position += velocity * deltaTime; //multiplying again with delta time results in the proper acceleration of gravity... in theory.
+					dynamic_cast<TransformComponent*>(owner->components[i])->position += velocity * deltaTime; //multiplying again with delta time results in the proper acceleration of gravity... in theory.
+				}
 			}
 		}
+	}
+	else 
+	{
+		velocity = { 0,0,0 }; //not having this here would make it so we can stop simulation and then start it again with the previous velocities applied, which could be useful in the future.
 	}
 }
