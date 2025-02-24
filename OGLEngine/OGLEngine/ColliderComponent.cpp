@@ -12,7 +12,8 @@ ColliderComponent::ColliderComponent()
 {
 	name = "Collider component";
 	myCollider = CollisionManager::Get().AddNewCollider(ColliderType::SphereType, *owner, *this);
-
+	myCollider->parent = this;
+	CollisionManager::Get().sphereColliderVector.push_back(dynamic_cast<SphereCollider*>(myCollider));
 }
 
 ColliderComponent::~ColliderComponent()
@@ -51,11 +52,11 @@ void ColliderComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 		return;
 	}
 
-	const char* typeNames[] = { "Sphere collider", "Box collider", "Mesh collider SAT", "Raycast collider"};
+	const char* typeNames[] = { "Sphere collider", "Box collider", "Mesh collider SAT", "Raycast collider" };
 
 	ImGui::Text("Current type:");
 	ImGui::SameLine();
-	ImGui::Text(typeNames[selectedType]); 
+	ImGui::Text(typeNames[selectedType]);
 
 
 	if (ImGui::Button("Select type"))
@@ -76,10 +77,14 @@ void ColliderComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 				case 0:
 					CollisionManager::Get().DeleteCollider(myCollider->type, myCollider);
 					myCollider = CollisionManager::Get().AddNewCollider(ColliderType::SphereType, *owner, *this);
+					myCollider->parent = this;
+					CollisionManager::Get().sphereColliderVector.push_back(dynamic_cast<SphereCollider*>(myCollider));
 					break;
 				case 1:
 					CollisionManager::Get().DeleteCollider(myCollider->type, myCollider);
 					myCollider = CollisionManager::Get().AddNewCollider(ColliderType::BoxType, *owner, *this);
+					myCollider->parent = this;
+					CollisionManager::Get().boxColliderVector.push_back(dynamic_cast<BoxCollider*>(myCollider));
 					break;
 				case 2:
 					CollisionManager::Get().DeleteCollider(myCollider->type, myCollider);
@@ -88,6 +93,8 @@ void ColliderComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 				case 3:
 					CollisionManager::Get().DeleteCollider(myCollider->type, myCollider);
 					myCollider = CollisionManager::Get().AddNewCollider(ColliderType::RaycastType, *owner, *this);
+					myCollider->parent = this; //do this here again after AddNewCollider to make it so parent has the correct myCollider value instead of a nullptr after the DeleteCollider.
+					CollisionManager::Get().raycastColliderVector.push_back(dynamic_cast<RaycastCollider*>(myCollider)); //fixes issue where doing push_back in the AddNewCollider would have an incomplete parent reference, later causing an error below on mycollider->DrawImGui().
 					break;
 				default:
 					break;

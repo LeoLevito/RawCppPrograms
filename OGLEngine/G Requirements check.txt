@@ -1,3 +1,9 @@
+HOW TO READ TASKS AS COMPLETED OR NOT: 
+"+" means task has been completed, 
+"-+" means task is in progress or partly complete, 
+"-" means task has had no work done on it.
+
+
 UI (module 2):
 
 To pass (G), complete the following tasks:
@@ -15,7 +21,7 @@ To pass (G), complete the following tasks:
 
 + Write a small Game Engine Architecture document (2 pages minimum) --> (CHECK, will add to it as times goes on)
 
-++ Implement Message class, including 2 sub-classes, and use them in at least 1 communication pattern between Managers in your project.
++ Implement Message class, including 2 sub-classes, and use them in at least 1 communication pattern between Managers in your project.
 	//I'm now going to analyse above requirement: Message class. Subclasses of Message class, 
 	//i.e. classes deriving from Message class. Use the subclasses in at least 1 communication pattern, 
 	//observer pattern or mediator pattern I presume, between two managers in your project. Send and receive messages between two managers.
@@ -23,11 +29,11 @@ To pass (G), complete the following tasks:
 + Implement the MessageQueue functions in at least 1 Manager and demonstrate usage. --> (MESHMANAGER).
 	//I'm now going to analyse above requirement: implement QueueMessage, ProcessMessages and ProcessMessage in one manager.
 
-++ Implement Memory checking functions, use it in one manager's allocations --> (CHECK, MESHMANAGER, didn't Emil do a remark about this? Yes, I've now done this task more properly, blocking a mesh load if available memory is less than say 500MB. And displaying an error popup modal if this happens.)
++ Implement Memory checking functions, use it in one manager's allocations --> (CHECK, MESHMANAGER, didn't Emil do a remark about this? Yes, I've now done this task more properly, blocking a mesh load if available memory is less than say 500MB. And displaying an error popup modal if this happens.)
 
 + Implement serialization (ReadFrom, WriteTo file) for your Mesh class --> (HANDLED IN OBJREADER)
 
-++ Implement Thread and Mutex functionality and run one of your message-supported Managers in its own thread, communicating only with messages.
++ Implement Thread and Mutex functionality and run one of your message-supported Managers in its own thread, communicating only with messages.
 
 + Implement a Camera class and UI to configure it for rendering your scene --> (CHECK, UI PART IN EDITORGUI)
 
@@ -68,8 +74,6 @@ To pass (G), complete the following tasks:
 + Implement either: Shadow mapping, or Deferred Rendering --> (CHECK, shadowmapping being worked on)
 
 
-REMEMBER TO UPDATE GAME ENGINE ARCHITECTURE DOCUMENT BEFORE MONDAY 27 JANUARY.
-
  
 To pass with distinction (VG), in addition to the above, complete one of the following:
 - Implement normal mapping
@@ -83,3 +87,25 @@ To pass with distinction (VG), in addition to the above, complete one of the fol
 - Add a toggle to render your lights as wireframes
 + Add possibility to attach a light to an entity via a LightProperty --> (CHECK, in my case the LightProperty would be a LightComponent.)
 - Use Uniform Buffer Objects to enable use of very many lights (requires Deferred)
+
+
+
+
+
+
+
+PHYSICS (module 4)
+
+To pass (G) complete the following tasks:
++ Sphere intersection --> (CHECK, simple distance check with radius as margin for Sphere-Sphere testing.)
+
++ Box intersection  --> (CHECK, SAT implementation for Box-Box testing, and a 'find closest point on Box surface' approach for Sphere-Box testing.)
+
++ Raycast intersection --> (CHECK, raycast has a start and end point, Ray-Sphere testing is similar to how Martin did it, and Ray-Box testing is similar to opengl-tutorial's custom Ray-OBB picking function. The main difference with my implementations here is that I also accound for the start and end point of the ray as opposed to having the ray go infinitely far in a certain direction.)
+
++ Collision response either – Call function on intersect, bounce off intersecting collider --> (CHECK, Spheres can bounce off of other spheres and boxes. I use an impulse-based approach with linear velocity so these colliders can influence each other's velocities when colliding.)
+
+
+
+To pass with distinction (VG), in addition to the above, complete one of the following: 
+-+ Either, linear and angular velocity on spheres or mesh collider intersections --> (I only did linear velocity, I also have gravity being applied as well.)

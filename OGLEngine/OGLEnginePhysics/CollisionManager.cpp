@@ -34,7 +34,7 @@ Collider* CollisionManager::AddNewCollider(ColliderType type, GameObject& topPar
 		SphereCollider* sphereCollider = new SphereCollider();
 		sphereCollider->type = type;
 		sphereCollider->parent = &parent;
-		sphereColliderVector.push_back(sphereCollider);
+		//sphereColliderVector.push_back(sphereCollider);
 		return sphereCollider;
 	}
 	case ColliderType::BoxType:
@@ -42,7 +42,7 @@ Collider* CollisionManager::AddNewCollider(ColliderType type, GameObject& topPar
 		BoxCollider* boxCollider = new BoxCollider();
 		boxCollider->type = type;
 		boxCollider->parent = &parent;
-		boxColliderVector.push_back(boxCollider);
+		//boxColliderVector.push_back(boxCollider);
 		return boxCollider;
 	}
 	case ColliderType::MeshType:
@@ -58,7 +58,8 @@ Collider* CollisionManager::AddNewCollider(ColliderType type, GameObject& topPar
 	{
 		RaycastCollider* raycastCollider = new RaycastCollider();
 		raycastCollider->type = type;
-		raycastColliderVector.push_back(raycastCollider);
+		raycastCollider->parent = &parent;
+		//raycastColliderVector.push_back(raycastCollider);
 		break;
 	}
 	default:
@@ -285,6 +286,11 @@ void CollisionManager::RaySphereTest()
 	{
 		for (int j = 0; j < sphereColliderVector.size(); j++) //is this how you're supposed to do it with different collider types?
 		{
+			if (!sphereColliderVector[j]->hasGotFirstPosition) //takes a little while for a new box collider to fill the corners vector, this if check prevents a vector out of range error that's caused by this function running on a different thread compared to the box collider bounds update.
+			{											   //Hmm, maybe I should set it to check if corners.size() == 8, just to be sure?
+														   //Or maybe this isn't needed anymore because I run the UpdateBounds function before this one inside the Process() loop of this class?
+				return;
+			}
 			glm::vec3 rayDir = glm::normalize(raycastColliderVector[i]->endPoint - raycastColliderVector[i]->startPoint);
 			float rayLength = glm::length(raycastColliderVector[i]->endPoint - raycastColliderVector[i]->startPoint); //is this right?
 			float projectionLength = glm::clamp(glm::dot(sphereColliderVector[j]->position - raycastColliderVector[i]->startPoint, rayDir), 0.0f, rayLength);
