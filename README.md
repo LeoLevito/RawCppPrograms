@@ -3,4 +3,5 @@ These are 'raw' C++ programs made for assignments in my first and second year of
 Files where created in C:\Users\[USER NAME]\source\repos, as per Visual Studio defaults I believe.
 
 If you're here to see my OpenGL game engine made during the Engine Specialization course, please visit the _OGLEngine_ directory.
+
 The TinyEngine stuff was for an earlier C++ course. 
