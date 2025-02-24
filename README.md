@@ -4,4 +4,4 @@ Files where created in C:\Users\[USER NAME]\source\repos, as per Visual Studio d
 
 If you're here to see my OpenGL game engine made during the Engine Specialization course, please visit the _OGLEngine_ directory.
 
-The TinyEngine stuff was for an earlier C++ course. 
+The TinyEngine stuff was for an earlier C++ course, where we were supplied an small engine to learn how to make a simple game with C++. 
