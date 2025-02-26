@@ -92,6 +92,16 @@ void EditorGUI::HierarchyWindow(Camera& camera, glm::mat4& projection)
 		GameObjectManager::Get().QueueMessage(newMessage); //send a message to create an empty game object.
 	}
 
+	if (ImGui::Button("Save Game Objects"))
+	{
+		GameObjectManager::Get().Serialization("../Levels/LevelSaveTest2.scene");
+	}
+
+	if (ImGui::Button("Load Game Objects"))
+	{
+		GameObjectManager::Get().Deserialization("../Levels/LevelSaveTest2.scene");
+	}
+
 	int objectIndex = 0;
 	for (GameObject* var : GameObjectManager::Get().gameObjects) //for every game object
 	{

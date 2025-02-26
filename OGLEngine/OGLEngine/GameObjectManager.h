@@ -2,6 +2,7 @@
 #include "GameObject.h"
 #include <vector>
 #include "Message.h"
+#include <string>
 class GameObjectManager
 {
 private:
@@ -22,6 +23,8 @@ public:
 	bool shouldRun = true;
 
 
+	void Serialization(const std::string& filename);
+	void Deserialization(const std::string& filename);
 
 
 

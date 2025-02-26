@@ -46,6 +46,10 @@ void GameObject::Update()
 
 void GameObject::DrawObjectSpecificImGuiHierarchyAdjustables(std::vector<GameObject*>& vec) //maybe this should be called in update instead.
 {
+	ImGui::Text("ID:");
+	ImGui::SameLine();
+	ImGui::Text(std::to_string(ID).c_str());
+
 	static char str0[128] = "name"; //how it's done in the ImGui demo, tho it is replicated across all objects now...
 	ImGui::InputText("Object name", str0, IM_ARRAYSIZE(str0)); //Yeah, I gotta change this to a dropdown or something.
 	if (ImGui::Button("Change object name"))
