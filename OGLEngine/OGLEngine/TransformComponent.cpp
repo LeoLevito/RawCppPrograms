@@ -7,6 +7,7 @@
 TransformComponent::TransformComponent()
 {
 	name = "Transform component";
+	type = ComponentType::Transform;
 
 	position = glm::vec3(0, 0, 0);
 	rotation = glm::vec3(0, 0, 0);

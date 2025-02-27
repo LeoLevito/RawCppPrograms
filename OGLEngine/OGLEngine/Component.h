@@ -7,6 +7,14 @@
 
 class GameObject;
 
+enum class ComponentType {
+	Transform,
+	Mesh,
+	Light,
+	Collider,
+	Rigidbody
+};
+
 class Component
 {
 public:
@@ -17,6 +25,9 @@ public:
 	virtual void Update();
 	GameObject* owner;
 	bool isMarkedForDeletion;
+
+	ComponentType type;
+
 private:
 };
 

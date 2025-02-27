@@ -1,7 +1,7 @@
 #include "GameObjectManager.h"
 #include "ObjectMessage.h"
 #include "LevelMessage.h"
-
+#include "TransformComponent.h"
 #include <mutex>
 #include <iostream>
 #include <fstream>
@@ -131,12 +131,12 @@ void GameObjectManager::Serialization(const std::string& filename)
 			//get size of vectors to integers.
 			int nameSize = gameObjects[i]->name.size();
 			int IDSize = gameObjects[i]->ID;
-			//int componentsSize = go->components.size();
+			int componentsSize = gameObjects[i]->components.size();
 
 			//write sizes of vectors, https://stackoverflow.com/a/31213593
 			file.write(reinterpret_cast<char*>(&nameSize), sizeof(nameSize));
 			file.write(reinterpret_cast<char*>(&IDSize), sizeof(IDSize));
-			//file.write(reinterpret_cast<char*>(&componentsSize), sizeof(componentsSize));
+			file.write(reinterpret_cast<char*>(&componentsSize), sizeof(componentsSize));
 
 
 			//write contents of vectors, https://stackoverflow.com/a/31213593
@@ -172,22 +172,76 @@ void GameObjectManager::Deserialization(const std::string& filename)
 
 			int nameSize;
 			int IDSize;
-			//int componentsSize;
+			int componentsSize;
 
 			//read sizes of vectors, https://stackoverflow.com/a/31213593
 			file.read(reinterpret_cast<char*>(&nameSize), sizeof(nameSize)); //I see the issue now, we don't know the size of the vector when we want to read it, and since we input the size of an empty vector right now, it's gonna return nothing as well. so maybe we need to write the size to the file for us to retrieve when reading it.
 			file.read(reinterpret_cast<char*>(&IDSize), sizeof(IDSize));
-			//file.read(reinterpret_cast<char*>(&componentsSize), sizeof(componentsSize));
+			file.read(reinterpret_cast<char*>(&componentsSize), sizeof(componentsSize));
 
 			//resize vectors to the size read from binary file.
 			gameObjects[i]->name.resize(nameSize);
 			gameObjects[i]->ID = IDSize;
-			//gameObject.components.resize(componentsSize);
+			gameObjects[i]->components.resize(componentsSize);
 
 			//read contents of vectors, https://stackoverflow.com/a/31213593
 			file.read(reinterpret_cast<char*>(&gameObjects[i]->name[0]), nameSize); //https://stackoverflow.com/a/37035925
 			//file.read(reinterpret_cast<char*>(&gameObjects[i]->ID), sizeof(int) * gameObjects[i]->ID);
 			//file.read(reinterpret_cast<char*>(&gameObject.components[0]), sizeof(Component*) * gameObject.components.size());
+
+			for (int j = 0; j < componentsSize; j++)
+			{
+				ComponentType currentType = ComponentType::Transform; //Need to change this to be written and read to binary file.
+				switch (currentType)
+				{
+				case ComponentType::Transform:
+				{
+					TransformComponent* newTransform = new TransformComponent();
+
+					int positionSize;
+					int rotationSize;
+					int scaleSize;
+
+					//read sizes of vectors, https://stackoverflow.com/a/31213593
+					file.read(reinterpret_cast<char*>(&positionSize), sizeof(positionSize)); //I see the issue now, we don't know the size of the vector when we want to read it, and since we input the size of an empty vector right now, it's gonna return nothing as well. so maybe we need to write the size to the file for us to retrieve when reading it.
+					file.read(reinterpret_cast<char*>(&rotationSize), sizeof(rotationSize));
+					file.read(reinterpret_cast<char*>(&scaleSize), sizeof(scaleSize));
+
+					//what?
+
+					file.read(reinterpret_cast<char*>(&newTransform->position[0]), positionSize);
+
+
+
+
+					gameObjects[i]->components[j] = newTransform;
+
+
+
+
+					//int vertice;
+					////read sizes of vectors, https://stackoverflow.com/a/31213593
+					//file.read(reinterpret_cast<char*>(&vertice), sizeof(vertice)); //I see the issue now, we don't know the size of the vector when we want to read it, and since we input the size of an empty vector right now, it's gonna return nothing as well. so maybe we need to write the size to the file for us to retrieve when reading it.
+					////resize vectors to the size read from binary file.
+					//myIndexed_vertices.resize(vertice);
+					////read contents of vectors, https://stackoverflow.com/a/31213593
+					//file.read(reinterpret_cast<char*>(&myIndexed_vertices[0]), sizeof(glm::vec3) * myIndexed_vertices.size());
+
+
+					break;
+				}
+				case ComponentType::Mesh:
+					break;
+				case ComponentType::Light:
+					break;
+				case ComponentType::Collider:
+					break;
+				case ComponentType::Rigidbody:
+					break;
+				default:
+					break;
+				}
+			}
 		}
 	}
 	file.close();
