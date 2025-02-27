@@ -150,6 +150,7 @@
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="IWritable.cpp" />
     <ClCompile Include="Level.cpp" />
+    <ClCompile Include="LevelMessage.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="LightComponent.cpp" />
     <ClCompile Include="LightManager.cpp" />
@@ -182,6 +183,7 @@
     <ClInclude Include="Input.h" />
     <ClInclude Include="IWritable.h" />
     <ClInclude Include="Level.h" />
+    <ClInclude Include="LevelMessage.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="LightComponent.h" />
     <ClInclude Include="LightManager.h" />

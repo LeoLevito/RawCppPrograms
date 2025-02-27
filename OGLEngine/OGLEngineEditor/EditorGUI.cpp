@@ -7,6 +7,7 @@
 #include <iostream>
 #include <gtc/matrix_transform.hpp>
 #include "ObjectMessage.h"
+#include "LevelMessage.h"
 #include "Engine.h"
 #include "MeshManager.h"
 #include "CollisionManager.h"
@@ -94,11 +95,15 @@ void EditorGUI::HierarchyWindow(Camera& camera, glm::mat4& projection)
 
 	if (ImGui::Button("Save Game Objects"))
 	{
+		//LevelMessage* newMessage = new LevelMessage(LevelMessageType::Save);
+		//GameObjectManager::Get().QueueMessage(newMessage); //send a message to create an empty game object.
 		GameObjectManager::Get().Serialization("../Levels/LevelSaveTest2.scene");
 	}
 
 	if (ImGui::Button("Load Game Objects"))
 	{
+		//LevelMessage* newMessage = new LevelMessage(LevelMessageType::Load);
+		//GameObjectManager::Get().QueueMessage(newMessage); //send a message to create an empty game object.
 		GameObjectManager::Get().Deserialization("../Levels/LevelSaveTest2.scene");
 	}
 

@@ -1,5 +1,7 @@
 #include "GameObjectManager.h"
 #include "ObjectMessage.h"
+#include "LevelMessage.h"
+
 #include <mutex>
 #include <iostream>
 #include <fstream>
@@ -26,6 +28,8 @@ GameObject* GameObjectManager::CreateGameObject()
 	GameObject* gameObject = new GameObject();
 	gameObjects.push_back(gameObject);
 	gameObject->ID = gameObjects.size() - 1;
+
+	std::cout << gameObjects.back() << std::endl;
 	return gameObject;
 }
 
@@ -44,8 +48,9 @@ void GameObjectManager::ProcessMessage(Message* message)
 	switch (message->type)
 	{
 	case MessageType::ObjectMessage:
+	{
 		ObjectMessage& objectmessage = dynamic_cast<ObjectMessage&>(*message); //is this bad practice for messaging? RE:(MeshComponent), apparently this dynamic_cast is better than other types of casts, even Emil has used them multiple times. Plus this cast only happens when processing messages, so not too frequently.
-		
+
 		if (objectmessage.myMessageType == ObjectMessageType::Create)
 		{
 			CreateGameObject();
@@ -55,6 +60,21 @@ void GameObjectManager::ProcessMessage(Message* message)
 			DeleteGameObject(objectmessage.gameObjectToDelete);
 		}
 		break;
+	}
+	case MessageType::LevelMessage:
+	{
+		LevelMessage& levelmessage = dynamic_cast<LevelMessage&>(*message); //is this bad practice for messaging? RE:(MeshComponent), apparently this dynamic_cast is better than other types of casts, even Emil has used them multiple times. Plus this cast only happens when processing messages, so not too frequently.
+
+		if (levelmessage.myMessageType == LevelMessageType::Save)
+		{
+			Serialization("../Levels/LevelSaveTest2.scene");
+		}
+		if (levelmessage.myMessageType == LevelMessageType::Load)
+		{
+			Deserialization("../Levels/LevelSaveTest2.scene");
+		}
+		break;
+	}
 	}
 }
 
@@ -104,9 +124,9 @@ void GameObjectManager::Serialization(const std::string& filename)
 		file.write(reinterpret_cast<char*>(&gameObjectsSize), sizeof(gameObjectsSize));
 
 		//write contents of vectors, https://stackoverflow.com/a/31213593
-		file.write(reinterpret_cast<char*>(&gameObjects[0]), sizeof(GameObject*) * gameObjects.size());
+		//file.write(reinterpret_cast<char*>(&gameObjects[0]), sizeof(GameObject*) * gameObjects.size());
 
-		for (int i = 0; i < gameObjects.size(); i++)
+		for (int i = 0; i < gameObjectsSize; i++)
 		{
 			//get size of vectors to integers.
 			int nameSize = gameObjects[i]->name.size();
@@ -120,8 +140,8 @@ void GameObjectManager::Serialization(const std::string& filename)
 
 
 			//write contents of vectors, https://stackoverflow.com/a/31213593
-			file.write(reinterpret_cast<char*>(&gameObjects[i]->name[0]), sizeof(std::string) * gameObjects[i]->name.size());
-			file.write(reinterpret_cast<char*>(&gameObjects[i]->ID), sizeof(int) * gameObjects[i]->ID);
+			file.write(reinterpret_cast<char*>(&gameObjects[i]->name[0]), nameSize); //https://stackoverflow.com/a/37035925
+			//file.write(reinterpret_cast<char*>(&gameObjects[i]->ID), sizeof(int) * gameObjects[i]->ID);
 			//file.write(reinterpret_cast<char*>(&go->components[0]), sizeof(Component*) * go->components.size());
 		}
 	}
@@ -130,7 +150,6 @@ void GameObjectManager::Serialization(const std::string& filename)
 
 void GameObjectManager::Deserialization(const std::string& filename)
 {
-	std::cout << "Starting deserialization of gameobjects" << std::endl;
 	std::fstream file;
 	file.open(filename.c_str(), std::ios_base::in | std::ios_base::binary);
 	////read meta-data if you wrote that.
@@ -141,15 +160,13 @@ void GameObjectManager::Deserialization(const std::string& filename)
 		//read sizes of vectors, https://stackoverflow.com/a/31213593
 		file.read(reinterpret_cast<char*>(&gameObjectsSize), sizeof(gameObjectsSize)); //I see the issue now, we don't know the size of the vector when we want to read it, and since we input the size of an empty vector right now, it's gonna return nothing as well. so maybe we need to write the size to the file for us to retrieve when reading it.
 
-
 		//resize vectors to the size read from binary file.
 		gameObjects.resize(gameObjectsSize);
 
-
 		//read contents of vectors, https://stackoverflow.com/a/31213593
-		file.read(reinterpret_cast<char*>(&gameObjects[0]), sizeof(GameObject*) * gameObjects.size());
+		//file.read(reinterpret_cast<char*>(&gameObjects[0]), gameObjectsSize);
 
-		for (int i = 0; i < gameObjects.size(); i++)
+		for (int i = 0; i < gameObjectsSize; i++)
 		{
 			gameObjects[i] = new GameObject(); //multithreading error? Clicking continue here sometimes makes the program work again, if no other errors occur.
 
@@ -168,8 +185,8 @@ void GameObjectManager::Deserialization(const std::string& filename)
 			//gameObject.components.resize(componentsSize);
 
 			//read contents of vectors, https://stackoverflow.com/a/31213593
-			file.read(reinterpret_cast<char*>(&gameObjects[i]->name[0]), sizeof(std::string) * gameObjects[i]->name.size());
-			file.read(reinterpret_cast<char*>(&gameObjects[i]->ID), sizeof(int) * gameObjects[i]->ID);
+			file.read(reinterpret_cast<char*>(&gameObjects[i]->name[0]), nameSize); //https://stackoverflow.com/a/37035925
+			//file.read(reinterpret_cast<char*>(&gameObjects[i]->ID), sizeof(int) * gameObjects[i]->ID);
 			//file.read(reinterpret_cast<char*>(&gameObject.components[0]), sizeof(Component*) * gameObject.components.size());
 		}
 	}

@@ -120,6 +120,9 @@
     <ClCompile Include="RigidbodyComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
+    <ClCompile Include="LevelMessage.cpp">
+      <Filter>Messaging</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Component.h">
@@ -208,6 +211,9 @@
     </ClInclude>
     <ClInclude Include="RigidbodyComponent.h">
       <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelMessage.h">
+      <Filter>Messaging</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
