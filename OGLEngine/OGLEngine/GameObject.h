@@ -16,6 +16,10 @@ public:
 	int ID;
 	virtual void Update();
 	virtual void DrawObjectSpecificImGuiHierarchyAdjustables(std::vector<GameObject*>& vec);
+
+	virtual void Serialization(std::fstream& file);
+	virtual void Deserialization(std::fstream& file);
+
 private:
 
 };

@@ -2,6 +2,7 @@
 #include "ObjectMessage.h"
 #include "LevelMessage.h"
 #include "TransformComponent.h"
+#include "MeshComponent.h"
 #include <mutex>
 #include <iostream>
 #include <fstream>
@@ -112,37 +113,53 @@ void GameObjectManager::ProcessMessages() //I should probably wrap this into a f
 void GameObjectManager::Serialization(const std::string& filename)
 {
 	std::fstream file;
+	file.open(filename.c_str(), std::ios_base::out | std::ios_base::binary);
 
-	file.open(filename.c_str(), std::ios_base::out | std::ios_base::binary); //binary files require the use of 
-	////write meta-data first, if you want
 	if (file.is_open())
 	{
-		//get size of vectors to integers.
 		int gameObjectsSize = gameObjects.size();
-
-		//write sizes of vectors, https://stackoverflow.com/a/31213593
 		file.write(reinterpret_cast<char*>(&gameObjectsSize), sizeof(gameObjectsSize));
-
-		//write contents of vectors, https://stackoverflow.com/a/31213593
-		//file.write(reinterpret_cast<char*>(&gameObjects[0]), sizeof(GameObject*) * gameObjects.size());
 
 		for (int i = 0; i < gameObjectsSize; i++)
 		{
-			//get size of vectors to integers.
-			int nameSize = gameObjects[i]->name.size();
-			int IDSize = gameObjects[i]->ID;
-			int componentsSize = gameObjects[i]->components.size();
+			gameObjects[i]->Serialization(file);
 
-			//write sizes of vectors, https://stackoverflow.com/a/31213593
-			file.write(reinterpret_cast<char*>(&nameSize), sizeof(nameSize));
-			file.write(reinterpret_cast<char*>(&IDSize), sizeof(IDSize));
-			file.write(reinterpret_cast<char*>(&componentsSize), sizeof(componentsSize));
+			for (int j = 0; j < gameObjects[i]->components.size(); j++)
+			{
+				int componentType = static_cast<int>(gameObjects[i]->components[j]->type);
+				file.write(reinterpret_cast<char*>(&componentType), sizeof(componentType));
 
+				switch (gameObjects[i]->components[j]->type)
+				{
+				case ComponentType::Transform:
+				{
+					dynamic_cast<TransformComponent*>(gameObjects[i]->components[j])->Serialization(file);
+					break;
+				}
+				case ComponentType::Mesh:
+				{
+					dynamic_cast<MeshComponent*>(gameObjects[i]->components[j])->Serialization(file);
+					break;
+				}
+				case ComponentType::Light:
+				{
 
-			//write contents of vectors, https://stackoverflow.com/a/31213593
-			file.write(reinterpret_cast<char*>(&gameObjects[i]->name[0]), nameSize); //https://stackoverflow.com/a/37035925
-			//file.write(reinterpret_cast<char*>(&gameObjects[i]->ID), sizeof(int) * gameObjects[i]->ID);
-			//file.write(reinterpret_cast<char*>(&go->components[0]), sizeof(Component*) * go->components.size());
+					break;
+				}
+				case ComponentType::Collider:
+				{
+
+					break;
+				}
+				case ComponentType::Rigidbody:
+				{
+
+					break;
+				}
+				default:
+					break;
+				}
+			}
 		}
 	}
 	file.close();
@@ -152,92 +169,56 @@ void GameObjectManager::Deserialization(const std::string& filename)
 {
 	std::fstream file;
 	file.open(filename.c_str(), std::ios_base::in | std::ios_base::binary);
-	////read meta-data if you wrote that.
+
 	if (file.is_open())
 	{
 		int gameObjectsSize;
+		file.read(reinterpret_cast<char*>(&gameObjectsSize), sizeof(gameObjectsSize));
 
-		//read sizes of vectors, https://stackoverflow.com/a/31213593
-		file.read(reinterpret_cast<char*>(&gameObjectsSize), sizeof(gameObjectsSize)); //I see the issue now, we don't know the size of the vector when we want to read it, and since we input the size of an empty vector right now, it's gonna return nothing as well. so maybe we need to write the size to the file for us to retrieve when reading it.
-
-		//resize vectors to the size read from binary file.
 		gameObjects.resize(gameObjectsSize);
-
-		//read contents of vectors, https://stackoverflow.com/a/31213593
-		//file.read(reinterpret_cast<char*>(&gameObjects[0]), gameObjectsSize);
 
 		for (int i = 0; i < gameObjectsSize; i++)
 		{
-			gameObjects[i] = new GameObject(); //multithreading error? Clicking continue here sometimes makes the program work again, if no other errors occur.
+			gameObjects[i] = new GameObject();
+			gameObjects[i]->Deserialization(file);
 
-			int nameSize;
-			int IDSize;
-			int componentsSize;
-
-			//read sizes of vectors, https://stackoverflow.com/a/31213593
-			file.read(reinterpret_cast<char*>(&nameSize), sizeof(nameSize)); //I see the issue now, we don't know the size of the vector when we want to read it, and since we input the size of an empty vector right now, it's gonna return nothing as well. so maybe we need to write the size to the file for us to retrieve when reading it.
-			file.read(reinterpret_cast<char*>(&IDSize), sizeof(IDSize));
-			file.read(reinterpret_cast<char*>(&componentsSize), sizeof(componentsSize));
-
-			//resize vectors to the size read from binary file.
-			gameObjects[i]->name.resize(nameSize);
-			gameObjects[i]->ID = IDSize;
-			gameObjects[i]->components.resize(componentsSize);
-
-			//read contents of vectors, https://stackoverflow.com/a/31213593
-			file.read(reinterpret_cast<char*>(&gameObjects[i]->name[0]), nameSize); //https://stackoverflow.com/a/37035925
-			//file.read(reinterpret_cast<char*>(&gameObjects[i]->ID), sizeof(int) * gameObjects[i]->ID);
-			//file.read(reinterpret_cast<char*>(&gameObject.components[0]), sizeof(Component*) * gameObject.components.size());
-
-			for (int j = 0; j < componentsSize; j++)
+			for (int j = 0; j < gameObjects[i]->components.size(); j++) //components.size() is read in gameObjects[i]->Deserialization().
 			{
-				ComponentType currentType = ComponentType::Transform; //Need to change this to be written and read to binary file.
+				int componentType;
+				file.read(reinterpret_cast<char*>(&componentType), sizeof(componentType));
+				ComponentType currentType = static_cast<ComponentType>(componentType);
+
 				switch (currentType)
 				{
 				case ComponentType::Transform:
 				{
 					TransformComponent* newTransform = new TransformComponent();
-
-					int positionSize;
-					int rotationSize;
-					int scaleSize;
-
-					//read sizes of vectors, https://stackoverflow.com/a/31213593
-					file.read(reinterpret_cast<char*>(&positionSize), sizeof(positionSize)); //I see the issue now, we don't know the size of the vector when we want to read it, and since we input the size of an empty vector right now, it's gonna return nothing as well. so maybe we need to write the size to the file for us to retrieve when reading it.
-					file.read(reinterpret_cast<char*>(&rotationSize), sizeof(rotationSize));
-					file.read(reinterpret_cast<char*>(&scaleSize), sizeof(scaleSize));
-
-					//what?
-
-					file.read(reinterpret_cast<char*>(&newTransform->position[0]), positionSize);
-
-
-
-
+					newTransform->Deserialization(file);
 					gameObjects[i]->components[j] = newTransform;
-
-
-
-
-					//int vertice;
-					////read sizes of vectors, https://stackoverflow.com/a/31213593
-					//file.read(reinterpret_cast<char*>(&vertice), sizeof(vertice)); //I see the issue now, we don't know the size of the vector when we want to read it, and since we input the size of an empty vector right now, it's gonna return nothing as well. so maybe we need to write the size to the file for us to retrieve when reading it.
-					////resize vectors to the size read from binary file.
-					//myIndexed_vertices.resize(vertice);
-					////read contents of vectors, https://stackoverflow.com/a/31213593
-					//file.read(reinterpret_cast<char*>(&myIndexed_vertices[0]), sizeof(glm::vec3) * myIndexed_vertices.size());
-
-
 					break;
 				}
 				case ComponentType::Mesh:
+				{
+					MeshComponent* newMesh = new MeshComponent();
+					newMesh->Deserialization(file);
+					gameObjects[i]->components[j] = newMesh;
 					break;
+				}
 				case ComponentType::Light:
+				{
+
 					break;
+				}
 				case ComponentType::Collider:
+				{
+
 					break;
+				}
 				case ComponentType::Rigidbody:
+				{
+
 					break;
+				}
 				default:
 					break;
 				}

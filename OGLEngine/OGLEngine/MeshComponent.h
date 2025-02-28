@@ -26,8 +26,8 @@ public:
 
 	Texture* diffuseMap;
 	Texture* specularMap;
-	std::string diffuseMapPath;
-	std::string specularMapPath;
+	std::string diffuseMapPath; //important for serialization
+	std::string specularMapPath; //important for serialization
 
 	void DrawComponentSpecificImGuiHierarchyAdjustables() override;
 
@@ -40,6 +40,7 @@ public:
 	void Update() override;
 	bool meshInvalid = false;
 	std::string lastSelectedMeshName;
+	std::string lastLoadableMeshName; //important for serialization
 	std::vector<std::filesystem::directory_entry> textureVector;
 	std::vector<std::filesystem::directory_entry> meshVector;
 
@@ -47,7 +48,7 @@ public:
 	glm::vec3 ambient;
 	glm::vec3 diffuse;
 	glm::vec3 specular;
-	float shininess;
+	float shininess;//important for serialization
 
 	enum TextureChoice
 	{
@@ -57,12 +58,13 @@ public:
 
 	TextureChoice textureChoice;
 
-	int selectedMinType;
-	int selectedMagType;
+	int selectedMinType; //important for serialization
+	int selectedMagType; //important for serialization
 
 	void ReloadTextures();
 
-
+	void Serialization(std::fstream& file) override;
+	void Deserialization(std::fstream& file) override;
 
 private:
 };

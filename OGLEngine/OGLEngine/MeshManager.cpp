@@ -27,7 +27,7 @@ MeshManager& MeshManager::Get()
 	return instance;
 }
 
-Mesh* MeshManager::LoadMesh(const std::string& filename, std::filesystem::directory_entry directoryEntry)
+Mesh* MeshManager::LoadMesh(const std::string& filename)
 {
 	for (size_t i = 0; i < CachedMeshes.size(); i++)
 	{
@@ -113,7 +113,7 @@ void MeshManager::ProcessMessage(Message* message)
 		MemoryMessage& memoryMessage = dynamic_cast<MemoryMessage&>(*message); //is this bad practice for messaging? RE:(MeshComponent), apparently this dynamic_cast is better than other types of casts, even Emil has used them multiple times. Plus this cast only happens when processing messages, so not too frequently.
 		IsAvailableMemoryOK = memoryMessage.isAvailableMemoryOK;
 		IsObjSizeOK = memoryMessage.isFileSizeOK;
-		LoadMesh(currentMeshName, currentDirectoryEntry); //Using data 'meshToLoad' from the message casted to meshmessage. We wouldn't need to cast if we were calling a class function that doesn't need specific data from a message.
+		LoadMesh(currentMeshName); //Using data 'meshToLoad' from the message casted to meshmessage. We wouldn't need to cast if we were calling a class function that doesn't need specific data from a message.
 		currentlyLoadingMesh = false; //this needs to be moved;
 		break;
 	}

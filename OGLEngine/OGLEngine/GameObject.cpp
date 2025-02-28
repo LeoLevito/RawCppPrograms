@@ -117,3 +117,33 @@ void GameObject::DrawObjectSpecificImGuiHierarchyAdjustables(std::vector<GameObj
 		std::cout << "Deletion of Game Object completed." << std::endl;
 	}
 }
+
+void GameObject::Serialization(std::fstream& file)
+{
+	int nameSize = name.size();
+	int IDSize = ID;
+	int componentsSize = components.size();
+
+	file.write(reinterpret_cast<char*>(&nameSize), sizeof(nameSize));
+	file.write(reinterpret_cast<char*>(&IDSize), sizeof(IDSize));
+	file.write(reinterpret_cast<char*>(&componentsSize), sizeof(componentsSize));
+
+	file.write(reinterpret_cast<char*>(&name[0]), nameSize); //https://stackoverflow.com/a/37035925
+}
+
+void GameObject::Deserialization(std::fstream& file)
+{
+	int nameSize;
+	int IDSize;
+	int componentsSize;
+
+	file.read(reinterpret_cast<char*>(&nameSize), sizeof(nameSize)); 
+	file.read(reinterpret_cast<char*>(&IDSize), sizeof(IDSize));
+	file.read(reinterpret_cast<char*>(&componentsSize), sizeof(componentsSize));
+
+	name.resize(nameSize);
+	ID = IDSize;
+	components.resize(componentsSize);
+
+	file.read(reinterpret_cast<char*>(&name[0]), nameSize); //https://stackoverflow.com/a/37035925
+}

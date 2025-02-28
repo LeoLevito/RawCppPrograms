@@ -27,3 +27,11 @@ void Component::DrawComponentSpecificImGuiHierarchyAdjustables()
 void Component::Update()
 {
 }
+
+void Component::Serialization(std::fstream& file)
+{
+}
+
+void Component::Deserialization(std::fstream& file)
+{
+}

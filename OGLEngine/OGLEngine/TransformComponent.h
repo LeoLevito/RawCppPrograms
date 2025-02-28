@@ -12,5 +12,9 @@ public:
 	glm::vec3 scale;
 
 	void DrawComponentSpecificImGuiHierarchyAdjustables() override;
+
+	void Serialization(std::fstream& file) override;
+	void Deserialization(std::fstream& file) override;
+
 };
 

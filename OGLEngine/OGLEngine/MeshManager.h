@@ -12,7 +12,7 @@ private:
 public:
 	static MeshManager& Get();
 	
-	Mesh* LoadMesh(const std::string& filename, std::filesystem::directory_entry directoryEntry); //include load from file or load from memory if requested mesh has been cached.
+	Mesh* LoadMesh(const std::string& filename); //include load from file or load from memory if requested mesh has been cached.
 	void RequestMemoryCheck(std::filesystem::directory_entry directoryEntry);
 	//I have a question, how do I make it so multiple objects can have the same mesh while effectively only allocating and using memory for one mesh?
 	void CacheMesh(); //isn't this done by adding it to the vector?

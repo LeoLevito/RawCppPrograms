@@ -3,7 +3,10 @@
 #include "Camera.h"
 #include "glm.hpp"
 #include "Shader.h"
+#include <fstream>
+#include <sstream>
 //#include "GameObject.h"
+
 
 class GameObject;
 
@@ -27,6 +30,11 @@ public:
 	bool isMarkedForDeletion;
 
 	ComponentType type;
+
+
+	virtual void Serialization(std::fstream& file);
+	virtual void Deserialization(std::fstream& file);
+
 
 private:
 };

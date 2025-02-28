@@ -18,6 +18,8 @@
 MeshComponent::MeshComponent()
 {
 	name = "Mesh component";
+	type = ComponentType::Mesh;
+
 	diffuseMapPath = "../Textures/Bliss/Bliss.jpg";
 	specularMapPath = "../Textures/Bliss/Bliss2.jpg";
 	diffuseMap = new Texture(diffuseMapPath.c_str(), 5, 1);
@@ -119,8 +121,9 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 				if (ImGui::Selectable(selectableMeshName.c_str())) //Display new Selectable for mesh files.
 				{
 					lastSelectedMeshName = selectableMeshName;
+					lastLoadableMeshName = loadableMeshName;
 					MeshMessage* newMessage = new MeshMessage();
-					newMessage->meshToLoad = loadableMeshName.c_str();
+					newMessage->meshToLoad = lastLoadableMeshName.c_str();
 					newMessage->directoryEntry = meshVector[i];
 					MeshManager::Get().QueueMessage(newMessage);
 				}
@@ -409,5 +412,51 @@ void MeshComponent::ReloadTextures()
 	{
 		ShaderManager::Get().shader->SetInt(1, "material.specular"); //why do I need to do this again? time to re-read https://learnopengl.com/Lighting/Lighting-maps
 		mesh->ApplySpecularMap(specularMap);
+	}
+}
+
+void MeshComponent::Serialization(std::fstream& file)
+{
+	//write (MESH):
+	lastLoadableMeshName;
+	
+	//write (TEXTURE): 
+	diffuseMapPath;
+	specularMapPath;
+	selectedMinType;
+	selectedMagType;
+
+	//write (MATERIAL):
+	shininess;
+
+	//think that's it.
+
+}
+
+void MeshComponent::Deserialization(std::fstream& file)
+{
+	//read (MESH):
+	lastLoadableMeshName;
+	//do (MESH):
+	mesh = MeshManager::Get().LoadMesh(lastLoadableMeshName);
+	mesh->bufferMesh();
+
+	//read (TEXTURE):
+	diffuseMapPath;
+	specularMapPath;
+	selectedMinType;
+	selectedMagType;
+	//do (TEXTURE):
+	diffuseMap = new Texture(diffuseMapPath.c_str(), selectedMinType, selectedMagType);
+	specularMap = new Texture(specularMapPath.c_str(), selectedMinType, selectedMagType);
+	mesh->ApplyDiffuseMap(diffuseMap);
+	mesh->ApplySpecularMap(specularMap);
+
+	//read (MATERIAL):
+	shininess;
+	//do (MATERIAL):
+	if (ShaderManager::Get().depthPass == false)
+	{
+		ShaderManager::Get().shader->SetFloat(shininess, "material.shininess");
 	}
 }
