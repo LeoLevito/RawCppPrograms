@@ -17,6 +17,9 @@ public:
 	std::vector<DirectionalLight*> directionalLightVector;
 	std::vector<PointLight*> pointLightVector;
 	std::vector<SpotLight*> spotLightVector;
+
+	void DrawImgui();
+	bool blinn;
 private:
 };
 

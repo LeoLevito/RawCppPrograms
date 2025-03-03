@@ -81,3 +81,14 @@ void LightManager::DeleteLight(LightType type, Light* light)
 	}
 	delete light;
 }
+
+void LightManager::DrawImgui()
+{
+	if (ImGui::Checkbox("Blinn?", &blinn)) //this is a global toggle right?
+	{
+		if (ShaderManager::Get().depthPass == false)
+		{
+			ShaderManager::Get().shader->SetBool(blinn, "blinn");
+		}
+	}
+}

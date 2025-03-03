@@ -11,6 +11,7 @@
 #include "Engine.h"
 #include "MeshManager.h"
 #include "CollisionManager.h"
+#include "LightManager.h"
 
 void EditorGUI::Initialize(GLFWwindow* window, Graphics* graphics, Camera& camera)
 {
@@ -259,6 +260,7 @@ void EditorGUI::QuickGUITesting()
 
 	MeshManager::Get().ErrorGUI();
 	CollisionManager::Get().DebugGUI();
+	LightManager::Get().DrawImgui();
 
 	ImGui::End();
 }

@@ -2,6 +2,8 @@
 #include "Component.h"
 #include "Light.h"
 
+class Light;
+
 class LightComponent : public Component
 {
 
@@ -19,6 +21,9 @@ public:
 	int selectedType = 0;
 
 	Light* myLight;
+
+	void Serialization(std::fstream& file) override;
+	void Deserialization(std::fstream& file) override;
 
 private:
 };

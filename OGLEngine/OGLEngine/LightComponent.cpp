@@ -11,6 +11,8 @@
 LightComponent::LightComponent()
 {
 	name = "Light component";
+	type = ComponentType::Light;
+
 	myLight = LightManager::Get().AddNewLight(LightType::DirectionalLightType);
 	myLight->SetToDefault();
 }
@@ -93,4 +95,32 @@ void LightComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 		ImGui::EndPopup();
 	}
 	myLight->DrawImgui();
+}
+
+void LightComponent::Serialization(std::fstream& file)
+{
+	int ID = myLight->ID;
+	int lightType = static_cast<int>(myLight->type);
+
+	file.write(reinterpret_cast<char*>(&ID), sizeof(ID));
+	file.write(reinterpret_cast<char*>(&lightType), sizeof(lightType));
+
+	myLight->Serialization(file);
+}
+
+void LightComponent::Deserialization(std::fstream& file)
+{
+	int ID;
+	int lightType;
+
+	file.read(reinterpret_cast<char*>(&ID), sizeof(ID));
+	file.read(reinterpret_cast<char*>(&lightType), sizeof(lightType));
+
+	LightType currentType = static_cast<LightType>(lightType);
+	LightManager::Get().DeleteLight(myLight->type, myLight);
+	myLight = LightManager::Get().AddNewLight(currentType);
+	myLight->ID = ID; //man I don't like this ID system. Somewhere This ID gets reset somewhere after this. I think it may be DeleteLight somewhere that causes this.
+	myLight->UpdateIDBasedStrings();
+
+	myLight->Deserialization(file);
 }

@@ -38,11 +38,12 @@ void Light::SetLightSpaceMatrix()
 
 void Light::DrawImgui()
 {
-	if (ImGui::Checkbox("Blinn?", &blinn))
-	{
-		if (ShaderManager::Get().depthPass == false)
-		{
-			ShaderManager::Get().shader->SetBool(blinn, "blinn");
-		}
-	}
+}
+
+void Light::Serialization(std::fstream& file)
+{
+}
+
+void Light::Deserialization(std::fstream& file)
+{
 }

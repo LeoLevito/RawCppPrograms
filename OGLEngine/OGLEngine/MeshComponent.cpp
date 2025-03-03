@@ -417,43 +417,70 @@ void MeshComponent::ReloadTextures()
 
 void MeshComponent::Serialization(std::fstream& file)
 {
-	//write (MESH):
-	lastLoadableMeshName;
-	
-	//write (TEXTURE): 
-	diffuseMapPath;
-	specularMapPath;
-	selectedMinType;
-	selectedMagType;
+	int lastLoadableMeshNameSize = lastLoadableMeshName.size();
+	int diffuseMapPathSize = diffuseMapPath.size();
+	int specularMapPathSize = specularMapPath.size();
+	int selectedMinTypeSize = selectedMinType;
+	int selectedMagTypeSize = selectedMagType;
+	int shininessSize = sizeof(float);
 
-	//write (MATERIAL):
-	shininess;
+	file.write(reinterpret_cast<char*>(&lastLoadableMeshNameSize), sizeof(lastLoadableMeshNameSize));
+	file.write(reinterpret_cast<char*>(&diffuseMapPathSize), sizeof(diffuseMapPathSize));
+	file.write(reinterpret_cast<char*>(&specularMapPathSize), sizeof(specularMapPathSize));
+	file.write(reinterpret_cast<char*>(&selectedMinTypeSize), sizeof(selectedMinTypeSize));
+	file.write(reinterpret_cast<char*>(&selectedMagTypeSize), sizeof(selectedMagTypeSize));
+	file.write(reinterpret_cast<char*>(&shininessSize), sizeof(shininessSize));
 
-	//think that's it.
 
+	file.write(reinterpret_cast<char*>(&lastLoadableMeshName[0]), lastLoadableMeshNameSize);
+	file.write(reinterpret_cast<char*>(&diffuseMapPath[0]), diffuseMapPathSize);
+	file.write(reinterpret_cast<char*>(&specularMapPath[0]), specularMapPathSize);
+	file.write(reinterpret_cast<char*>(&shininess), shininessSize);
 }
 
 void MeshComponent::Deserialization(std::fstream& file)
 {
-	//read (MESH):
-	lastLoadableMeshName;
+	int lastLoadableMeshNameSize;
+	int diffuseMapPathSize;
+	int specularMapPathSize;
+	int selectedMinTypeSize;
+	int selectedMagTypeSize;
+	int shininessSize;
+
+	file.read(reinterpret_cast<char*>(&lastLoadableMeshNameSize), sizeof(lastLoadableMeshNameSize));
+	file.read(reinterpret_cast<char*>(&diffuseMapPathSize), sizeof(diffuseMapPathSize));
+	file.read(reinterpret_cast<char*>(&specularMapPathSize), sizeof(specularMapPathSize));
+	file.read(reinterpret_cast<char*>(&selectedMinTypeSize), sizeof(selectedMinTypeSize));
+	file.read(reinterpret_cast<char*>(&selectedMagTypeSize), sizeof(selectedMagTypeSize));
+	file.read(reinterpret_cast<char*>(&shininessSize), sizeof(shininessSize));
+
+	lastLoadableMeshName.resize(lastLoadableMeshNameSize);
+	diffuseMapPath.resize(diffuseMapPathSize);
+	specularMapPath.resize(specularMapPathSize);
+	selectedMinType = selectedMinTypeSize;
+	selectedMagType = selectedMagTypeSize;
+
+
+	file.read(reinterpret_cast<char*>(&lastLoadableMeshName[0]), lastLoadableMeshNameSize);
+	file.read(reinterpret_cast<char*>(&diffuseMapPath[0]), diffuseMapPathSize);
+	file.read(reinterpret_cast<char*>(&specularMapPath[0]), specularMapPathSize);
+	file.read(reinterpret_cast<char*>(&shininess), shininessSize);
+
+
 	//do (MESH):
+	MeshManager::Get().currentlyLoadingMesh = true;
+	MeshManager::Get().IsAvailableMemoryOK = true; //okay, this may become an edge case problem if the computer's RAM is already filled up when loading the scene.
+	MeshManager::Get().IsObjSizeOK = true; //we know this to be true because we've loaded it before.
 	mesh = MeshManager::Get().LoadMesh(lastLoadableMeshName);
+	MeshManager::Get().currentlyLoadingMesh = false;
 	mesh->bufferMesh();
 
-	//read (TEXTURE):
-	diffuseMapPath;
-	specularMapPath;
-	selectedMinType;
-	selectedMagType;
 	//do (TEXTURE):
 	diffuseMap = new Texture(diffuseMapPath.c_str(), selectedMinType, selectedMagType);
 	specularMap = new Texture(specularMapPath.c_str(), selectedMinType, selectedMagType);
 	mesh->ApplyDiffuseMap(diffuseMap);
 	mesh->ApplySpecularMap(specularMap);
 
-	//read (MATERIAL):
-	shininess;
 	//do (MATERIAL):
 	if (ShaderManager::Get().depthPass == false)
 	{

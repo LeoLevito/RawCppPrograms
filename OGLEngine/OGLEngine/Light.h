@@ -7,6 +7,8 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include <vector> 
+#include <fstream>
+#include <sstream>
 
 //#include "LightManager.h"
 
@@ -38,7 +40,10 @@ public:
 
 	virtual void DrawImgui();
 
-	bool blinn;
+	virtual void Serialization(std::fstream& file);
+	virtual void Deserialization(std::fstream& file);
+
+
 private:
 };
 

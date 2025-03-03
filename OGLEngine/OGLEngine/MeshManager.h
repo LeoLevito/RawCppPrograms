@@ -35,12 +35,14 @@ public:
 	bool shouldRun = true;
 	bool currentlyLoadingMesh = false;
 	void ErrorGUI();
+
+	bool IsAvailableMemoryOK;
+	bool IsObjSizeOK;
 private:
 	bool allowLowMemoryErrorPopup;
 	bool allowObjSizeErrorPopup;
 
-	bool IsAvailableMemoryOK;
-	bool IsObjSizeOK;
+
 	std::filesystem::directory_entry currentDirectoryEntry;
 	std::string currentMeshName;
 

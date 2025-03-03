@@ -34,6 +34,9 @@ public:
 	virtual void SetLightSpaceMatrix() override;
 
 	virtual void DrawImgui() override;
+
+	virtual void Serialization(std::fstream& file) override;
+	virtual void Deserialization(std::fstream& file) override;
 private:
 };
 

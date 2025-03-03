@@ -3,6 +3,8 @@
 #include "LevelMessage.h"
 #include "TransformComponent.h"
 #include "MeshComponent.h"
+#include "LightComponent.h"
+
 #include <mutex>
 #include <iostream>
 #include <fstream>
@@ -143,7 +145,7 @@ void GameObjectManager::Serialization(const std::string& filename)
 				}
 				case ComponentType::Light:
 				{
-
+					dynamic_cast<LightComponent*>(gameObjects[i]->components[j])->Serialization(file);
 					break;
 				}
 				case ComponentType::Collider:
@@ -193,6 +195,7 @@ void GameObjectManager::Deserialization(const std::string& filename)
 				case ComponentType::Transform:
 				{
 					TransformComponent* newTransform = new TransformComponent();
+					newTransform->owner = gameObjects[i];
 					newTransform->Deserialization(file);
 					gameObjects[i]->components[j] = newTransform;
 					break;
@@ -200,13 +203,17 @@ void GameObjectManager::Deserialization(const std::string& filename)
 				case ComponentType::Mesh:
 				{
 					MeshComponent* newMesh = new MeshComponent();
+					newMesh->owner = gameObjects[i];
 					newMesh->Deserialization(file);
 					gameObjects[i]->components[j] = newMesh;
 					break;
 				}
 				case ComponentType::Light:
 				{
-
+					LightComponent* newLight = new LightComponent();
+					newLight->owner = gameObjects[i];
+					newLight->Deserialization(file);
+					gameObjects[i]->components[j] = newLight;
 					break;
 				}
 				case ComponentType::Collider:
