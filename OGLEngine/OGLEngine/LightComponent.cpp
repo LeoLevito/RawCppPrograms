@@ -101,9 +101,11 @@ void LightComponent::Serialization(std::fstream& file)
 {
 	int ID = myLight->ID;
 	int lightType = static_cast<int>(myLight->type);
+	int selectedTypeSize = selectedType; //for correct imgui text above.
 
 	file.write(reinterpret_cast<char*>(&ID), sizeof(ID));
 	file.write(reinterpret_cast<char*>(&lightType), sizeof(lightType));
+	file.write(reinterpret_cast<char*>(&selectedTypeSize), sizeof(selectedTypeSize));
 
 	myLight->Serialization(file);
 }
@@ -112,10 +114,13 @@ void LightComponent::Deserialization(std::fstream& file)
 {
 	int ID;
 	int lightType;
+	int selectedTypeSize;
 
 	file.read(reinterpret_cast<char*>(&ID), sizeof(ID));
 	file.read(reinterpret_cast<char*>(&lightType), sizeof(lightType));
+	file.read(reinterpret_cast<char*>(&selectedTypeSize), sizeof(selectedTypeSize));
 
+	selectedType = selectedTypeSize;
 	LightType currentType = static_cast<LightType>(lightType);
 	LightManager::Get().DeleteLight(myLight->type, myLight);
 	myLight = LightManager::Get().AddNewLight(currentType);

@@ -45,6 +45,9 @@ public:
 	virtual void SetDirection(glm::vec3 dir);
 
 	virtual void DrawImgui() override;
+
+	virtual void Serialization(std::fstream& file) override;
+	virtual void Deserialization(std::fstream& file) override;
 private:
 };
 

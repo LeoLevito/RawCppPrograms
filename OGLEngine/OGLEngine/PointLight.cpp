@@ -136,3 +136,45 @@ void PointLight::DrawImgui()
 		ShaderManager::Get().shader->SetFloat(quadratic, quadraticString);
 	}
 }
+
+void PointLight::Serialization(std::fstream& file)
+{
+	int ambientSize = ambient.length();
+	int diffuseSize = diffuse.length();
+	int specularSize = specular.length();
+	int linearSize = sizeof(float);
+	int quadraticSize = sizeof(float);
+
+	file.write(reinterpret_cast<char*>(&ambientSize), sizeof(ambientSize));
+	file.write(reinterpret_cast<char*>(&diffuseSize), sizeof(diffuseSize));
+	file.write(reinterpret_cast<char*>(&specularSize), sizeof(specularSize));
+	file.write(reinterpret_cast<char*>(&linearSize), sizeof(linearSize));
+	file.write(reinterpret_cast<char*>(&quadraticSize), sizeof(quadraticSize));
+
+	file.write(reinterpret_cast<char*>(&ambient[0]), sizeof(glm::vec3) * ambientSize);
+	file.write(reinterpret_cast<char*>(&diffuse[0]), sizeof(glm::vec3) * diffuseSize);
+	file.write(reinterpret_cast<char*>(&specular[0]), sizeof(glm::vec3) * specularSize);
+	file.write(reinterpret_cast<char*>(&linear), linearSize);
+	file.write(reinterpret_cast<char*>(&quadratic), quadraticSize);
+}
+
+void PointLight::Deserialization(std::fstream& file)
+{
+	int ambientSize;
+	int diffuseSize;
+	int specularSize;
+	int linearSize;
+	int quadraticSize;
+
+	file.read(reinterpret_cast<char*>(&ambientSize), sizeof(ambientSize));
+	file.read(reinterpret_cast<char*>(&diffuseSize), sizeof(diffuseSize));
+	file.read(reinterpret_cast<char*>(&specularSize), sizeof(specularSize));
+	file.read(reinterpret_cast<char*>(&linearSize), sizeof(linearSize));
+	file.read(reinterpret_cast<char*>(&quadraticSize), sizeof(quadraticSize));
+
+	file.read(reinterpret_cast<char*>(&ambient[0]), sizeof(glm::vec3) * ambientSize);
+	file.read(reinterpret_cast<char*>(&diffuse[0]), sizeof(glm::vec3) * diffuseSize);
+	file.read(reinterpret_cast<char*>(&specular[0]), sizeof(glm::vec3) * specularSize);
+	file.read(reinterpret_cast<char*>(&linear), linearSize);
+	file.read(reinterpret_cast<char*>(&quadratic), quadraticSize);
+}

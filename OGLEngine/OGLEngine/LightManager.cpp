@@ -55,7 +55,7 @@ void LightManager::DeleteLight(LightType type, Light* light)
 		directionalLightVector.erase(std::remove(directionalLightVector.begin(), directionalLightVector.end(), light));
 		for (int i = 0; i < directionalLightVector.size(); i++)
 		{
-			directionalLightVector[i]->ID = i;
+			directionalLightVector[i]->ID = i; //this is where the ID shift happens on the previous light. I don't want this to happen when I manually set the ID's.
 			directionalLightVector[i]->UpdateIDBasedStrings();
 		}
 		break;
