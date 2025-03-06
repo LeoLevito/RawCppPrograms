@@ -4,7 +4,8 @@
 #include "TransformComponent.h"
 #include "MeshComponent.h"
 #include "LightComponent.h"
-
+#include "ColliderComponent.h"
+#include "RigidbodyComponent.h"
 #include <mutex>
 #include <iostream>
 #include <fstream>
@@ -150,12 +151,12 @@ void GameObjectManager::Serialization(const std::string& filename)
 				}
 				case ComponentType::Collider:
 				{
-
+					dynamic_cast<ColliderComponent*>(gameObjects[i]->components[j])->Serialization(file);
 					break;
 				}
 				case ComponentType::Rigidbody:
 				{
-
+					dynamic_cast<RigidbodyComponent*>(gameObjects[i]->components[j])->Serialization(file);
 					break;
 				}
 				default:
@@ -218,12 +219,18 @@ void GameObjectManager::Deserialization(const std::string& filename)
 				}
 				case ComponentType::Collider:
 				{
-
+					ColliderComponent* newCollider = new ColliderComponent();
+					newCollider->owner = gameObjects[i];
+					newCollider->Deserialization(file);
+					gameObjects[i]->components[j] = newCollider;
 					break;
 				}
 				case ComponentType::Rigidbody:
 				{
-
+					RigidbodyComponent* newRigidbody = new RigidbodyComponent();
+					newRigidbody->owner = gameObjects[i];
+					newRigidbody->Deserialization(file);
+					gameObjects[i]->components[j] = newRigidbody;
 					break;
 				}
 				default:
