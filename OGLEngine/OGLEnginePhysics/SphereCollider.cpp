@@ -10,7 +10,6 @@ void SphereCollider::SetPosition(glm::vec3 pos)
 	if (hasGotFirstPosition == false) 
 	{
 		hasGotFirstPosition = true;
-		CollisionManager::Get().sphereColliderVector.push_back(dynamic_cast<SphereCollider*>(this));
 	}
 	position = pos;
 }

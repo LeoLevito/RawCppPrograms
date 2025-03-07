@@ -124,14 +124,18 @@ void CollisionManager::Process()
 
 		for (int i = 0; i < sphereColliderVector.size(); i++)
 		{
-			//std::cout << sphereColliderVector[i]->parent->myRigidbody << std::endl;
-			if (sphereColliderVector[i]->hasGotFirstPosition) //I also don't understand why this doesn't happen on the first spherecollider added, but frequently happens on the second one.
+			if (sphereColliderVector[i]->topParent != nullptr)
 			{
-				if (sphereColliderVector[i]->parent->myRigidbody != nullptr) //man these checks are slowly getting ridiculous.
+				if (sphereColliderVector[i]->hasGotFirstPosition) //I also don't understand why this doesn't happen on the first spherecollider added, but frequently happens on the second one.
 				{
-					sphereColliderVector[i]->parent->myRigidbody->ApplyGravity(deltaTime);
+					if (sphereColliderVector[i]->parent->myRigidbody != nullptr) //man these checks are slowly getting ridiculous.
+					{
+						sphereColliderVector[i]->parent->myRigidbody->ApplyGravity(deltaTime);
+					}
 				}
 			}
+			//std::cout << sphereColliderVector[i]->parent->myRigidbody << std::endl;
+			
 		}
 
 		for (int i = 0; i < boxColliderVector.size(); i++)

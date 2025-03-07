@@ -13,7 +13,7 @@ public:
 
 	std::vector<Component*> components; //I need to make it so you can only have one of each component on a game object. Maybe grey out the options in the dropdown menu.
 	std::string name;
-	int ID;
+	int ID{};
 	virtual void Update();
 	virtual void DrawObjectSpecificImGuiHierarchyAdjustables(std::vector<GameObject*>& vec);
 

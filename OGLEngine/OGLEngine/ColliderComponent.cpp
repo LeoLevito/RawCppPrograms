@@ -14,7 +14,10 @@ ColliderComponent::ColliderComponent()
 	type = ComponentType::Collider;
 	myCollider = CollisionManager::Get().AddNewCollider(ColliderType::SphereType, *owner, *this);
 	myCollider->parent = this; //why do i do this again after AddNewCollider()?
-	//CollisionManager::Get().sphereColliderVector.push_back(dynamic_cast<SphereCollider*>(myCollider));
+	CollisionManager::Get().sphereColliderVector.push_back(dynamic_cast<SphereCollider*>(myCollider)); //this might happen too early, this happens before the parent game object gets to assign itself as the owner of this component, which could lead to the read access violation I get in the CollisionManager.
+	name = "Collider component";																	   //though it shouldn't matter, since we did the check for the rigidbody before and got the same error.
+																									   //Something weird happens here, when push_back is done, the CollisionManager's Process() function tries to access it immediately,
+																									   //EVEN BEFORE THE CONSTRUCTOR IS DONE WITH EVERYTHING.
 }
 
 ColliderComponent::~ColliderComponent()
