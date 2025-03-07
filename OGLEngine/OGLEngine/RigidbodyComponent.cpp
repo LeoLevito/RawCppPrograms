@@ -12,6 +12,8 @@
 RigidbodyComponent::RigidbodyComponent()
 {
 	name = "Rigidbody component";
+	type = ComponentType::Rigidbody;
+
 }
 
 RigidbodyComponent::~RigidbodyComponent()
@@ -107,4 +109,12 @@ void RigidbodyComponent::ApplyGravity(float deltaTime)
 	{
 		velocity = { 0,0,0 }; //not having this here would make it so we can stop simulation and then start it again with the previous velocities applied, which could be useful in the future.
 	}
+}
+
+void RigidbodyComponent::Serialization(std::fstream& file)
+{
+}
+
+void RigidbodyComponent::Deserialization(std::fstream& file)
+{
 }

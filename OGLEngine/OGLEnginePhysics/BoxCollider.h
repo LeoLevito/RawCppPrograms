@@ -40,6 +40,9 @@ public:
 	glm::vec3 forward;
 	glm::mat4 trans;
 	glm::mat4 transWithoutScale;
+
+	void Serialization(std::fstream& file) override;
+	void Deserialization(std::fstream& file) override;
 private:
 };
 

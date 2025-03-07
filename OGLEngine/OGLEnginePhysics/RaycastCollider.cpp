@@ -10,7 +10,7 @@ RaycastCollider::RaycastCollider()
 {
 	//we only wanna do glGen once.
 	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO); 
+	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
 }
 
@@ -23,7 +23,7 @@ void RaycastCollider::SetPosition(glm::vec3 pos)
 	position = pos;
 	if (usePositionAsStartPoint)
 	{
-		startPoint = position; 
+		startPoint = position;
 	}
 }
 
@@ -46,7 +46,7 @@ void RaycastCollider::Update()
 
 	glm::mat4 trans = glm::mat4(1.0f);
 
-	trans = glm::translate(trans, glm::vec3(0,0,0)); //translate first so that each object rotates independently.
+	trans = glm::translate(trans, glm::vec3(0, 0, 0)); //translate first so that each object rotates independently.
 	//trans = glm::rotate(trans, rotation.x, glm::vec3(1, 0, 0));
 	//trans = glm::rotate(trans, rotation.y, glm::vec3(0, 1, 0));
 	//trans = glm::rotate(trans, rotation.z, glm::vec3(0, 0, 1));
@@ -128,7 +128,7 @@ void RaycastCollider::DrawImgui()
 	if (ImGui::Checkbox("Draw Debug Line", &drawDebugLine))
 	{
 	}
-	
+
 }
 
 void RaycastCollider::CalculateStartAndEndPoints()
@@ -138,4 +138,86 @@ void RaycastCollider::CalculateStartAndEndPoints()
 
 	//direction, distance
 	endPoint = startPoint + (glm::normalize(direction) * distance);
+}
+
+void RaycastCollider::Serialization(std::fstream& file)
+{
+	int drawDebugLineSize = drawDebugLine;
+	int usePositionAsStartPointSize = usePositionAsStartPoint;
+	int useDirectionAndDistanceAsEndPointSize = useDirectionAndDistanceAsEndPoint;
+	int useRotationAsDirectionSize = useRotationAsDirection;
+
+	file.write(reinterpret_cast<char*>(&drawDebugLineSize), sizeof(drawDebugLineSize));
+	file.write(reinterpret_cast<char*>(&usePositionAsStartPointSize), sizeof(usePositionAsStartPointSize));
+	file.write(reinterpret_cast<char*>(&useDirectionAndDistanceAsEndPointSize), sizeof(useDirectionAndDistanceAsEndPointSize));
+	file.write(reinterpret_cast<char*>(&useRotationAsDirectionSize), sizeof(useRotationAsDirectionSize));
+
+
+	if (!usePositionAsStartPoint)
+	{
+		int startPointSize = startPoint.length();
+		file.write(reinterpret_cast<char*>(&startPointSize), sizeof(startPointSize));
+		file.write(reinterpret_cast<char*>(&startPoint[0]), sizeof(glm::vec3) * startPointSize);
+	}
+	if (!useDirectionAndDistanceAsEndPoint)
+	{
+		int endPointSize = endPoint.length();
+		file.write(reinterpret_cast<char*>(&endPointSize), sizeof(endPointSize));
+		file.write(reinterpret_cast<char*>(&endPoint[0]), sizeof(glm::vec3) * endPointSize);
+	}
+	else
+	{
+		int distanceSize = sizeof(float);
+		file.write(reinterpret_cast<char*>(&distanceSize), sizeof(distanceSize));
+		file.write(reinterpret_cast<char*>(&distance), distanceSize);
+	}
+	if (!useRotationAsDirection) 
+	{
+		int directionSize = direction.length();
+		file.write(reinterpret_cast<char*>(&directionSize), sizeof(directionSize));
+		file.write(reinterpret_cast<char*>(&direction[0]), sizeof(glm::vec3) * directionSize);
+	}
+}
+
+void RaycastCollider::Deserialization(std::fstream& file)
+{
+	int drawDebugLineSize;
+	int usePositionAsStartPointSize;
+	int useDirectionAndDistanceAsEndPointSize;
+	int useRotationAsDirectionSize;
+
+	file.read(reinterpret_cast<char*>(&drawDebugLineSize), sizeof(drawDebugLineSize));
+	file.read(reinterpret_cast<char*>(&usePositionAsStartPointSize), sizeof(usePositionAsStartPointSize));
+	file.read(reinterpret_cast<char*>(&useDirectionAndDistanceAsEndPointSize), sizeof(useDirectionAndDistanceAsEndPointSize));
+	file.read(reinterpret_cast<char*>(&useRotationAsDirectionSize), sizeof(useRotationAsDirectionSize));
+
+	drawDebugLine = drawDebugLineSize;
+	usePositionAsStartPoint = usePositionAsStartPointSize;
+	useDirectionAndDistanceAsEndPoint = useDirectionAndDistanceAsEndPointSize;
+	useRotationAsDirection = useRotationAsDirectionSize;
+
+	if (!usePositionAsStartPoint)
+	{
+		int startPointSize;
+		file.read(reinterpret_cast<char*>(&startPointSize), sizeof(startPointSize));
+		file.read(reinterpret_cast<char*>(&startPoint[0]), sizeof(glm::vec3) * startPointSize);
+	}
+	if (!useDirectionAndDistanceAsEndPoint)
+	{
+		int endPointSize;
+		file.read(reinterpret_cast<char*>(&endPointSize), sizeof(endPointSize));
+		file.read(reinterpret_cast<char*>(&endPoint[0]), sizeof(glm::vec3) * endPointSize);
+	}
+	else
+	{
+		int distanceSize;
+		file.read(reinterpret_cast<char*>(&distanceSize), sizeof(distanceSize));
+		file.read(reinterpret_cast<char*>(&distance), distanceSize);
+	}
+	if (!useRotationAsDirection) 
+	{
+		int directionSize;
+		file.read(reinterpret_cast<char*>(&directionSize), sizeof(directionSize));
+		file.read(reinterpret_cast<char*>(&direction[0]), sizeof(glm::vec3) * directionSize);
+	}
 }

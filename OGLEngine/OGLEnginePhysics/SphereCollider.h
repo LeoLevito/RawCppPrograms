@@ -13,6 +13,9 @@ public:
 	float radius{ 1.0f };
 
 	bool hasGotFirstPosition = false;
+
+	void Serialization(std::fstream& file) override;
+	void Deserialization(std::fstream& file) override;
 private:
 };
 

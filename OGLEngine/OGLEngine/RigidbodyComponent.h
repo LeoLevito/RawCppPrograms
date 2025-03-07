@@ -29,6 +29,9 @@ public:
 	float restitution = 0.1f; //this is just supposed to be between 0 and one.
 
 	bool setupMyRigidbody = false;
+
+	void Serialization(std::fstream& file) override;
+	void Deserialization(std::fstream& file) override;
 private:
 };
 

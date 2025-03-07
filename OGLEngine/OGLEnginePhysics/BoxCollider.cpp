@@ -272,3 +272,14 @@ void BoxCollider::DrawImgui()
 	ImGui::Text(std::to_string(scale.y).c_str());
 	ImGui::Text(std::to_string(scale.z).c_str());
 }
+
+void BoxCollider::Serialization(std::fstream& file)
+{
+	//i don't need to do anything here since BoxCollider is singlularly based on an accompanying TransformComponent's values.
+}
+
+void BoxCollider::Deserialization(std::fstream& file)
+{
+	//i don't need to do anything here since BoxCollider is singlularly based on an accompanying TransformComponent's values.
+
+}

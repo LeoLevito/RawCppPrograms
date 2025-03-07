@@ -11,9 +11,10 @@
 ColliderComponent::ColliderComponent()
 {
 	name = "Collider component";
+	type = ComponentType::Collider;
 	myCollider = CollisionManager::Get().AddNewCollider(ColliderType::SphereType, *owner, *this);
-	myCollider->parent = this;
-	CollisionManager::Get().sphereColliderVector.push_back(dynamic_cast<SphereCollider*>(myCollider));
+	myCollider->parent = this; //why do i do this again after AddNewCollider()?
+	//CollisionManager::Get().sphereColliderVector.push_back(dynamic_cast<SphereCollider*>(myCollider));
 }
 
 ColliderComponent::~ColliderComponent()
@@ -104,4 +105,51 @@ void ColliderComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 		ImGui::EndPopup();
 	}
 	myCollider->DrawImgui();
+}
+
+void ColliderComponent::Serialization(std::fstream& file)
+{
+	int selectedTypeSize = selectedType;
+	int ColliderTypeSize = static_cast<int>(myCollider->type);
+
+	file.write(reinterpret_cast<char*>(&selectedTypeSize), sizeof(selectedTypeSize));
+	file.write(reinterpret_cast<char*>(&ColliderTypeSize), sizeof(ColliderTypeSize));
+
+	myCollider->Serialization(file);
+}
+
+void ColliderComponent::Deserialization(std::fstream& file)
+{
+	int selectedTypeSize;
+	int ColliderTypeSize;
+
+	file.read(reinterpret_cast<char*>(&selectedTypeSize), sizeof(selectedTypeSize));
+	file.read(reinterpret_cast<char*>(&ColliderTypeSize), sizeof(ColliderTypeSize));
+
+	selectedType = selectedTypeSize;
+	ColliderType currentType = static_cast<ColliderType>(ColliderTypeSize);
+
+	CollisionManager::Get().DeleteCollider(myCollider->type, myCollider);
+	myCollider = CollisionManager::Get().AddNewCollider(currentType, *owner, *this);
+	myCollider->parent = this; //why do I do this again after AddNewCollider()?
+
+	switch (currentType)
+	{
+	case ColliderType::SphereType:
+		CollisionManager::Get().sphereColliderVector.push_back(dynamic_cast<SphereCollider*>(myCollider));
+		break;
+	case ColliderType::BoxType:
+		CollisionManager::Get().boxColliderVector.push_back(dynamic_cast<BoxCollider*>(myCollider));
+		break;
+	case ColliderType::MeshType:
+
+		break;
+	case ColliderType::RaycastType:
+		CollisionManager::Get().raycastColliderVector.push_back(dynamic_cast<RaycastCollider*>(myCollider)); //fixes issue where doing push_back in the AddNewCollider would have an incomplete parent reference, later causing an error below on mycollider->DrawImGui().
+		break;
+	default:
+		break;
+	}
+
+	myCollider->Deserialization(file);
 }

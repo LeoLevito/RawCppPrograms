@@ -20,8 +20,11 @@ public:
 
 	int selectedType = 0;
 
-	Collider* myCollider;
-	RigidbodyComponent* myRigidbody;
+	Collider* myCollider = nullptr;
+	RigidbodyComponent* myRigidbody = nullptr;
+
+	void Serialization(std::fstream& file) override;
+	void Deserialization(std::fstream& file) override;
 private:
 
 };

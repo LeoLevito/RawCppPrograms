@@ -23,3 +23,11 @@ void Collider::Update()
 void Collider::DrawImgui()
 {
 }
+
+void Collider::Serialization(std::fstream& file)
+{
+}
+
+void Collider::Deserialization(std::fstream& file)
+{
+}
