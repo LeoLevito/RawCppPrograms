@@ -5,6 +5,7 @@ class SphereCollider : public Collider
 {
 public:
 	SphereCollider();
+	~SphereCollider();
 	virtual void SetPosition(glm::vec3 pos) override;
 
 	virtual void DrawImgui() override;

@@ -53,6 +53,8 @@ public:
 	void RaySphereTest();
 	bool RayBoxTest();
 	bool FindMaxMinProjectionAB(BoxCollider& boxA, BoxCollider& boxB);
+	void ApplyGravityToRigidbodies(float deltaTime);
+	void DeleteCollidersMarkedForDeletion();
 
 	int runFindAmount2 = 0;
 	int runFindAmount1 = 0;

@@ -12,18 +12,21 @@ ColliderComponent::ColliderComponent()
 {
 	name = "Collider component";
 	type = ComponentType::Collider;
+
 	myCollider = CollisionManager::Get().AddNewCollider(ColliderType::SphereType, *owner, *this);
 	myCollider->parent = this; //why do i do this again after AddNewCollider()?
-	CollisionManager::Get().sphereColliderVector.push_back(dynamic_cast<SphereCollider*>(myCollider)); //this might happen too early, this happens before the parent game object gets to assign itself as the owner of this component, which could lead to the read access violation I get in the CollisionManager.
-	name = "Collider component";																	   //though it shouldn't matter, since we did the check for the rigidbody before and got the same error.
-																									   //Something weird happens here, when push_back is done, the CollisionManager's Process() function tries to access it immediately,
-																									   //EVEN BEFORE THE CONSTRUCTOR IS DONE WITH EVERYTHING.
+	myCollider->topParent = owner;
+	CollisionManager::Get().sphereColliderVector.push_back(dynamic_cast<SphereCollider*>(myCollider));  //this might happen too early, this happens before the parent game object gets to assign itself as the owner of this component, which could lead to the read access violation I get in the CollisionManager.
+																										//though it shouldn't matter, since we did the check for the rigidbody before and got the same error.
+																										//Something weird happens here, when push_back is done, the CollisionManager's Process() function tries to access it immediately,
+																										//EVEN BEFORE THE CONSTRUCTOR IS DONE WITH EVERYTHING.
+	myRigidbody = nullptr;
 }
 
 ColliderComponent::~ColliderComponent()
 {
 	std::cout << "-->Deleting Collider component." << std::endl;
-	CollisionManager::Get().DeleteCollider(myCollider->type, myCollider);
+	CollisionManager::Get().DeleteCollider(*myCollider->type, myCollider);
 
 }
 
@@ -38,14 +41,15 @@ void ColliderComponent::Update()
 			rotation = dynamic_cast<TransformComponent*>(owner->components[i])->rotation;
 			scale = dynamic_cast<TransformComponent*>(owner->components[i])->scale;
 
-			myCollider->SetPosition(position);
-			myCollider->SetRotation(rotation);
-			myCollider->SetScale(scale);
-			myCollider->Update();
+			if (myCollider != nullptr)
+			{
+				myCollider->SetPosition(position);
+				myCollider->SetRotation(rotation);
+				myCollider->SetScale(scale);
+				myCollider->Update();
+			}
 		}
 	}
-
-
 }
 
 void ColliderComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
@@ -79,23 +83,32 @@ void ColliderComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 				switch (selectedType)
 				{
 				case 0:
-					CollisionManager::Get().DeleteCollider(myCollider->type, myCollider);
+					if (myCollider != nullptr)
+					{
+						CollisionManager::Get().DeleteCollider(*myCollider->type, myCollider);
+					}
 					myCollider = CollisionManager::Get().AddNewCollider(ColliderType::SphereType, *owner, *this);
 					myCollider->parent = this;
 					CollisionManager::Get().sphereColliderVector.push_back(dynamic_cast<SphereCollider*>(myCollider));
 					break;
 				case 1:
-					CollisionManager::Get().DeleteCollider(myCollider->type, myCollider);
+					if (myCollider != nullptr)
+					{
+						CollisionManager::Get().DeleteCollider(*myCollider->type, myCollider);
+					}
 					myCollider = CollisionManager::Get().AddNewCollider(ColliderType::BoxType, *owner, *this);
 					myCollider->parent = this;
 					CollisionManager::Get().boxColliderVector.push_back(dynamic_cast<BoxCollider*>(myCollider));
 					break;
 				case 2:
-					CollisionManager::Get().DeleteCollider(myCollider->type, myCollider);
+					CollisionManager::Get().DeleteCollider(*myCollider->type, myCollider);
 					myCollider = CollisionManager::Get().AddNewCollider(ColliderType::MeshType, *owner, *this);
 					break;
 				case 3:
-					CollisionManager::Get().DeleteCollider(myCollider->type, myCollider);
+					if (myCollider != nullptr)
+					{
+						CollisionManager::Get().DeleteCollider(*myCollider->type, myCollider);
+					}
 					myCollider = CollisionManager::Get().AddNewCollider(ColliderType::RaycastType, *owner, *this);
 					myCollider->parent = this; //do this here again after AddNewCollider to make it so parent has the correct myCollider value instead of a nullptr after the DeleteCollider.
 					CollisionManager::Get().raycastColliderVector.push_back(dynamic_cast<RaycastCollider*>(myCollider)); //fixes issue where doing push_back in the AddNewCollider would have an incomplete parent reference, later causing an error below on mycollider->DrawImGui().
@@ -107,13 +120,16 @@ void ColliderComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 		}
 		ImGui::EndPopup();
 	}
-	myCollider->DrawImgui();
+	if (myCollider != nullptr)
+	{
+		myCollider->DrawImgui();
+	}
 }
 
 void ColliderComponent::Serialization(std::fstream& file)
 {
 	int selectedTypeSize = selectedType;
-	int ColliderTypeSize = static_cast<int>(myCollider->type);
+	int ColliderTypeSize = static_cast<int>(*myCollider->type);
 
 	file.write(reinterpret_cast<char*>(&selectedTypeSize), sizeof(selectedTypeSize));
 	file.write(reinterpret_cast<char*>(&ColliderTypeSize), sizeof(ColliderTypeSize));
@@ -132,7 +148,10 @@ void ColliderComponent::Deserialization(std::fstream& file)
 	selectedType = selectedTypeSize;
 	ColliderType currentType = static_cast<ColliderType>(ColliderTypeSize);
 
-	CollisionManager::Get().DeleteCollider(myCollider->type, myCollider);
+	if (myCollider != nullptr)
+	{
+		CollisionManager::Get().DeleteCollider(*myCollider->type, myCollider);
+	}
 	myCollider = CollisionManager::Get().AddNewCollider(currentType, *owner, *this);
 	myCollider->parent = this; //why do I do this again after AddNewCollider()?
 

@@ -25,6 +25,9 @@ public:
 
 	void Serialization(std::fstream& file) override;
 	void Deserialization(std::fstream& file) override;
+
+	bool DoOnce = false;
+
 private:
 
 };

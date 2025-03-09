@@ -3,6 +3,14 @@
 
 SphereCollider::SphereCollider()
 {
+	position = { 0.0f,0.0f,0.0f };
+	radius = { 1.0f };
+
+	hasGotFirstPosition = false;
+}
+
+SphereCollider::~SphereCollider()
+{
 }
 
 void SphereCollider::SetPosition(glm::vec3 pos)

@@ -21,7 +21,8 @@ class Collider
 {
 public:
 	Collider();
-	ColliderType type;
+	~Collider();
+	ColliderType* type;
 
 	virtual void SetPosition(glm::vec3 pos);
 	virtual void SetRotation(glm::vec3 rot);
@@ -36,6 +37,7 @@ public:
 	virtual void Serialization(std::fstream& file);
 	virtual void Deserialization(std::fstream& file);
 
+	bool isMarkedForDeletion;
 private:
 };
 

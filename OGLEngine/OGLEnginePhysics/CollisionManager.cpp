@@ -13,6 +13,12 @@
 
 CollisionManager::CollisionManager()
 {
+	sphereColliderVector.reserve(3 * sizeof(SphereCollider*)); //fixes issue where pushing back a new SphereCollider would cause an error where the ApplyGravityToRigidbodies() function would try to access memory that's been reallocated during the push_back. Though it may still be a problem when we add more and more sphereColliders.
+	boxColliderVector.reserve(3 * sizeof(BoxCollider*));
+	raycastColliderVector.reserve(3 * sizeof(RaycastCollider*));
+	std::cout << "sphereColliderVector capacity: " << sphereColliderVector.capacity() << std::endl;
+	std::cout << "boxColliderVector capacity: " << boxColliderVector.capacity() << std::endl;
+	std::cout << "raycastColliderVector capacity: " << raycastColliderVector.capacity() << std::endl;
 }
 
 CollisionManager::~CollisionManager()
@@ -32,7 +38,7 @@ Collider* CollisionManager::AddNewCollider(ColliderType type, GameObject& topPar
 	case ColliderType::SphereType:
 	{ //curious thing with switch cases, if you wanna initialize a new object, like directionalLight here, you need to have explicit scopes ({}), since otherwise we'd get an uninitialized variable if this case isn't hit. Best to just put this stuff in a function and call that instead. 
 		SphereCollider* sphereCollider = new SphereCollider();
-		sphereCollider->type = type;
+		sphereCollider->type = &type;
 		sphereCollider->parent = &parent;
 		//sphereColliderVector.push_back(sphereCollider);
 		return sphereCollider;
@@ -40,7 +46,7 @@ Collider* CollisionManager::AddNewCollider(ColliderType type, GameObject& topPar
 	case ColliderType::BoxType:
 	{
 		BoxCollider* boxCollider = new BoxCollider();
-		boxCollider->type = type;
+		boxCollider->type = &type;
 		boxCollider->parent = &parent;
 		//boxColliderVector.push_back(boxCollider);
 		return boxCollider;
@@ -48,7 +54,7 @@ Collider* CollisionManager::AddNewCollider(ColliderType type, GameObject& topPar
 	case ColliderType::MeshType:
 	{
 		MeshColliderSAT* meshCollider = new MeshColliderSAT();
-		meshCollider->type = type;
+		meshCollider->type = &type;
 		meshCollider->topParent = &topParent;
 		meshColliderSATVector.push_back(meshCollider);
 		return meshCollider;
@@ -57,7 +63,7 @@ Collider* CollisionManager::AddNewCollider(ColliderType type, GameObject& topPar
 	case ColliderType::RaycastType:
 	{
 		RaycastCollider* raycastCollider = new RaycastCollider();
-		raycastCollider->type = type;
+		raycastCollider->type = &type;
 		raycastCollider->parent = &parent;
 		//raycastColliderVector.push_back(raycastCollider);
 		break;
@@ -69,24 +75,7 @@ Collider* CollisionManager::AddNewCollider(ColliderType type, GameObject& topPar
 
 void CollisionManager::DeleteCollider(ColliderType type, Collider* collider)
 {
-	switch (type)
-	{
-	case ColliderType::SphereType:
-		sphereColliderVector.erase(std::remove(sphereColliderVector.begin(), sphereColliderVector.end(), collider));
-		break;
-	case ColliderType::BoxType:
-		boxColliderVector.erase(std::remove(boxColliderVector.begin(), boxColliderVector.end(), collider));
-		break;
-	case ColliderType::MeshType:
-		meshColliderSATVector.erase(std::remove(meshColliderSATVector.begin(), meshColliderSATVector.end(), collider));
-		break;
-	case ColliderType::RaycastType:
-		raycastColliderVector.erase(std::remove(raycastColliderVector.begin(), raycastColliderVector.end(), collider));
-		break;
-	default:
-		break;
-	}
-	delete collider;
+	collider->isMarkedForDeletion = true;
 }
 
 void CollisionManager::Process()
@@ -121,30 +110,9 @@ void CollisionManager::Process()
 		SphereBoxTest();
 		RaySphereTest();
 		RayBoxTest();
+		DeleteCollidersMarkedForDeletion();
+		ApplyGravityToRigidbodies(deltaTime);
 
-		for (int i = 0; i < sphereColliderVector.size(); i++)
-		{
-			if (sphereColliderVector[i]->topParent != nullptr)
-			{
-				if (sphereColliderVector[i]->hasGotFirstPosition) //I also don't understand why this doesn't happen on the first spherecollider added, but frequently happens on the second one.
-				{
-					if (sphereColliderVector[i]->parent->myRigidbody != nullptr) //man these checks are slowly getting ridiculous.
-					{
-						sphereColliderVector[i]->parent->myRigidbody->ApplyGravity(deltaTime);
-					}
-				}
-			}
-			//std::cout << sphereColliderVector[i]->parent->myRigidbody << std::endl;
-			
-		}
-
-		for (int i = 0; i < boxColliderVector.size(); i++)
-		{
-			if (boxColliderVector[i]->parent->myRigidbody != nullptr)
-			{
-				boxColliderVector[i]->parent->myRigidbody->ApplyGravity(deltaTime);
-			}
-		}
 	}
 }
 
@@ -550,6 +518,66 @@ bool CollisionManager::FindMaxMinProjectionAB(BoxCollider& boxA, BoxCollider& bo
 	}
 	return true; //we didn't find a separating axis / separating plane, the two box colliders must be colliding!
 	//But where are we colliding?
+}
+
+void CollisionManager::ApplyGravityToRigidbodies(float deltaTime)
+{
+	for (int i = 0; i < sphereColliderVector.size(); i++)
+	{
+		if (sphereColliderVector.at(i) != nullptr)
+		{
+			//std::cout << std::to_string(sphereColliderVector.capacity()) << std::endl;
+			/*if (sphereColliderVector[i]->type == ColliderType::SphereType)
+			{*/
+			//if (sphereColliderVector[i]->hasGotFirstPosition) //I also don't understand why this doesn't happen on the first spherecollider added, but frequently happens on the second one.
+			//{
+			if (sphereColliderVector.at(i)->parent->myRigidbody != nullptr) //man these checks are slowly getting ridiculous.
+			{
+				sphereColliderVector.at(i)->parent->myRigidbody->ApplyGravity(deltaTime);
+			}
+			/*}*/
+		//}
+		}
+		//std::cout << sphereColliderVector[i]->parent->myRigidbody << std::endl;
+	}
+
+	for (int i = 0; i < boxColliderVector.size(); i++)
+	{
+		if (boxColliderVector[i]->parent->myRigidbody != nullptr)
+		{
+			boxColliderVector[i]->parent->myRigidbody->ApplyGravity(deltaTime);
+		}
+	}
+}
+
+void CollisionManager::DeleteCollidersMarkedForDeletion()
+{
+	for(SphereCollider* col : sphereColliderVector)
+	{
+		if (col->isMarkedForDeletion) 
+		{
+			sphereColliderVector.erase(std::remove(sphereColliderVector.begin(), sphereColliderVector.end(), col));
+			delete col;
+		}
+	}
+
+	for (BoxCollider* col : boxColliderVector)
+	{
+		if (col->isMarkedForDeletion)
+		{
+			boxColliderVector.erase(std::remove(boxColliderVector.begin(), boxColliderVector.end(), col));
+			delete col;
+		}
+	}
+
+	for (RaycastCollider* col : raycastColliderVector)
+	{
+		if (col->isMarkedForDeletion)
+		{
+			raycastColliderVector.erase(std::remove(raycastColliderVector.begin(), raycastColliderVector.end(), col));
+			delete col;
+		}
+	}
 }
 
 void CollisionManager::DebugGUI()

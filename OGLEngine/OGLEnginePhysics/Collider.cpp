@@ -4,6 +4,10 @@ Collider::Collider()
 {
 }
 
+Collider::~Collider()
+{
+}
+
 void Collider::SetPosition(glm::vec3 pos)
 {
 }
