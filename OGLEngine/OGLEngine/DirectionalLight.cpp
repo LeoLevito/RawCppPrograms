@@ -176,4 +176,11 @@ void DirectionalLight::Deserialization(std::fstream& file)
 	file.read(reinterpret_cast<char*>(&ambient[0]), sizeof(glm::vec3) * ambientSize);
 	file.read(reinterpret_cast<char*>(&diffuse[0]), sizeof(glm::vec3) * diffuseSize);
 	file.read(reinterpret_cast<char*>(&specular[0]), sizeof(glm::vec3) * specularSize);
+
+	if (ShaderManager::Get().depthPass == false)
+	{
+		ShaderManager::Get().shader->SetVector3(ambient, ambientString);
+		ShaderManager::Get().shader->SetVector3(diffuse, diffuseString);
+		ShaderManager::Get().shader->SetVector3(specular, specularString);
+	}
 }

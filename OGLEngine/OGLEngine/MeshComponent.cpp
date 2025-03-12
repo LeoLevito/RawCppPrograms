@@ -467,19 +467,27 @@ void MeshComponent::Deserialization(std::fstream& file)
 	file.read(reinterpret_cast<char*>(&shininess), shininessSize);
 
 
-	//do (MESH):
-	MeshManager::Get().currentlyLoadingMesh = true;
-	MeshManager::Get().IsAvailableMemoryOK = true; //okay, this may become an edge case problem if the computer's RAM is already filled up when loading the scene.
-	MeshManager::Get().IsObjSizeOK = true; //we know this to be true because we've loaded it before.
-	mesh = MeshManager::Get().LoadMesh(lastLoadableMeshName);
-	MeshManager::Get().currentlyLoadingMesh = false;
-	mesh->bufferMesh();
+	
+	if (lastLoadableMeshName.size() > 0)
+	{
+		//do (MESH):
+		MeshManager::Get().currentlyLoadingMesh = true;
+		MeshManager::Get().IsAvailableMemoryOK = true; //okay, this may become an edge case problem if the computer's RAM is already filled up when loading the scene.
+		MeshManager::Get().IsObjSizeOK = true; //we know this to be true because we've loaded it before.
+		
+		mesh = MeshManager::Get().LoadMesh(lastLoadableMeshName);
+		MeshManager::Get().currentlyLoadingMesh = false;
+		mesh->bufferMesh();
 
-	//do (TEXTURE):
-	diffuseMap = new Texture(diffuseMapPath.c_str(), selectedMinType, selectedMagType);
-	specularMap = new Texture(specularMapPath.c_str(), selectedMinType, selectedMagType);
-	mesh->ApplyDiffuseMap(diffuseMap);
-	mesh->ApplySpecularMap(specularMap);
+		//do (TEXTURE):
+		diffuseMap = new Texture(diffuseMapPath.c_str(), selectedMinType, selectedMagType);
+		specularMap = new Texture(specularMapPath.c_str(), selectedMinType, selectedMagType);
+		mesh->ApplyDiffuseMap(diffuseMap);
+		mesh->ApplySpecularMap(specularMap);
+	}
+
+
+
 
 	//do (MATERIAL):
 	if (ShaderManager::Get().depthPass == false)

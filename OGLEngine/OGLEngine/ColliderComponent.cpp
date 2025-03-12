@@ -26,7 +26,7 @@ ColliderComponent::ColliderComponent()
 ColliderComponent::~ColliderComponent()
 {
 	std::cout << "-->Deleting Collider component." << std::endl;
-	CollisionManager::Get().DeleteCollider(*myCollider->type, myCollider);
+	CollisionManager::Get().DeleteCollider(myCollider->type, myCollider);
 
 }
 
@@ -80,38 +80,39 @@ void ColliderComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 			if (ImGui::Selectable(typeNames[i]))
 			{
 				selectedType = i;
-				switch (selectedType)
+				ColliderType type = static_cast<ColliderType>(selectedType);
+				switch (type)
 				{
-				case 0:
+				case ColliderType::SphereType:
 					if (myCollider != nullptr)
 					{
-						CollisionManager::Get().DeleteCollider(*myCollider->type, myCollider);
+						CollisionManager::Get().DeleteCollider(myCollider->type, myCollider);
 					}
-					myCollider = CollisionManager::Get().AddNewCollider(ColliderType::SphereType, *owner, *this);
+					myCollider = CollisionManager::Get().AddNewCollider(type, *owner, *this);
 					myCollider->parent = this;
-					CollisionManager::Get().sphereColliderVector.push_back(dynamic_cast<SphereCollider*>(myCollider));
+					CollisionManager::Get().sphereColliderVector.push_back(static_cast<SphereCollider*>(myCollider));
 					break;
-				case 1:
+				case  ColliderType::BoxType:
 					if (myCollider != nullptr)
 					{
-						CollisionManager::Get().DeleteCollider(*myCollider->type, myCollider);
+						CollisionManager::Get().DeleteCollider(myCollider->type, myCollider);
 					}
-					myCollider = CollisionManager::Get().AddNewCollider(ColliderType::BoxType, *owner, *this);
+					myCollider = CollisionManager::Get().AddNewCollider(type, *owner, *this);
 					myCollider->parent = this;
-					CollisionManager::Get().boxColliderVector.push_back(dynamic_cast<BoxCollider*>(myCollider));
+					CollisionManager::Get().boxColliderVector.push_back(static_cast<BoxCollider*>(myCollider));
 					break;
-				case 2:
-					CollisionManager::Get().DeleteCollider(*myCollider->type, myCollider);
-					myCollider = CollisionManager::Get().AddNewCollider(ColliderType::MeshType, *owner, *this);
+				case  ColliderType::MeshType:
+					CollisionManager::Get().DeleteCollider(myCollider->type, myCollider);
+					myCollider = CollisionManager::Get().AddNewCollider(type, *owner, *this);
 					break;
-				case 3:
+				case  ColliderType::RaycastType:
 					if (myCollider != nullptr)
 					{
-						CollisionManager::Get().DeleteCollider(*myCollider->type, myCollider);
+						CollisionManager::Get().DeleteCollider(myCollider->type, myCollider);
 					}
-					myCollider = CollisionManager::Get().AddNewCollider(ColliderType::RaycastType, *owner, *this);
+					myCollider = CollisionManager::Get().AddNewCollider(type, *owner, *this);
 					myCollider->parent = this; //do this here again after AddNewCollider to make it so parent has the correct myCollider value instead of a nullptr after the DeleteCollider.
-					CollisionManager::Get().raycastColliderVector.push_back(dynamic_cast<RaycastCollider*>(myCollider)); //fixes issue where doing push_back in the AddNewCollider would have an incomplete parent reference, later causing an error below on mycollider->DrawImGui().
+					CollisionManager::Get().raycastColliderVector.push_back(static_cast<RaycastCollider*>(myCollider)); //fixes issue where doing push_back in the AddNewCollider would have an incomplete parent reference, later causing an error below on mycollider->DrawImGui().
 					break;
 				default:
 					break;
@@ -129,7 +130,7 @@ void ColliderComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 void ColliderComponent::Serialization(std::fstream& file)
 {
 	int selectedTypeSize = selectedType;
-	int ColliderTypeSize = static_cast<int>(*myCollider->type);
+	int ColliderTypeSize = static_cast<int>(myCollider->type); //type is also a pointer so gotta do [0] to get memory address of it.
 
 	file.write(reinterpret_cast<char*>(&selectedTypeSize), sizeof(selectedTypeSize));
 	file.write(reinterpret_cast<char*>(&ColliderTypeSize), sizeof(ColliderTypeSize));
@@ -150,7 +151,7 @@ void ColliderComponent::Deserialization(std::fstream& file)
 
 	if (myCollider != nullptr)
 	{
-		CollisionManager::Get().DeleteCollider(*myCollider->type, myCollider);
+		CollisionManager::Get().DeleteCollider(myCollider->type, myCollider); //this can become an issue in the future since it only marks it for deletion, actual deletion may happen later than executions below this scope, causing errors.
 	}
 	myCollider = CollisionManager::Get().AddNewCollider(currentType, *owner, *this);
 	myCollider->parent = this; //why do I do this again after AddNewCollider()?

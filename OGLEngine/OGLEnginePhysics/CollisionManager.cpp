@@ -38,7 +38,7 @@ Collider* CollisionManager::AddNewCollider(ColliderType type, GameObject& topPar
 	case ColliderType::SphereType:
 	{ //curious thing with switch cases, if you wanna initialize a new object, like directionalLight here, you need to have explicit scopes ({}), since otherwise we'd get an uninitialized variable if this case isn't hit. Best to just put this stuff in a function and call that instead. 
 		SphereCollider* sphereCollider = new SphereCollider();
-		sphereCollider->type = &type;
+		sphereCollider->type = type;
 		sphereCollider->parent = &parent;
 		//sphereColliderVector.push_back(sphereCollider);
 		return sphereCollider;
@@ -46,7 +46,7 @@ Collider* CollisionManager::AddNewCollider(ColliderType type, GameObject& topPar
 	case ColliderType::BoxType:
 	{
 		BoxCollider* boxCollider = new BoxCollider();
-		boxCollider->type = &type;
+		boxCollider->type = type;
 		boxCollider->parent = &parent;
 		//boxColliderVector.push_back(boxCollider);
 		return boxCollider;
@@ -54,7 +54,7 @@ Collider* CollisionManager::AddNewCollider(ColliderType type, GameObject& topPar
 	case ColliderType::MeshType:
 	{
 		MeshColliderSAT* meshCollider = new MeshColliderSAT();
-		meshCollider->type = &type;
+		meshCollider->type = type;
 		meshCollider->topParent = &topParent;
 		meshColliderSATVector.push_back(meshCollider);
 		return meshCollider;
@@ -63,7 +63,7 @@ Collider* CollisionManager::AddNewCollider(ColliderType type, GameObject& topPar
 	case ColliderType::RaycastType:
 	{
 		RaycastCollider* raycastCollider = new RaycastCollider();
-		raycastCollider->type = &type;
+		raycastCollider->type = type;
 		raycastCollider->parent = &parent;
 		//raycastColliderVector.push_back(raycastCollider);
 		break;

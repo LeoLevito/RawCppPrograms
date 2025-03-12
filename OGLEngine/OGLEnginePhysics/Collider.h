@@ -22,7 +22,7 @@ class Collider
 public:
 	Collider();
 	~Collider();
-	ColliderType* type;
+	ColliderType type;
 
 	virtual void SetPosition(glm::vec3 pos);
 	virtual void SetRotation(glm::vec3 rot);

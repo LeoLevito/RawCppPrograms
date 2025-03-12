@@ -202,4 +202,20 @@ void SpotLight::Deserialization(std::fstream& file)
 	file.read(reinterpret_cast<char*>(&quadratic), quadraticSize);
 	file.read(reinterpret_cast<char*>(&cutoff), cutoffSize);
 	file.read(reinterpret_cast<char*>(&outerCutoff), outerCutoffSize);
+
+
+	if (ShaderManager::Get().depthPass == false)
+	{
+		ShaderManager::Get().shader->SetVector3(ambient, ambientString);
+		ShaderManager::Get().shader->SetVector3(diffuse, diffuseString);
+		ShaderManager::Get().shader->SetVector3(specular, specularString);
+
+		ShaderManager::Get().shader->SetFloat(linear, linearString);
+		ShaderManager::Get().shader->SetFloat(quadratic, quadraticString);
+
+		float myCutoff = glm::cos(glm::radians(cutoff)); //calculate cosine value before handing it to the fragment shader because it's an expensive operation and we don't wanna do that inside the shader.
+		ShaderManager::Get().shader->SetFloat(myCutoff, cutoffString);
+		float myOuterCutoff = glm::cos(glm::radians(outerCutoff)); //calculate cosine value before handing it to the fragment shader because it's an expensive operation and we don't wanna do that inside the shader.
+		ShaderManager::Get().shader->SetFloat(myOuterCutoff, outerCutoffString);
+	}
 }
