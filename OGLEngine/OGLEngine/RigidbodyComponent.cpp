@@ -113,8 +113,41 @@ void RigidbodyComponent::ApplyGravity(float deltaTime)
 
 void RigidbodyComponent::Serialization(std::fstream& file)
 {
+	int isKinematicSize = isKinematic;
+	int useGravitySize = useGravity;
+	int gravityMultiplierSize = sizeof(float);
+	int massSize = sizeof(float);
+	int restitutionSize = sizeof(float);
+
+	file.write(reinterpret_cast<char*>(&isKinematicSize), sizeof(isKinematicSize));
+	file.write(reinterpret_cast<char*>(&useGravitySize), sizeof(useGravitySize));
+	file.write(reinterpret_cast<char*>(&gravityMultiplierSize), sizeof(gravityMultiplierSize));
+	file.write(reinterpret_cast<char*>(&massSize), sizeof(massSize));
+	file.write(reinterpret_cast<char*>(&restitutionSize), restitutionSize);
+
+	file.write(reinterpret_cast<char*>(&gravityMultiplier), sizeof(gravityMultiplierSize));
+	file.write(reinterpret_cast<char*>(&mass), sizeof(massSize));
+	file.write(reinterpret_cast<char*>(&restitution), sizeof(restitutionSize));
 }
 
 void RigidbodyComponent::Deserialization(std::fstream& file)
 {
+	int isKinematicSize;
+	int useGravitySize;
+	int gravityMultiplierSize;
+	int massSize;
+	int restitutionSize;
+
+	file.read(reinterpret_cast<char*>(&isKinematicSize), sizeof(isKinematicSize));
+	file.read(reinterpret_cast<char*>(&useGravitySize), sizeof(useGravitySize));
+	file.read(reinterpret_cast<char*>(&gravityMultiplierSize), sizeof(gravityMultiplierSize));
+	file.read(reinterpret_cast<char*>(&massSize), sizeof(massSize));
+	file.read(reinterpret_cast<char*>(&restitutionSize), sizeof(restitutionSize));
+
+	isKinematic = isKinematicSize;
+	useGravity = useGravitySize;
+
+	file.read(reinterpret_cast<char*>(&gravityMultiplier), gravityMultiplierSize);
+	file.read(reinterpret_cast<char*>(&mass), massSize);
+	file.read(reinterpret_cast<char*>(&restitution), restitutionSize);
 }
