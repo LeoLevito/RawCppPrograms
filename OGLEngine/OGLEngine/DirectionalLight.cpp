@@ -2,6 +2,7 @@
 
 DirectionalLight::DirectionalLight()
 {
+	IDstring.reserve(50);
 }
 
 DirectionalLight::~DirectionalLight()
@@ -150,32 +151,16 @@ void DirectionalLight::DrawImgui()
 
 void DirectionalLight::Serialization(std::fstream& file)
 {
-	int ambientSize = ambient.length();
-	int diffuseSize = diffuse.length();
-	int specularSize = specular.length();
-
-	file.write(reinterpret_cast<char*>(&ambientSize), sizeof(ambientSize));
-	file.write(reinterpret_cast<char*>(&diffuseSize), sizeof(diffuseSize));
-	file.write(reinterpret_cast<char*>(&specularSize), sizeof(specularSize));
-
-	file.write(reinterpret_cast<char*>(&ambient[0]), sizeof(glm::vec3) * ambientSize);
-	file.write(reinterpret_cast<char*>(&diffuse[0]), sizeof(glm::vec3) * diffuseSize);
-	file.write(reinterpret_cast<char*>(&specular[0]), sizeof(glm::vec3) * specularSize);
+	file.write(reinterpret_cast<char*>(&ambient[0]), sizeof(glm::vec3));
+	file.write(reinterpret_cast<char*>(&diffuse[0]), sizeof(glm::vec3));
+	file.write(reinterpret_cast<char*>(&specular[0]), sizeof(glm::vec3));
 }
 
 void DirectionalLight::Deserialization(std::fstream& file)
 {
-	int ambientSize;
-	int diffuseSize;
-	int specularSize;
-
-	file.read(reinterpret_cast<char*>(&ambientSize), sizeof(ambientSize));
-	file.read(reinterpret_cast<char*>(&diffuseSize), sizeof(diffuseSize));
-	file.read(reinterpret_cast<char*>(&specularSize), sizeof(specularSize));
-
-	file.read(reinterpret_cast<char*>(&ambient[0]), sizeof(glm::vec3) * ambientSize);
-	file.read(reinterpret_cast<char*>(&diffuse[0]), sizeof(glm::vec3) * diffuseSize);
-	file.read(reinterpret_cast<char*>(&specular[0]), sizeof(glm::vec3) * specularSize);
+	file.read(reinterpret_cast<char*>(&ambient[0]), sizeof(glm::vec3));
+	file.read(reinterpret_cast<char*>(&diffuse[0]), sizeof(glm::vec3));
+	file.read(reinterpret_cast<char*>(&specular[0]), sizeof(glm::vec3));
 
 	if (ShaderManager::Get().depthPass == false)
 	{

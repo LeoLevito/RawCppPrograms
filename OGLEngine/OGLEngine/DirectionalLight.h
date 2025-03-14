@@ -6,12 +6,12 @@ public:
 	DirectionalLight();
 	~DirectionalLight();
 
-	glm::vec3 position;
-	glm::vec3 direction;
+	glm::vec3 position{0,0,0};
+	glm::vec3 direction{ 0,0,0 };
 
-	glm::vec3 ambient;
-	glm::vec3 diffuse;
-	glm::vec3 specular;
+	glm::vec3 ambient{ 0,0,0 };
+	glm::vec3 diffuse{ 0,0,0 };
+	glm::vec3 specular{ 0,0,0 };
 
 
 	std::string IDstring;

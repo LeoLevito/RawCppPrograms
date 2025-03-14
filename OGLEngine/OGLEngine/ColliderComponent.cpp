@@ -129,24 +129,21 @@ void ColliderComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 
 void ColliderComponent::Serialization(std::fstream& file)
 {
-	int selectedTypeSize = selectedType;
 	int ColliderTypeSize = static_cast<int>(myCollider->type); //type is also a pointer so gotta do [0] to get memory address of it.
+	file.write(reinterpret_cast<char*>(&ColliderTypeSize), sizeof(int));
 
-	file.write(reinterpret_cast<char*>(&selectedTypeSize), sizeof(selectedTypeSize));
-	file.write(reinterpret_cast<char*>(&ColliderTypeSize), sizeof(ColliderTypeSize));
+	file.write(reinterpret_cast<char*>(&selectedType), sizeof(int));
 
 	myCollider->Serialization(file);
 }
 
 void ColliderComponent::Deserialization(std::fstream& file)
 {
-	int selectedTypeSize;
 	int ColliderTypeSize;
+	file.read(reinterpret_cast<char*>(&ColliderTypeSize), sizeof(int));
 
-	file.read(reinterpret_cast<char*>(&selectedTypeSize), sizeof(selectedTypeSize));
-	file.read(reinterpret_cast<char*>(&ColliderTypeSize), sizeof(ColliderTypeSize));
+	file.read(reinterpret_cast<char*>(&selectedType), sizeof(int));
 
-	selectedType = selectedTypeSize;
 	ColliderType currentType = static_cast<ColliderType>(ColliderTypeSize);
 
 	if (myCollider != nullptr)

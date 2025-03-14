@@ -35,14 +35,14 @@ MeshComponent::MeshComponent()
 
 	//Get all texture file names.
 	std::string path = "../Textures/";
-	for (const std::filesystem::directory_entry entry : std::filesystem::recursive_directory_iterator(path))
+	for (const std::filesystem::directory_entry& entry : std::filesystem::recursive_directory_iterator(path))
 	{
 		textureVector.push_back(entry);
 	}
 
 	//Get all mesh file names.
 	std::string path2 = "../Meshes/";
-	for (const std::filesystem::directory_entry entry : std::filesystem::recursive_directory_iterator(path2))
+	for (const std::filesystem::directory_entry& entry : std::filesystem::recursive_directory_iterator(path2))
 	{
 		if (!entry.path().has_extension())
 		{
@@ -420,22 +420,18 @@ void MeshComponent::Serialization(std::fstream& file)
 	int lastLoadableMeshNameSize = lastLoadableMeshName.size();
 	int diffuseMapPathSize = diffuseMapPath.size();
 	int specularMapPathSize = specularMapPath.size();
-	int selectedMinTypeSize = selectedMinType;
-	int selectedMagTypeSize = selectedMagType;
-	int shininessSize = sizeof(float);
 
-	file.write(reinterpret_cast<char*>(&lastLoadableMeshNameSize), sizeof(lastLoadableMeshNameSize));
-	file.write(reinterpret_cast<char*>(&diffuseMapPathSize), sizeof(diffuseMapPathSize));
-	file.write(reinterpret_cast<char*>(&specularMapPathSize), sizeof(specularMapPathSize));
-	file.write(reinterpret_cast<char*>(&selectedMinTypeSize), sizeof(selectedMinTypeSize));
-	file.write(reinterpret_cast<char*>(&selectedMagTypeSize), sizeof(selectedMagTypeSize));
-	file.write(reinterpret_cast<char*>(&shininessSize), sizeof(shininessSize));
-
+	file.write(reinterpret_cast<char*>(&lastLoadableMeshNameSize), sizeof(int));
+	file.write(reinterpret_cast<char*>(&diffuseMapPathSize), sizeof(int));
+	file.write(reinterpret_cast<char*>(&specularMapPathSize), sizeof(int));
 
 	file.write(reinterpret_cast<char*>(&lastLoadableMeshName[0]), lastLoadableMeshNameSize);
 	file.write(reinterpret_cast<char*>(&diffuseMapPath[0]), diffuseMapPathSize);
 	file.write(reinterpret_cast<char*>(&specularMapPath[0]), specularMapPathSize);
-	file.write(reinterpret_cast<char*>(&shininess), shininessSize);
+
+	file.write(reinterpret_cast<char*>(&selectedMinType), sizeof(int));
+	file.write(reinterpret_cast<char*>(&selectedMagType), sizeof(int));
+	file.write(reinterpret_cast<char*>(&shininess), sizeof(float));
 }
 
 void MeshComponent::Deserialization(std::fstream& file)
@@ -443,31 +439,23 @@ void MeshComponent::Deserialization(std::fstream& file)
 	int lastLoadableMeshNameSize;
 	int diffuseMapPathSize;
 	int specularMapPathSize;
-	int selectedMinTypeSize;
-	int selectedMagTypeSize;
-	int shininessSize;
 
-	file.read(reinterpret_cast<char*>(&lastLoadableMeshNameSize), sizeof(lastLoadableMeshNameSize));
-	file.read(reinterpret_cast<char*>(&diffuseMapPathSize), sizeof(diffuseMapPathSize));
-	file.read(reinterpret_cast<char*>(&specularMapPathSize), sizeof(specularMapPathSize));
-	file.read(reinterpret_cast<char*>(&selectedMinTypeSize), sizeof(selectedMinTypeSize));
-	file.read(reinterpret_cast<char*>(&selectedMagTypeSize), sizeof(selectedMagTypeSize));
-	file.read(reinterpret_cast<char*>(&shininessSize), sizeof(shininessSize));
+	file.read(reinterpret_cast<char*>(&lastLoadableMeshNameSize), sizeof(int));
+	file.read(reinterpret_cast<char*>(&diffuseMapPathSize), sizeof(int));
+	file.read(reinterpret_cast<char*>(&specularMapPathSize), sizeof(int));
 
 	lastLoadableMeshName.resize(lastLoadableMeshNameSize);
 	diffuseMapPath.resize(diffuseMapPathSize);
 	specularMapPath.resize(specularMapPathSize);
-	selectedMinType = selectedMinTypeSize;
-	selectedMagType = selectedMagTypeSize;
-
-
 	file.read(reinterpret_cast<char*>(&lastLoadableMeshName[0]), lastLoadableMeshNameSize);
 	file.read(reinterpret_cast<char*>(&diffuseMapPath[0]), diffuseMapPathSize);
 	file.read(reinterpret_cast<char*>(&specularMapPath[0]), specularMapPathSize);
-	file.read(reinterpret_cast<char*>(&shininess), shininessSize);
+
+	file.read(reinterpret_cast<char*>(&selectedMinType), sizeof(int));
+	file.read(reinterpret_cast<char*>(&selectedMagType), sizeof(int));
+	file.read(reinterpret_cast<char*>(&shininess), sizeof(float));
 
 
-	
 	if (lastLoadableMeshName.size() > 0)
 	{
 		//do (MESH):
@@ -485,8 +473,6 @@ void MeshComponent::Deserialization(std::fstream& file)
 		mesh->ApplyDiffuseMap(diffuseMap);
 		mesh->ApplySpecularMap(specularMap);
 	}
-
-
 
 
 	//do (MATERIAL):

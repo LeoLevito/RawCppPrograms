@@ -15,6 +15,7 @@ std::mutex myMutex2; //oh my god I can't be doing this, I need to have a new mut
 
 GameObjectManager::GameObjectManager()
 {
+	gameObjects.reserve(3 * sizeof(GameObject*));
 }
 
 GameObjectManager::~GameObjectManager()
@@ -121,7 +122,7 @@ void GameObjectManager::Serialization(const std::string& filename)
 	if (file.is_open())
 	{
 		int gameObjectsSize = gameObjects.size();
-		file.write(reinterpret_cast<char*>(&gameObjectsSize), sizeof(gameObjectsSize));
+		file.write(reinterpret_cast<char*>(&gameObjectsSize), sizeof(int));
 
 		for (int i = 0; i < gameObjectsSize; i++)
 		{
@@ -130,7 +131,7 @@ void GameObjectManager::Serialization(const std::string& filename)
 			for (int j = 0; j < gameObjects[i]->components.size(); j++)
 			{
 				int componentType = static_cast<int>(gameObjects[i]->components[j]->type);
-				file.write(reinterpret_cast<char*>(&componentType), sizeof(componentType));
+				file.write(reinterpret_cast<char*>(&componentType), sizeof(int));
 
 				switch (gameObjects[i]->components[j]->type)
 				{
@@ -176,7 +177,7 @@ void GameObjectManager::Deserialization(const std::string& filename)
 	if (file.is_open())
 	{
 		int gameObjectsSize;
-		file.read(reinterpret_cast<char*>(&gameObjectsSize), sizeof(gameObjectsSize));
+		file.read(reinterpret_cast<char*>(&gameObjectsSize), sizeof(int));
 
 		gameObjects.resize(gameObjectsSize);
 
@@ -188,7 +189,7 @@ void GameObjectManager::Deserialization(const std::string& filename)
 			for (int j = 0; j < gameObjects[i]->components.size(); j++) //components.size() is read in gameObjects[i]->Deserialization().
 			{
 				int componentType;
-				file.read(reinterpret_cast<char*>(&componentType), sizeof(componentType));
+				file.read(reinterpret_cast<char*>(&componentType), sizeof(int));
 				ComponentType currentType = static_cast<ComponentType>(componentType);
 
 				switch (currentType)

@@ -22,7 +22,7 @@ class MeshComponent : public Component
 public:
 	MeshComponent();
 	~MeshComponent();
-	Mesh* mesh;
+	Mesh* mesh = nullptr;
 
 	Texture* diffuseMap;
 	Texture* specularMap;
@@ -53,10 +53,11 @@ public:
 	enum TextureChoice
 	{
 		choice_diffuse,
-		choice_specular
+		choice_specular, 
+		none
 	};
 
-	TextureChoice textureChoice;
+	TextureChoice textureChoice = TextureChoice::none;
 
 	int selectedMinType; //important for serialization
 	int selectedMagType; //important for serialization

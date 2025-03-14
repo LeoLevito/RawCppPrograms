@@ -20,7 +20,7 @@ public:
 
 	int selectedType = 0;
 
-	Light* myLight;
+	Light* myLight = nullptr;
 
 	void Serialization(std::fstream& file) override;
 	void Deserialization(std::fstream& file) override;

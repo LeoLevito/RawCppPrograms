@@ -20,7 +20,7 @@ LightComponent::LightComponent()
 LightComponent::~LightComponent()
 {
 	std::cout << "-->Deleting Light component." << std::endl;
-	LightManager::Get().DeleteLight(myLight->type, myLight);
+	LightManager::Get().DeleteLight(myLight->type, *myLight);
 }
 
 void LightComponent::Update()
@@ -76,15 +76,15 @@ void LightComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 				switch (selectedType)
 				{
 				case 0:
-					LightManager::Get().DeleteLight(myLight->type, myLight);
+					LightManager::Get().DeleteLight(myLight->type, *myLight);
 					myLight = LightManager::Get().AddNewLight(LightType::DirectionalLightType);
 					break;
 				case 1:
-					LightManager::Get().DeleteLight(myLight->type, myLight);
+					LightManager::Get().DeleteLight(myLight->type, *myLight);
 					myLight = LightManager::Get().AddNewLight(LightType::PointLightType);
 					break;
 				case 2:
-					LightManager::Get().DeleteLight(myLight->type, myLight);
+					LightManager::Get().DeleteLight(myLight->type, *myLight);
 					myLight = LightManager::Get().AddNewLight(LightType::SpotLightType);
 					break;
 				default:
@@ -99,32 +99,27 @@ void LightComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 
 void LightComponent::Serialization(std::fstream& file)
 {
-	int IDsize = myLight->ID;
 	int lightTypeSize = static_cast<int>(myLight->type);
-	int selectedTypeSize = selectedType; //for correct imgui text above.
+	file.write(reinterpret_cast<char*>(&lightTypeSize), sizeof(int));
 
-	file.write(reinterpret_cast<char*>(&IDsize), sizeof(IDsize));
-	file.write(reinterpret_cast<char*>(&lightTypeSize), sizeof(lightTypeSize));
-	file.write(reinterpret_cast<char*>(&selectedTypeSize), sizeof(selectedTypeSize));
+	file.write(reinterpret_cast<char*>(&myLight->ID), sizeof(int));
+	file.write(reinterpret_cast<char*>(&selectedType), sizeof(int));
 
 	myLight->Serialization(file);
 }
 
 void LightComponent::Deserialization(std::fstream& file)
 {
-	int IDsize;
 	int lightTypeSize;
-	int selectedTypeSize;
+	file.read(reinterpret_cast<char*>(&lightTypeSize), sizeof(int));
 
-	file.read(reinterpret_cast<char*>(&IDsize), sizeof(IDsize));
-	file.read(reinterpret_cast<char*>(&lightTypeSize), sizeof(lightTypeSize));
-	file.read(reinterpret_cast<char*>(&selectedTypeSize), sizeof(selectedTypeSize));
-
-	selectedType = selectedTypeSize;
 	LightType currentType = static_cast<LightType>(lightTypeSize);
-	LightManager::Get().DeleteLight(myLight->type, myLight);
+	LightManager::Get().DeleteLight(myLight->type, *myLight);
 	myLight = LightManager::Get().AddNewLight(currentType);
-	myLight->ID = IDsize; //man I don't like this ID system. Somewhere This ID gets reset somewhere after this. I think it may be DeleteLight somewhere that causes this.
+
+	file.read(reinterpret_cast<char*>(&myLight->ID), sizeof(int));
+	file.read(reinterpret_cast<char*>(&selectedType), sizeof(int));
+
 	myLight->UpdateIDBasedStrings();
 
 	myLight->Deserialization(file);

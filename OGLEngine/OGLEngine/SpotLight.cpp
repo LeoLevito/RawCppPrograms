@@ -152,56 +152,24 @@ void SpotLight::DrawImgui()
 
 void SpotLight::Serialization(std::fstream& file)
 {
-	int ambientSize = ambient.length();
-	int diffuseSize = diffuse.length();
-	int specularSize = specular.length();
-	int linearSize = sizeof(float);
-	int quadraticSize = sizeof(float);
-	int cutoffSize = sizeof(float);
-	int outerCutoffSize = sizeof(float);
-
-	file.write(reinterpret_cast<char*>(&ambientSize), sizeof(ambientSize));
-	file.write(reinterpret_cast<char*>(&diffuseSize), sizeof(diffuseSize));
-	file.write(reinterpret_cast<char*>(&specularSize), sizeof(specularSize));
-	file.write(reinterpret_cast<char*>(&linearSize), sizeof(linearSize));
-	file.write(reinterpret_cast<char*>(&quadraticSize), sizeof(quadraticSize));
-	file.write(reinterpret_cast<char*>(&cutoffSize), sizeof(cutoffSize));
-	file.write(reinterpret_cast<char*>(&outerCutoffSize), sizeof(outerCutoffSize));
-
-	file.write(reinterpret_cast<char*>(&ambient[0]), sizeof(glm::vec3) * ambientSize);
-	file.write(reinterpret_cast<char*>(&diffuse[0]), sizeof(glm::vec3) * diffuseSize);
-	file.write(reinterpret_cast<char*>(&specular[0]), sizeof(glm::vec3) * specularSize);
-	file.write(reinterpret_cast<char*>(&linear), linearSize);
-	file.write(reinterpret_cast<char*>(&quadratic), quadraticSize);
-	file.write(reinterpret_cast<char*>(&cutoff), cutoffSize);
-	file.write(reinterpret_cast<char*>(&outerCutoff), outerCutoffSize);
+	file.write(reinterpret_cast<char*>(&ambient[0]), sizeof(glm::vec3));
+	file.write(reinterpret_cast<char*>(&diffuse[0]), sizeof(glm::vec3));
+	file.write(reinterpret_cast<char*>(&specular[0]), sizeof(glm::vec3));
+	file.write(reinterpret_cast<char*>(&linear), sizeof(float));
+	file.write(reinterpret_cast<char*>(&quadratic), sizeof(float));
+	file.write(reinterpret_cast<char*>(&cutoff), sizeof(float));
+	file.write(reinterpret_cast<char*>(&outerCutoff), sizeof(float));
 }
 
 void SpotLight::Deserialization(std::fstream& file)
 {
-	int ambientSize;
-	int diffuseSize;
-	int specularSize;
-	int linearSize;
-	int quadraticSize;
-	int cutoffSize;
-	int outerCutoffSize;
-
-	file.read(reinterpret_cast<char*>(&ambientSize), sizeof(ambientSize));
-	file.read(reinterpret_cast<char*>(&diffuseSize), sizeof(diffuseSize));
-	file.read(reinterpret_cast<char*>(&specularSize), sizeof(specularSize));
-	file.read(reinterpret_cast<char*>(&linearSize), sizeof(linearSize));
-	file.read(reinterpret_cast<char*>(&quadraticSize), sizeof(quadraticSize));
-	file.read(reinterpret_cast<char*>(&cutoffSize), sizeof(cutoffSize));
-	file.read(reinterpret_cast<char*>(&outerCutoffSize), sizeof(outerCutoffSize));
-
-	file.read(reinterpret_cast<char*>(&ambient[0]), sizeof(glm::vec3) * ambientSize);
-	file.read(reinterpret_cast<char*>(&diffuse[0]), sizeof(glm::vec3) * diffuseSize);
-	file.read(reinterpret_cast<char*>(&specular[0]), sizeof(glm::vec3) * specularSize);
-	file.read(reinterpret_cast<char*>(&linear), linearSize);
-	file.read(reinterpret_cast<char*>(&quadratic), quadraticSize);
-	file.read(reinterpret_cast<char*>(&cutoff), cutoffSize);
-	file.read(reinterpret_cast<char*>(&outerCutoff), outerCutoffSize);
+	file.read(reinterpret_cast<char*>(&ambient[0]), sizeof(glm::vec3));
+	file.read(reinterpret_cast<char*>(&diffuse[0]), sizeof(glm::vec3));
+	file.read(reinterpret_cast<char*>(&specular[0]), sizeof(glm::vec3));
+	file.read(reinterpret_cast<char*>(&linear), sizeof(float));
+	file.read(reinterpret_cast<char*>(&quadratic), sizeof(float));
+	file.read(reinterpret_cast<char*>(&cutoff), sizeof(float));
+	file.read(reinterpret_cast<char*>(&outerCutoff), sizeof(float));
 
 
 	if (ShaderManager::Get().depthPass == false)

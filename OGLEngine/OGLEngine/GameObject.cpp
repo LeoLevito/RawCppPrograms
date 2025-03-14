@@ -15,6 +15,7 @@
 GameObject::GameObject()
 {
 	name = "Game object";
+	components.reserve(3 * sizeof(Component*));
 }
 
 GameObject::~GameObject()
@@ -121,29 +122,25 @@ void GameObject::DrawObjectSpecificImGuiHierarchyAdjustables(std::vector<GameObj
 void GameObject::Serialization(std::fstream& file)
 {
 	int nameSize = name.size();
-	int IDSize = ID;
 	int componentsSize = components.size();
-
-	file.write(reinterpret_cast<char*>(&nameSize), sizeof(nameSize));
-	file.write(reinterpret_cast<char*>(&IDSize), sizeof(IDSize));
-	file.write(reinterpret_cast<char*>(&componentsSize), sizeof(componentsSize));
+	file.write(reinterpret_cast<char*>(&nameSize), sizeof(int));
+	file.write(reinterpret_cast<char*>(&componentsSize), sizeof(int));
 
 	file.write(reinterpret_cast<char*>(&name[0]), nameSize); //https://stackoverflow.com/a/37035925
+
+	file.write(reinterpret_cast<char*>(&ID), sizeof(int));
 }
 
 void GameObject::Deserialization(std::fstream& file)
 {
 	int nameSize;
-	int IDSize;
 	int componentsSize;
-
-	file.read(reinterpret_cast<char*>(&nameSize), sizeof(nameSize)); 
-	file.read(reinterpret_cast<char*>(&IDSize), sizeof(IDSize));
-	file.read(reinterpret_cast<char*>(&componentsSize), sizeof(componentsSize));
-
+	file.read(reinterpret_cast<char*>(&nameSize), sizeof(int)); 
+	file.read(reinterpret_cast<char*>(&componentsSize), sizeof(int));
 	name.resize(nameSize);
-	ID = IDSize;
 	components.resize(componentsSize);
 
 	file.read(reinterpret_cast<char*>(&name[0]), nameSize); //https://stackoverflow.com/a/37035925
+
+	file.read(reinterpret_cast<char*>(&ID), sizeof(int));
 }

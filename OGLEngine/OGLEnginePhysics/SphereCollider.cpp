@@ -33,20 +33,10 @@ void SphereCollider::DrawImgui()
 
 void SphereCollider::Serialization(std::fstream& file)
 {
-	int radiusSize = sizeof(float);
-
-	file.write(reinterpret_cast<char*>(&radiusSize), sizeof(radiusSize));
-
-	file.write(reinterpret_cast<char*>(&radius), radiusSize);
-
+	file.write(reinterpret_cast<char*>(&radius), sizeof(float));
 }
 
 void SphereCollider::Deserialization(std::fstream& file)
 {
-	int radiusSize;
-
-	file.read(reinterpret_cast<char*>(&radiusSize), sizeof(radiusSize));
-
-	file.read(reinterpret_cast<char*>(&radius), radiusSize);
-
+	file.read(reinterpret_cast<char*>(&radius), sizeof(float));
 }

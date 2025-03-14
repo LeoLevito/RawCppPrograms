@@ -1,5 +1,17 @@
 #include "LightManager.h"
 
+LightManager::LightManager()
+{
+	directionalLightVector.reserve(3 * sizeof(DirectionalLight*));
+	pointLightVector.reserve(3 * sizeof(PointLight*));
+	spotLightVector.reserve(3 * sizeof(SpotLight*));
+
+}
+
+LightManager::~LightManager()
+{
+}
+
 LightManager& LightManager::Get()
 {
 	static LightManager instance;
@@ -43,16 +55,16 @@ Light* LightManager::AddNewLight(LightType type)
 	}
 }
 
-void LightManager::DeleteLight(LightType type, Light* light)
+void LightManager::DeleteLight(LightType type, Light& light)
 {
-
+	//mark for deletion?
 	//NOTE: Shifting IDs causes a problem where lights may be swapped between light components. This causes confusion and should be worked out.
 
-	light->SetToZero();
+	light.SetToZero();
 	switch (type)
 	{
 	case LightType::DirectionalLightType:
-		directionalLightVector.erase(std::remove(directionalLightVector.begin(), directionalLightVector.end(), light));
+		directionalLightVector.erase(std::remove(directionalLightVector.begin(), directionalLightVector.end(), &light));
 		for (int i = 0; i < directionalLightVector.size(); i++)
 		{
 			directionalLightVector[i]->ID = i; //this is where the ID shift happens on the previous light. I don't want this to happen when I manually set the ID's.
@@ -60,7 +72,7 @@ void LightManager::DeleteLight(LightType type, Light* light)
 		}
 		break;
 	case LightType::PointLightType:
-		pointLightVector.erase(std::remove(pointLightVector.begin(), pointLightVector.end(), light));
+		pointLightVector.erase(std::remove(pointLightVector.begin(), pointLightVector.end(), &light));
 		for (int i = 0; i < pointLightVector.size(); i++)
 		{
 			pointLightVector[i]->ID = i;
@@ -69,7 +81,7 @@ void LightManager::DeleteLight(LightType type, Light* light)
 
 		break;
 	case LightType::SpotLightType:
-		spotLightVector.erase(std::remove(spotLightVector.begin(), spotLightVector.end(), light));
+		spotLightVector.erase(std::remove(spotLightVector.begin(), spotLightVector.end(), &light));
 		for (int i = 0; i < spotLightVector.size(); i++)
 		{
 			spotLightVector[i]->ID = i;
@@ -79,7 +91,7 @@ void LightManager::DeleteLight(LightType type, Light* light)
 	default:
 		break;
 	}
-	delete light;
+	delete &light;
 }
 
 void LightManager::DrawImgui()
