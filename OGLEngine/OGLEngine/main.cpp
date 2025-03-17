@@ -14,13 +14,11 @@
 
 int main()
 {
-	Graphics* graphics = new Graphics;
-	graphics->Initialize(1280, 720);
+	Graphics::Get().Initialize(1280, 720);
 
-	Engine::Get().Initialize(graphics->window, &Camera::Get());
+	Engine::Get().Initialize(Graphics::Get().window, &Camera::Get());
 
-	EditorGUI* editorGUI = new EditorGUI;
-	editorGUI->Initialize(graphics->window, graphics, Camera::Get());
+	EditorGUI::Get().Initialize(Graphics::Get().window, &Graphics::Get(), Camera::Get());
 
 	std::thread MeshManagerThread(&MeshManager::Process, &MeshManager::Get()); //make a wrapper function in Thread class that does std::thread t1(func).
 	std::thread GameObjectManagerThread(&GameObjectManager::Process, &GameObjectManager::Get()); //make a wrapper function in Thread class that does std::thread t1(func).
@@ -34,21 +32,21 @@ int main()
 	glfwSwapInterval(1); //set max framerate, think (1/50) * 50 for 1 fps at 50hz, this doesn't function like a VSYNC toggle it seems to my eyes. Edit: well, when a big mesh is rendering it does seem to lock the framerate perfectly.
 
 	ShaderManager::Get().Initialize(); //initialize shadermanager with shadowmap.
-	while (!graphics->ShouldClose())
+	while (!Graphics::Get().ShouldClose())
 	{
 		currentTime = glfwGetTime(); //May or may not be super accurate at the moment.
 		deltaTime = currentTime - lastTime;
 		lastTime = currentTime;
 
 		glfwPollEvents(); //moved from Graphics::Render().
-		editorGUI->StartImGuiFrame(deltaTime);
+		EditorGUI::Get().StartImGuiFrame(deltaTime);
 
-		Engine::Get().Update(graphics->window,deltaTime);
-		graphics->Render();
+		Engine::Get().Update(Graphics::Get().window, deltaTime);
+		Graphics::Get().Render();
 
-		editorGUI->RenderImGui(Camera::Get().projection);
+		EditorGUI::Get().RenderImGui(Camera::Get().projection);
 
-		glfwSwapBuffers(graphics->window); //moved from Graphics::Render().
+		glfwSwapBuffers(Graphics::Get().window); //moved from Graphics::Render().
 	}
 
 	//terminate thread.
@@ -71,7 +69,7 @@ int main()
 	CollisionManagerThread.join();
 	CollisionManagerThread.~thread();
 
-	editorGUI->CloseImGui();
+	EditorGUI::Get().CloseImGui();
 	return 0;
 }
 

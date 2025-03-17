@@ -13,6 +13,21 @@
 #include "CollisionManager.h"
 #include "LightManager.h"
 
+EditorGUI::EditorGUI()
+{
+}
+
+EditorGUI::~EditorGUI()
+{
+}
+
+EditorGUI& EditorGUI::Get()
+{
+	// TODO: insert return statement here
+	static EditorGUI instance;
+	return instance;
+}
+
 void EditorGUI::Initialize(GLFWwindow* window, Graphics* graphics, Camera& camera)
 {
 	//Initialize ImGui, check https://github.com/ocornut/imgui/wiki/Getting-Started#example-if-you-are-using-glfw--openglwebgl, and cross-reference with Martin's project as well.
@@ -22,7 +37,7 @@ void EditorGUI::Initialize(GLFWwindow* window, Graphics* graphics, Camera& camer
 	ImGuiIO& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-	//io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // IF using Docking Branch
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // IF using Docking Branch
 
 	// Setup Platform/Renderer backends
 	ImGui_ImplGlfw_InitForOpenGL(window, true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
@@ -46,7 +61,7 @@ void EditorGUI::StartImGuiFrame(float deltaTime)
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 
-
+	SceneWindow();
 	ImGui::ShowDemoWindow(); // Show demo window! :)
 	FrameRateWindow(deltaTime);
 	HierarchyWindow(Camera::Get(), Camera::Get().projection);
@@ -70,6 +85,28 @@ void EditorGUI::CloseImGui() //When shutting down program, make sure ImGui is sh
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
+}
+
+//https://gamedev.stackexchange.com/questions/140693/how-can-i-render-an-opengl-scene-into-an-imgui-window
+void EditorGUI::SceneWindow()
+{
+	ImGui::Begin("Scene");
+	ImGui::BeginChild("Scene2"); //child allows for larger area of window to be used.
+	if (ImGui::GetWindowSize().x != sceneWindowWidth || ImGui::GetWindowSize().y != sceneWindowHeight)
+	{
+		sceneWindowWidth = ImGui::GetWindowSize().x;
+		sceneWindowHeight = ImGui::GetWindowSize().y;
+		Camera::Get().UpdateCameraProjection();
+	}
+	//glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	//glClear(GL_COLOR_BUFFER_BIT);
+	//glBindTexture(GL_TEXTURE_2D, Graphics::Get().sceneTexture);
+
+	ImTextureID texid = Graphics::Get().sceneTexture;
+	ImVec2 texsize = { sceneWindowWidth, sceneWindowHeight }; //it can't get access to this for whatever reason.
+	ImGui::Image(texid, texsize, ImVec2(0, 1), ImVec2(1, 0));
+	ImGui::EndChild();
+	ImGui::End();
 }
 
 void EditorGUI::FrameRateWindow(float deltaTime)

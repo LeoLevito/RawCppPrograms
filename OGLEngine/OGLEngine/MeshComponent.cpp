@@ -285,7 +285,7 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 			}
 			else
 			{
-				ImGui::Image(texid, texsize); //Display image. I need a texture manager. 
+				ImGui::Image(texid, texsize, ImVec2(0,1), ImVec2(1,0)); //Display image. I need a texture manager. ImVec2 is for manipulating uv, we invert vertical so opengl displays the image correctly.
 				ImGui::SameLine();
 				std::string textureName = textureVector[i].path().string().c_str();
 				textureName.erase(textureName.length() - 4);
@@ -468,9 +468,9 @@ void MeshComponent::Deserialization(std::fstream& file)
 		mesh->bufferMesh();
 
 		//do (TEXTURE):
-		diffuseMap = new Texture(diffuseMapPath.c_str(), selectedMinType, selectedMagType);
+		diffuseMap = new Texture(diffuseMapPath.c_str(), selectedMinType, selectedMagType); 
 		specularMap = new Texture(specularMapPath.c_str(), selectedMinType, selectedMagType);
-		mesh->ApplyDiffuseMap(diffuseMap);
+		mesh->ApplyDiffuseMap(diffuseMap); //BUG!!! (nothing's wrong with the deserialization, but actually the texture application in general, the latest texture is applied to all game objects which shouldn't be the case)
 		mesh->ApplySpecularMap(specularMap);
 	}
 

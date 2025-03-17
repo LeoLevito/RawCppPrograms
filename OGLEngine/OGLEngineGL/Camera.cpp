@@ -2,6 +2,7 @@
 #include <gtc/matrix_transform.hpp>
 #include <iostream>
 #include <mutex>
+#include "EditorGUI.h"
 
 glm::vec3 WorldUp = glm::vec3(0.0f, 1.0f, 0.0f); //like is this allowed in C++?
 
@@ -44,11 +45,11 @@ void Camera::UpdateCameraProjection()
 {
 	if (isOrthographic)
 	{
-		projection = glm::ortho(0.f, 12.80f, 0.f, 7.20f, nearClipLane, farClipLane);
+		projection = glm::ortho(0.f, (EditorGUI::Get().sceneWindowWidth / 10.f), 0.f, (EditorGUI::Get().sceneWindowHeight / 10.f), nearClipLane, farClipLane);
 	}
 	else
 	{
-		projection = glm::perspective(glm::radians(FOV), 1280.f / 720.f, nearClipLane, farClipLane);
+		projection = glm::perspective(glm::radians(FOV), EditorGUI::Get().sceneWindowWidth / EditorGUI::Get().sceneWindowHeight, nearClipLane, farClipLane);
 	}
 	
 }

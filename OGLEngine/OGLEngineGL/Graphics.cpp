@@ -4,6 +4,22 @@
 #include <thread>
 #include "ShaderManager.h"
 #include "ShadowMap.h"
+#include "EditorGUI.h"
+
+Graphics::Graphics()
+{
+}
+
+Graphics::~Graphics()
+{
+}
+
+Graphics& Graphics::Get()
+{
+	static Graphics instance;
+	return instance;
+	// TODO: insert return statement here
+}
 
 void Graphics::Initialize(int width, int height)
 {
@@ -35,6 +51,10 @@ void Graphics::Initialize(int width, int height)
 	}
 
 	glEnable(GL_DEPTH_TEST); //enable depth testing, this makes it so objects in front occlude objects in back.
+
+	glGenFramebuffers(1, &sceneFBO); //only wanna do this once, otherwise memory would be allocated each tick.
+	glGenTextures(1, &sceneTexture); //only wanna do this once, otherwise memory would be allocated each tick.
+	glGenRenderbuffers(1, &rbo);
 }
 
 void Graphics::Render()
@@ -83,7 +103,10 @@ void Graphics::Render()
 
 
 //2. render scene like usual, now using the generated depth texture/shadowmap.
-	glViewport(0, 0, myWidth, myHeight);
+	RenderToSceneTexture();
+	glViewport(0, 0, EditorGUI::Get().sceneWindowWidth, EditorGUI::Get().sceneWindowHeight);
+	glBindFramebuffer(GL_FRAMEBUFFER, sceneFBO);
+	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	ShaderManager::Get().depthPass = false;
 	ShaderManager::Get().shader->Use();
@@ -92,6 +115,7 @@ void Graphics::Render()
 	{
 		GameObjectManager::Get().gameObjects[i]->Update();
 	}
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	//we need to swap buffers
 	//glfwSwapBuffers(window); //swap front and back buffers on the window. (Info: our framebuffer has two sides, the back buffer is what we add, the front buffer is what we see. Basically.). So we can see everything that was added before this function was called!
@@ -139,4 +163,25 @@ void Graphics::EscapeToCloseWindow()
 	{
 		glfwSetWindowShouldClose(window, true);
 	}
+}
+
+//https://learnopengl.com/Advanced-OpenGL/Framebuffers
+void Graphics::RenderToSceneTexture()
+{
+	glBindTexture(GL_TEXTURE_2D, sceneTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, EditorGUI::Get().sceneWindowWidth, EditorGUI::Get().sceneWindowHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL); //is this okay to do on tick?
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glBindFramebuffer(GL_FRAMEBUFFER, sceneFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, sceneTexture, 0);
+
+	// create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
+	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, EditorGUI::Get().sceneWindowWidth, EditorGUI::Get().sceneWindowHeight); // use a single renderbuffer object for both a depth AND stencil buffer.
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo); // now actually attach it
+	// now that we actually created the framebuffer and added all attachments we want to check if it is actually complete now
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
