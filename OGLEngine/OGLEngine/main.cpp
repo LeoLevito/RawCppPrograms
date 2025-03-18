@@ -44,7 +44,7 @@ int main()
 		Engine::Get().Update(Graphics::Get().window, deltaTime);
 		Graphics::Get().Render();
 
-		EditorGUI::Get().RenderImGui(Camera::Get().projection);
+		EditorGUI::Get().RenderImGui();
 
 		glfwSwapBuffers(Graphics::Get().window); //moved from Graphics::Render().
 	}

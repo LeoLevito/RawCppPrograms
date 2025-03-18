@@ -15,12 +15,13 @@ public:
 
 	void Initialize(GLFWwindow* window, Graphics* graphics, Camera& camera);
 	void StartImGuiFrame(float deltaTime);
-	void RenderImGui(glm::mat4& projection);
+	void RenderImGui();
 	void CloseImGui();
 
 	void SceneWindow();
 	void FrameRateWindow(float deltaTime);
-	void HierarchyWindow(Camera& camera, glm::mat4& projection);
+	void HierarchyWindow();
+	void InspectorWindow();
 	void CameraWindow();
 	void MainMenuBar();
 	void QuickGUITesting();
@@ -32,10 +33,11 @@ public:
 
 	float sceneWindowWidth;
 	float sceneWindowHeight;
+
+	int currentlySelectedGameObject;
 private:
 	Graphics* myGraphics;
 	//Camera myCamera;
-	glm::mat4 myProjection;
 	float currentTime; //May or may not be super accurate at the moment.
 	float deltaTime;
 	float lastTime;

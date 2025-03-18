@@ -6,6 +6,19 @@
 #include "ShadowMap.h"
 #include "EditorGUI.h"
 
+//https://www.glfw.org/docs/3.3/group__window.html#gab3fb7c3366577daef18c0023e2a8591f
+//https://stackoverflow.com/questions/45880238/how-to-draw-while-resizing-glfw-window
+//https://stackoverflow.com/questions/78009027/how-to-correctly-handle-window-resizing-when-using-imgui?noredirect=1
+void GLFW_window_size_callback(GLFWwindow* window, int width, int height) //receives the new size of the glfw frame buffer when the main window is resized.
+{
+	//resizing window during simulation could result in weird behavior from physics and deltatime dependent functions.
+	EditorGUI::Get().StartImGuiFrame(0.f);
+	Graphics::Get().Render();
+	EditorGUI::Get().RenderImGui();
+	glfwSwapBuffers(window); //moved from Graphics::Render().
+	std::cout << "resized window" << std::endl;
+}
+
 Graphics::Graphics()
 {
 }
@@ -35,6 +48,8 @@ void Graphics::Initialize(int width, int height)
 
 	window = glfwCreateWindow(width, height, "OGLEngine", NULL, NULL); //create window.
 	glfwMakeContextCurrent(window); //make window current context of OpenGL calling thread.
+
+	glfwSetFramebufferSizeCallback(Graphics::Get().window, GLFW_window_size_callback);
 
 	myWidth = width;
 	myHeight = height;

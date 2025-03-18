@@ -60,23 +60,24 @@ void EditorGUI::StartImGuiFrame(float deltaTime)
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
+	ImGui::DockSpaceOverViewport(); //https://github.com/ocornut/imgui/issues/5086
 
 	SceneWindow();
 	ImGui::ShowDemoWindow(); // Show demo window! :)
 	FrameRateWindow(deltaTime);
-	HierarchyWindow(Camera::Get(), Camera::Get().projection);
+	HierarchyWindow();
+	InspectorWindow();
 	CameraWindow();
 	MainMenuBar();
 	QuickGUITesting();
 }
 
-void EditorGUI::RenderImGui(glm::mat4& projection)
+void EditorGUI::RenderImGui()
 {
 	// Rendering
 	// (Your code clears your framebuffer, renders your other stuff etc.)
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-	myProjection = projection;
 	// (Your code calls glfwSwapBuffers() etc.)
 }
 
@@ -121,11 +122,11 @@ void EditorGUI::FrameRateWindow(float deltaTime)
 	ImGui::End(); //stop rendering new ImGui window
 }
 
-void EditorGUI::HierarchyWindow(Camera& camera, glm::mat4& projection)
+void EditorGUI::HierarchyWindow()
 {
 	ImGui::Begin("Hierarchy"); //start rendering new ImGui window
 
-	if (ImGui::Button("Add Game Object")) 
+	if (ImGui::Button("Add Game Object"))
 	{
 		ObjectMessage* newMessage = new ObjectMessage(ObjectMessageType::Create);
 		GameObjectManager::Get().QueueMessage(newMessage); //send a message to create an empty game object.
@@ -145,41 +146,74 @@ void EditorGUI::HierarchyWindow(Camera& camera, glm::mat4& projection)
 		GameObjectManager::Get().Deserialization("../Levels/LevelSaveTest2.scene");
 	}
 
-	int objectIndex = 0;
-	for (GameObject* var : GameObjectManager::Get().gameObjects) //for every game object
+	static ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
+	static int selection_mask = (1 << 2);
+	int node_clicked = -1;
+	for (int i = 0; i < GameObjectManager::Get().gameObjects.size(); i++)
 	{
-		int vectorSize = GameObjectManager::Get().gameObjects.size();
-
-		ImGui::PushID(objectIndex); //ID system is required for items in an ImGui windows that will be named the same.
-
-		if (ImGui::CollapsingHeader(GameObjectManager::Get().gameObjects.at(objectIndex)->name.c_str()))
+		// Disable the default "open on single-click behavior" + set Selected flag according to our selection.
+		// To alter selection we use IsItemClicked() && !IsItemToggledOpen(), so clicking on an arrow doesn't alter selection.
+		ImGuiTreeNodeFlags node_flags = base_flags;
+		const bool is_selected = (selection_mask & (1 << i)) != 0;
+		if (is_selected)
 		{
-			int componentIndex = 0;
-			for (Component* var : GameObjectManager::Get().gameObjects.at(objectIndex)->components) //for every component on the current index game object
-			{
-				int componentsSize = GameObjectManager::Get().gameObjects.at(objectIndex)->components.size();
-				if (ImGui::TreeNode(GameObjectManager::Get().gameObjects.at(objectIndex)->components.at(componentIndex)->name.c_str())) //treenode shall be named after the components attached to the specified game object!
-				{
-					GameObjectManager::Get().gameObjects.at(objectIndex)->components.at(componentIndex)->DrawComponentSpecificImGuiHierarchyAdjustables();
-					ImGui::TreePop();
-				}
-
-				if (GameObjectManager::Get().gameObjects.at(objectIndex)->components.size() == componentsSize)//check if vector has changed size, e.g. if we've deleted a component. If the size hasn't changed we increase the iterator as per usual.
-				{
-					componentIndex++;
-				}
-			}
-			GameObjectManager::Get().gameObjects.at(objectIndex)->DrawObjectSpecificImGuiHierarchyAdjustables(GameObjectManager::Get().gameObjects); //allows deletion of game object without code above complaining about component being missing. I should probably stream line this a little bit.
+			node_flags |= ImGuiTreeNodeFlags_Selected;
 		}
-
-		if (GameObjectManager::Get().gameObjects.size() == vectorSize)//check if vector has changed size, e.g. if we've deleted a game object. If the size hasn't changed we increase the iterator as per usual.
+		bool node_open = ImGui::TreeNodeEx((void*)(intptr_t)i, node_flags, GameObjectManager::Get().gameObjects.at(i)->name.c_str());
+		if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
 		{
-			objectIndex++;
+			node_clicked = i;
 		}
-
-		ImGui::PopID();
+		if (node_open)
+		{
+			//if i decide on having child objects, display them here.
+			ImGui::TreePop();
+		}
 	}
+	if (node_clicked != -1)
+	{
+		// Update selection state
+		// (process outside of tree loop to avoid visual inconsistencies during the clicking frame)
+		if (ImGui::GetIO().KeyCtrl)
+		{
+			selection_mask ^= (1 << node_clicked);          // CTRL+click to toggle
+		}
+		else //if (!(selection_mask & (1 << node_clicked))) // Depending on selection behavior you want, may want to preserve selection when clicking on item that is part of the selection
+		{
+			selection_mask = (1 << node_clicked);           // Click to single-select
+			currentlySelectedGameObject = node_clicked;
+		}
+	}
+
 	ImGui::End(); //stop rendering new ImGui window
+}
+
+void EditorGUI::InspectorWindow()
+{
+	ImGui::Begin("Inspector");
+	if (!GameObjectManager::Get().gameObjects.size() > 0 || !(currentlySelectedGameObject >= 0))
+	{
+		ImGui::End();
+		return;
+	}
+	int componentIndex = 0;
+	for (Component* var : GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components) //for every component on the current index game object
+	{
+		int componentsSize = GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components.size();
+		if (ImGui::TreeNode(GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components.at(componentIndex)->name.c_str())) //treenode shall be named after the components attached to the specified game object!
+		{
+			GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components.at(componentIndex)->DrawComponentSpecificImGuiHierarchyAdjustables();
+			ImGui::TreePop();
+		}
+
+		if (GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components.size() == componentsSize)//check if vector has changed size, e.g. if we've deleted a component. If the size hasn't changed we increase the iterator as per usual.
+		{
+			componentIndex++;
+		}
+	}
+	GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->DrawObjectSpecificImGuiHierarchyAdjustables(GameObjectManager::Get().gameObjects); //allows deletion of game object without code above complaining about component being missing. I should probably stream line this a little bit.
+
+	ImGui::End();
 }
 
 void EditorGUI::CameraWindow()
@@ -201,7 +235,7 @@ void EditorGUI::CameraWindow()
 		Camera::Get().UpdateCameraProjection();
 	}
 
-	if (ImGui::Checkbox("orthographic", &Camera::Get().isOrthographic)) 
+	if (ImGui::Checkbox("orthographic", &Camera::Get().isOrthographic))
 	{
 		Camera::Get().UpdateCameraProjection();
 	}
@@ -256,7 +290,7 @@ void EditorGUI::MainMenuBar()
 			{
 
 			}
-			if (ImGui::MenuItem("Redo", "Ctrl+Shift+Z", false,false)) //disabled item, need to update false to true whenever I get this functionality in and can redo stuff.
+			if (ImGui::MenuItem("Redo", "Ctrl+Shift+Z", false, false)) //disabled item, need to update false to true whenever I get this functionality in and can redo stuff.
 			{
 
 			}
@@ -289,7 +323,7 @@ void EditorGUI::QuickGUITesting()
 		{
 			glEnable(GL_FRAMEBUFFER_SRGB); //enable gamma correction.
 		}
-		else 
+		else
 		{
 			glDisable(GL_FRAMEBUFFER_SRGB); //disable gamma correction.
 		}
@@ -347,7 +381,7 @@ void EditorGUI::Deserialization(const std::string& filename) //not functional at
 
 		//read contents of vectors, https://stackoverflow.com/a/31213593
 		file.read(reinterpret_cast<char*>(&GameObjectManager::Get().gameObjects[0]), sizeof(GameObject) * GameObjectManager::Get().gameObjects.size());
-		
+
 		for (size_t i = 0; i < a; i++)
 		{
 			int b;
