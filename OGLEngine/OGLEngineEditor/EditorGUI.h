@@ -25,6 +25,9 @@ public:
 	void CameraWindow();
 	void MainMenuBar();
 	void QuickGUITesting();
+	void TransformStart(glm::mat4* cameraView, glm::mat4* cameraProjection, glm::mat4* objectMatrix);
+	void EditTransform(glm::mat4* cameraView, glm::mat4* cameraProjection, glm::mat4* objectMatrix);
+	void TransformEnd();
 	bool gammaCorrection;
 
 	//testing if writing whole game objects will work.
@@ -34,7 +37,9 @@ public:
 	float sceneWindowWidth;
 	float sceneWindowHeight;
 
-	int currentlySelectedGameObject;
+	int currentlySelectedGameObject = -1;
+
+	glm::mat4 trans;
 private:
 	Graphics* myGraphics;
 	//Camera myCamera;

@@ -2,16 +2,20 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#include "ImGuizmo.h"
 #include <string>
 #include <GameObjectTest.h>
 #include <iostream>
 #include <gtc/matrix_transform.hpp>
+#include <gtx/matrix_decompose.hpp>
+#include <gtc/type_ptr.hpp>
 #include "ObjectMessage.h"
 #include "LevelMessage.h"
 #include "Engine.h"
 #include "MeshManager.h"
 #include "CollisionManager.h"
 #include "LightManager.h"
+#include <imgui_internal.h>
 
 EditorGUI::EditorGUI()
 {
@@ -62,6 +66,9 @@ void EditorGUI::StartImGuiFrame(float deltaTime)
 	ImGui::NewFrame();
 	ImGui::DockSpaceOverViewport(); //https://github.com/ocornut/imgui/issues/5086
 
+	ImGuizmo::SetOrthographic(Camera::Get().isOrthographic);
+	ImGuizmo::BeginFrame();
+
 	SceneWindow();
 	ImGui::ShowDemoWindow(); // Show demo window! :)
 	FrameRateWindow(deltaTime);
@@ -93,12 +100,16 @@ void EditorGUI::SceneWindow()
 {
 	ImGui::Begin("Scene");
 	ImGui::BeginChild("Scene2"); //child allows for larger area of window to be used.
+
+	ImGuizmo::SetDrawlist();
+
 	if (ImGui::GetWindowSize().x != sceneWindowWidth || ImGui::GetWindowSize().y != sceneWindowHeight)
 	{
 		sceneWindowWidth = ImGui::GetWindowSize().x;
 		sceneWindowHeight = ImGui::GetWindowSize().y;
 		Camera::Get().UpdateCameraProjection();
 	}
+
 	//glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	//glClear(GL_COLOR_BUFFER_BIT);
 	//glBindTexture(GL_TEXTURE_2D, Graphics::Get().sceneTexture);
@@ -106,6 +117,31 @@ void EditorGUI::SceneWindow()
 	ImTextureID texid = Graphics::Get().sceneTexture;
 	ImVec2 texsize = { sceneWindowWidth, sceneWindowHeight }; //it can't get access to this for whatever reason.
 	ImGui::Image(texid, texsize, ImVec2(0, 1), ImVec2(1, 0));
+
+	ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, sceneWindowWidth, sceneWindowHeight);
+
+	//this here is so stupid, Maybe I SHOULD make the TransformComponent an inherent trait to the GameObject class.	
+	//glm::mat4* trans/* = glm::mat4(1.0f)*/;
+	//trans = glm::translate(trans, glm::vec3(0,0,0)); //translate first so that each object rotates independently.
+	//trans = glm::rotate(trans, glm::vec3(0, 0, 0).x, glm::vec3(1, 0, 0));
+	//trans = glm::rotate(trans, glm::vec3(0, 0, 0).y, glm::vec3(0, 1, 0));
+	//trans = glm::rotate(trans, glm::vec3(0, 0, 0).z, glm::vec3(0, 0, 1));
+	//trans = glm::scale(trans, glm::vec3(0, 0, 0));
+	if (currentlySelectedGameObject >= 0)
+	{
+		for (size_t i = 0; i < GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components.size(); i++)
+		{
+			if (dynamic_cast<TransformComponent*>(GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components[i])) //checking if owner has a component of type TransformComponent. Is of-type correct word-use in this case?
+			{
+				//trans = dynamic_cast<TransformComponent*>(GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components[i])->transformMatrix;
+				TransformStart(&Camera::Get().myView, &Camera::Get().projection, &dynamic_cast<TransformComponent*>(GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components[i])->transformMatrix);
+				EditTransform(&Camera::Get().myView, &Camera::Get().projection, &dynamic_cast<TransformComponent*>(GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components[i])->transformMatrix);
+			}
+		}
+	}
+
+	//TransformEnd();
+
 	ImGui::EndChild();
 	ImGui::End();
 }
@@ -333,7 +369,79 @@ void EditorGUI::QuickGUITesting()
 	CollisionManager::Get().DebugGUI();
 	LightManager::Get().DrawImgui();
 
+
+
+
+
+
+
+
+
+
+
+	ImGuiIO& io = ImGui::GetIO();
+	ImGui::Text("X: %f Y: %f", io.MousePos.x, io.MousePos.y);
+	if (ImGuizmo::IsUsing())
+	{
+		ImGui::Text("Using gizmo");
+	}
+	else
+	{
+		ImGui::Text(ImGuizmo::IsOver() ? "Over gizmo" : "");
+		ImGui::SameLine();
+		ImGui::Text(ImGuizmo::IsOver(ImGuizmo::TRANSLATE) ? "Over translate gizmo" : "");
+		ImGui::SameLine();
+		ImGui::Text(ImGuizmo::IsOver(ImGuizmo::ROTATE) ? "Over rotate gizmo" : "");
+		ImGui::SameLine();
+		ImGui::Text(ImGuizmo::IsOver(ImGuizmo::SCALE) ? "Over scale gizmo" : "");
+	}
+
 	ImGui::End();
+}
+
+void EditorGUI::TransformStart(glm::mat4* cameraView, glm::mat4* cameraProjection, glm::mat4* objectMatrix)
+{
+
+}
+
+void EditorGUI::EditTransform(glm::mat4* cameraView, glm::mat4* cameraProjection, glm::mat4* objectMatrix)
+{
+	//glm::vec3 pos;
+	//glm::vec3 rot;
+	//glm::vec3 sca;
+	//ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(*objectMatrix), glm::value_ptr(pos), glm::value_ptr(rot), glm::value_ptr(sca));
+	//glm::mat4 newTrans = glm::mat4(1.0f);
+	//newTrans = glm::translate(newTrans, pos);
+	ImGuizmo::Manipulate(glm::value_ptr(*cameraView), glm::value_ptr(*cameraProjection), ImGuizmo::TRANSLATE, ImGuizmo::WORLD, glm::value_ptr(*objectMatrix));
+	
+	if (ImGuizmo::IsUsing())
+	{
+		ImGui::Text("Using gizmo");
+		glm::vec3 newpos;
+		glm::vec3 newrot;
+		glm::vec3 newsca;
+		ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(*objectMatrix), glm::value_ptr(newpos), glm::value_ptr(newrot), glm::value_ptr(newsca));
+		//glm::decompose();
+		if (currentlySelectedGameObject >= 0)
+		{
+			for (size_t i = 0; i < GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components.size(); i++)
+			{
+				if (dynamic_cast<TransformComponent*>(GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components[i])) //checking if owner has a component of type TransformComponent. Is of-type correct word-use in this case?
+				{
+					dynamic_cast<TransformComponent*>(GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components[i])->position = newpos;
+					dynamic_cast<TransformComponent*>(GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components[i])->rotation = newrot;
+					dynamic_cast<TransformComponent*>(GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components[i])->scale = newsca;
+				}
+			}
+		}
+	}
+
+	std::cout << " " << std::endl;
+
+}
+
+void EditorGUI::TransformEnd()
+{
 }
 
 void EditorGUI::Serialization(const std::string& filename) //not functional at the moment.

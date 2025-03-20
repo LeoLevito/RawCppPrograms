@@ -42,6 +42,9 @@
     <ClInclude Include="EditorGUI.h">
       <Filter>EditorGUI</Filter>
     </ClInclude>
+    <ClInclude Include="..\imgui\ImGuizmo.h">
+      <Filter>IMGUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\imgui\imgui.cpp">
@@ -70,6 +73,9 @@
     </ClCompile>
     <ClCompile Include="EditorGUI.cpp">
       <Filter>EditorGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\imgui\ImGuizmo.cpp">
+      <Filter>IMGUI</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
