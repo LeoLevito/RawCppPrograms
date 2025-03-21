@@ -10,7 +10,7 @@ Camera::Camera()
 {
 	FOV = 45.f;
 	nearClipLane = 0.1f;
-	farClipLane = 100.f;
+	farClipLane = 1000.f;
 	isOrthographic = false;
 	projection = glm::perspective(glm::radians(FOV), 1280.f / 720.f, nearClipLane, farClipLane); //should make variables out of 1280 / 720.
 

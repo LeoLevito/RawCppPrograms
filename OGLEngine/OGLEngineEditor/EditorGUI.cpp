@@ -115,27 +115,22 @@ void EditorGUI::SceneWindow()
 	//glBindTexture(GL_TEXTURE_2D, Graphics::Get().sceneTexture);
 
 	ImTextureID texid = Graphics::Get().sceneTexture;
-	ImVec2 texsize = { sceneWindowWidth, sceneWindowHeight }; //it can't get access to this for whatever reason.
+	ImVec2 texsize = { sceneWindowWidth, sceneWindowHeight }; 
 	ImGui::Image(texid, texsize, ImVec2(0, 1), ImVec2(1, 0));
 
 	ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, sceneWindowWidth, sceneWindowHeight);
 
 	//this here is so stupid, Maybe I SHOULD make the TransformComponent an inherent trait to the GameObject class.	
-	//glm::mat4* trans/* = glm::mat4(1.0f)*/;
-	//trans = glm::translate(trans, glm::vec3(0,0,0)); //translate first so that each object rotates independently.
-	//trans = glm::rotate(trans, glm::vec3(0, 0, 0).x, glm::vec3(1, 0, 0));
-	//trans = glm::rotate(trans, glm::vec3(0, 0, 0).y, glm::vec3(0, 1, 0));
-	//trans = glm::rotate(trans, glm::vec3(0, 0, 0).z, glm::vec3(0, 0, 1));
-	//trans = glm::scale(trans, glm::vec3(0, 0, 0));
 	if (currentlySelectedGameObject >= 0)
 	{
 		for (size_t i = 0; i < GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components.size(); i++)
 		{
 			if (dynamic_cast<TransformComponent*>(GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components[i])) //checking if owner has a component of type TransformComponent. Is of-type correct word-use in this case?
 			{
+				TransformComponent* tComp = dynamic_cast<TransformComponent*>(GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components[i]);
 				//trans = dynamic_cast<TransformComponent*>(GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components[i])->transformMatrix;
-				TransformStart(&Camera::Get().myView, &Camera::Get().projection, &dynamic_cast<TransformComponent*>(GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components[i])->transformMatrix);
-				EditTransform(&Camera::Get().myView, &Camera::Get().projection, &dynamic_cast<TransformComponent*>(GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components[i])->transformMatrix);
+				//TransformStart(&Camera::Get().myView, &Camera::Get().projection, &dynamic_cast<TransformComponent*>(GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components[i])->transformMatrix);
+				EditTransform(&Camera::Get().myView, &Camera::Get().projection, &dynamic_cast<TransformComponent*>(GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components[i])->transformMatrix, *tComp);
 			}
 		}
 	}
@@ -404,35 +399,31 @@ void EditorGUI::TransformStart(glm::mat4* cameraView, glm::mat4* cameraProjectio
 
 }
 
-void EditorGUI::EditTransform(glm::mat4* cameraView, glm::mat4* cameraProjection, glm::mat4* objectMatrix)
+void EditorGUI::EditTransform(glm::mat4* cameraView, glm::mat4* cameraProjection, glm::mat4* objectMatrix, TransformComponent& tComp)
 {
-	//glm::vec3 pos;
-	//glm::vec3 rot;
-	//glm::vec3 sca;
-	//ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(*objectMatrix), glm::value_ptr(pos), glm::value_ptr(rot), glm::value_ptr(sca));
-	//glm::mat4 newTrans = glm::mat4(1.0f);
-	//newTrans = glm::translate(newTrans, pos);
-	ImGuizmo::Manipulate(glm::value_ptr(*cameraView), glm::value_ptr(*cameraProjection), ImGuizmo::TRANSLATE, ImGuizmo::WORLD, glm::value_ptr(*objectMatrix));
+	ImGuizmo::OPERATION operation = ImGuizmo::ROTATE;
+	float tmpMatrix[16]; //https://github.com/CedricGuillemet/ImGuizmo/issues/125 came in clutch, always try solutions that my brain feels I understand first.
+	ImGuizmo::RecomposeMatrixFromComponents(&tComp.position.x, &tComp.rotation.x, &tComp.scale.x, tmpMatrix);
+	ImGuizmo::Manipulate(glm::value_ptr(*cameraView), glm::value_ptr(*cameraProjection), operation, ImGuizmo::WORLD, tmpMatrix);
 	
 	if (ImGuizmo::IsUsing())
 	{
-		ImGui::Text("Using gizmo");
-		glm::vec3 newpos;
-		glm::vec3 newrot;
-		glm::vec3 newsca;
-		ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(*objectMatrix), glm::value_ptr(newpos), glm::value_ptr(newrot), glm::value_ptr(newsca));
-		//glm::decompose();
-		if (currentlySelectedGameObject >= 0)
+		float matrixTranslation[3], matrixRotation[3], matrixScale[3];
+		ImGuizmo::DecomposeMatrixToComponents(tmpMatrix, matrixTranslation, matrixRotation, matrixScale);
+
+		switch (operation)
 		{
-			for (size_t i = 0; i < GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components.size(); i++)
-			{
-				if (dynamic_cast<TransformComponent*>(GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components[i])) //checking if owner has a component of type TransformComponent. Is of-type correct word-use in this case?
-				{
-					dynamic_cast<TransformComponent*>(GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components[i])->position = newpos;
-					dynamic_cast<TransformComponent*>(GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components[i])->rotation = newrot;
-					dynamic_cast<TransformComponent*>(GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components[i])->scale = newsca;
-				}
-			}
+		case ImGuizmo::TRANSLATE:
+			tComp.position = glm::vec3(matrixTranslation[0], matrixTranslation[1], matrixTranslation[2]);
+			break;
+		case ImGuizmo::ROTATE:
+			tComp.rotation = glm::vec3(matrixRotation[0], matrixRotation[1], matrixRotation[2]);
+			break;
+		case ImGuizmo::SCALE:
+			tComp.scale = glm::vec3(matrixScale[0], matrixScale[1], matrixScale[2]);
+			break;
+		default:
+			break;
 		}
 	}
 
