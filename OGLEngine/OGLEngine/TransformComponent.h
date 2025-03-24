@@ -2,6 +2,7 @@
 #include "glm.hpp"
 #include "Component.h"
 #include "Camera.h"
+
 class TransformComponent : public Component
 {
 public:

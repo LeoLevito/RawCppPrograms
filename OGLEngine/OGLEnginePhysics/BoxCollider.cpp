@@ -3,7 +3,8 @@
 #include <unordered_set>
 #include <string>
 #include <iostream>
-
+#include <gtc/quaternion.hpp>
+#include <gtx/quaternion.hpp>
 
 //https://textbooks.cs.ksu.edu/cis580/04-collisions/04-separating-axis-theorem/
 
@@ -35,11 +36,13 @@ void BoxCollider::UpdateBounds()
 	//helpful code answers from Acegikmo (Freya Holmér!!) and Bas Smit!
 
 	//set up transformation for rotation of axes which will later be used to check collision.
+	glm::quat myRotationQuaternion = glm::quat(glm::radians(rotation));
+	glm::mat4 rotationMatrix = glm::toMat4(myRotationQuaternion);
+
 	glm::mat4 trans2 = glm::mat4(1.0f);
 	trans2 = glm::translate(trans2, glm::vec3(0,0,0)); //local space.
-	trans2 = glm::rotate(trans2, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f)); //matrix, angle, axis.
-	trans2 = glm::rotate(trans2, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-	trans2 = glm::rotate(trans2, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+	trans2 = trans2 * rotationMatrix;
+
 	//set up right, up and forward vectors.
 	right   = glm::vec3(1.0f, 0.0f, 0.0f);
 	up		= glm::vec3(0.0f, 1.0f, 0.0f);
@@ -52,17 +55,13 @@ void BoxCollider::UpdateBounds()
 	//set up transformation for world space position, rotation and scale
 	trans = glm::mat4(1.0f);
 	trans = glm::translate(trans, position); //translate first so that each object rotates independently.
-	trans = glm::rotate(trans, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f)); //matrix, angle, axis.
-	trans = glm::rotate(trans, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-	trans = glm::rotate(trans, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+	trans = trans * rotationMatrix;
 	trans = glm::scale(trans, scale);
 
 	//set up transform without scale, will be used in the inverse transform of sphere's position in the SphereBoxTest() function of the CollisionManager.
 	transWithoutScale = glm::mat4(1.0f);
 	transWithoutScale = glm::translate(transWithoutScale, position);
-	transWithoutScale = glm::rotate(transWithoutScale, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f)); //matrix, angle, axis.
-	transWithoutScale = glm::rotate(transWithoutScale, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-	transWithoutScale = glm::rotate(transWithoutScale, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+	transWithoutScale = transWithoutScale * rotationMatrix;
 
 	//https://en.wikibooks.org/wiki/OpenGL_Programming/Modern_OpenGL_Tutorial_05
 	//specify vertices of cube.

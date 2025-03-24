@@ -27,7 +27,7 @@ public:
 	void MainMenuBar();
 	void QuickGUITesting();
 	void TransformStart(glm::mat4* cameraView, glm::mat4* cameraProjection, glm::mat4* objectMatrix);
-	void EditTransform(glm::mat4* cameraView, glm::mat4* cameraProjection, glm::mat4* objectMatrix, TransformComponent& tComp);
+	void EditTransform(glm::mat4* cameraView, glm::mat4* cameraProjection, TransformComponent& tComp);
 	void TransformEnd();
 	bool gammaCorrection;
 

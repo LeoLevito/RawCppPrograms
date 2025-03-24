@@ -130,7 +130,7 @@ void EditorGUI::SceneWindow()
 				TransformComponent* tComp = dynamic_cast<TransformComponent*>(GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components[i]);
 				//trans = dynamic_cast<TransformComponent*>(GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components[i])->transformMatrix;
 				//TransformStart(&Camera::Get().myView, &Camera::Get().projection, &dynamic_cast<TransformComponent*>(GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components[i])->transformMatrix);
-				EditTransform(&Camera::Get().myView, &Camera::Get().projection, &dynamic_cast<TransformComponent*>(GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components[i])->transformMatrix, *tComp);
+				EditTransform(&Camera::Get().myView, &Camera::Get().projection, *tComp);
 			}
 		}
 	}
@@ -399,12 +399,12 @@ void EditorGUI::TransformStart(glm::mat4* cameraView, glm::mat4* cameraProjectio
 
 }
 
-void EditorGUI::EditTransform(glm::mat4* cameraView, glm::mat4* cameraProjection, glm::mat4* objectMatrix, TransformComponent& tComp)
+void EditorGUI::EditTransform(glm::mat4* cameraView, glm::mat4* cameraProjection, TransformComponent& tComp)
 {
 	ImGuizmo::OPERATION operation = ImGuizmo::ROTATE;
 	float tmpMatrix[16]; //https://github.com/CedricGuillemet/ImGuizmo/issues/125 came in clutch, always try solutions that my brain feels I understand first.
 	ImGuizmo::RecomposeMatrixFromComponents(&tComp.position.x, &tComp.rotation.x, &tComp.scale.x, tmpMatrix);
-	ImGuizmo::Manipulate(glm::value_ptr(*cameraView), glm::value_ptr(*cameraProjection), operation, ImGuizmo::WORLD, tmpMatrix);
+	ImGuizmo::Manipulate(glm::value_ptr(*cameraView), glm::value_ptr(*cameraProjection), operation, ImGuizmo::LOCAL, tmpMatrix);
 	
 	if (ImGuizmo::IsUsing())
 	{
@@ -417,7 +417,8 @@ void EditorGUI::EditTransform(glm::mat4* cameraView, glm::mat4* cameraProjection
 			tComp.position = glm::vec3(matrixTranslation[0], matrixTranslation[1], matrixTranslation[2]);
 			break;
 		case ImGuizmo::ROTATE:
-			tComp.rotation = glm::vec3(matrixRotation[0], matrixRotation[1], matrixRotation[2]);
+			tComp.rotation = glm::vec3(matrixRotation[0], matrixRotation[1], matrixRotation[2]); //Note about rotation: gizmo behavior is as expected both for WORLD and LOCAL space compared with Unity, where two axes will affect every other axis when dragging the gizmo, while one axis will only affect itself.
+																								 //and setting rotation manually on the TransformComponent in the inspector (in world and local space) results in same behavior as Unity does it, where one axis is world aligned (when in world space), while the other two are either locally aligned or something because of the underlying code. And two axes will affect every other axis when dragging the gizmo, while one axis will only affect itself.
 			break;
 		case ImGuizmo::SCALE:
 			tComp.scale = glm::vec3(matrixScale[0], matrixScale[1], matrixScale[2]);
@@ -426,9 +427,6 @@ void EditorGUI::EditTransform(glm::mat4* cameraView, glm::mat4* cameraProjection
 			break;
 		}
 	}
-
-	std::cout << " " << std::endl;
-
 }
 
 void EditorGUI::TransformEnd()

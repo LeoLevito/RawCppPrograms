@@ -4,6 +4,8 @@
 #include "imgui_impl_opengl3.h"
 #include <iostream>
 #include <gtc/matrix_transform.hpp>
+#include <gtc/quaternion.hpp>
+#include <gtx/quaternion.hpp>
 
 TransformComponent::TransformComponent()
 {
@@ -36,11 +38,7 @@ void TransformComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 
 void TransformComponent::Update()
 {
-	transformMatrix = glm::translate(transformMatrix, position); //translate first so that each object rotates independently.
-	transformMatrix = glm::rotate(transformMatrix, rotation.x, glm::vec3(1, 0, 0));
-	transformMatrix = glm::rotate(transformMatrix, rotation.y, glm::vec3(0, 1, 0));
-	transformMatrix = glm::rotate(transformMatrix, rotation.z, glm::vec3(0, 0, 1));
-	transformMatrix = glm::scale(transformMatrix, scale);
+
 }
 
 void TransformComponent::Serialization(std::fstream& file)

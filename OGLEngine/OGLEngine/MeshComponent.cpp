@@ -3,6 +3,8 @@
 #include "Texture.h"
 #include <GLFW/glfw3.h>
 #include <glm.hpp>
+#include <gtc/quaternion.hpp>
+#include <gtx/quaternion.hpp>
 #include <gtc/matrix_transform.hpp>
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -354,11 +356,10 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 void MeshComponent::DrawMesh()
 {
 	glm::mat4 trans = glm::mat4(1.0f);
-
+	glm::quat myRotationQuaternion = glm::quat(glm::radians(rotation));
+	glm::mat4 rotationMatrix = glm::toMat4(myRotationQuaternion);
 	trans = glm::translate(trans, position); //translate first so that each object rotates independently.
-	trans = glm::rotate(trans, rotation.x, glm::vec3(1, 0, 0));
-	trans = glm::rotate(trans, rotation.y, glm::vec3(0, 1, 0));
-	trans = glm::rotate(trans, rotation.z, glm::vec3(0, 0, 1));
+	trans = trans * rotationMatrix;
 	trans = glm::scale(trans, scale);
 
 	//write to Vertex Shader
