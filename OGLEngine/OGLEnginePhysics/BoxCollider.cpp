@@ -36,7 +36,7 @@ void BoxCollider::UpdateBounds()
 	//helpful code answers from Acegikmo (Freya Holmér!!) and Bas Smit!
 
 	//set up transformation for rotation of axes which will later be used to check collision.
-	glm::quat myRotationQuaternion = glm::quat(glm::radians(rotation));
+	glm::quat myRotationQuaternion = glm::quat(glm::radians(rotation)); //https://www.opengl-tutorial.org/intermediate-tutorials/tutorial-17-quaternions/
 	glm::mat4 rotationMatrix = glm::toMat4(myRotationQuaternion);
 
 	glm::mat4 trans2 = glm::mat4(1.0f);

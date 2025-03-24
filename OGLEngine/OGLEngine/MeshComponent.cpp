@@ -355,8 +355,9 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 
 void MeshComponent::DrawMesh()
 {
+	
 	glm::mat4 trans = glm::mat4(1.0f);
-	glm::quat myRotationQuaternion = glm::quat(glm::radians(rotation));
+	glm::quat myRotationQuaternion = glm::quat(glm::radians(rotation)); //https://www.opengl-tutorial.org/intermediate-tutorials/tutorial-17-quaternions/
 	glm::mat4 rotationMatrix = glm::toMat4(myRotationQuaternion);
 	trans = glm::translate(trans, position); //translate first so that each object rotates independently.
 	trans = trans * rotationMatrix;
