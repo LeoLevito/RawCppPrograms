@@ -41,6 +41,9 @@ public:
 	int currentlySelectedGameObject = -1;
 
 	glm::mat4 trans;
+
+	int currentImGizmoOperation;
+	int currentImGizmoMode;
 private:
 	Graphics* myGraphics;
 	//Camera myCamera;

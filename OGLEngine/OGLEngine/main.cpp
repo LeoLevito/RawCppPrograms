@@ -39,11 +39,12 @@ int main()
 		lastTime = currentTime;
 
 		glfwPollEvents(); //moved from Graphics::Render().
-		EditorGUI::Get().StartImGuiFrame(deltaTime);
+
 
 		Engine::Get().Update(Graphics::Get().window, deltaTime);
 		Graphics::Get().Render();
 
+		EditorGUI::Get().StartImGuiFrame(deltaTime);
 		EditorGUI::Get().RenderImGui();
 
 		glfwSwapBuffers(Graphics::Get().window); //moved from Graphics::Render().

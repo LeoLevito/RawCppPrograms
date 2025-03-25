@@ -1,8 +1,4 @@
 #include "EditorGUI.h"
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
-#include "ImGuizmo.h"
 #include <string>
 #include <GameObjectTest.h>
 #include <iostream>
@@ -15,10 +11,16 @@
 #include "MeshManager.h"
 #include "CollisionManager.h"
 #include "LightManager.h"
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+#include "ImGuizmo.h"
 #include <imgui_internal.h>
 
 EditorGUI::EditorGUI()
 {
+	currentImGizmoOperation = ImGuizmo::TRANSLATE;
+	currentImGizmoMode = ImGuizmo::WORLD;
 }
 
 EditorGUI::~EditorGUI()
@@ -98,7 +100,40 @@ void EditorGUI::CloseImGui() //When shutting down program, make sure ImGui is sh
 //https://gamedev.stackexchange.com/questions/140693/how-can-i-render-an-opengl-scene-into-an-imgui-window
 void EditorGUI::SceneWindow()
 {
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0)); //gets rid of window padding so we can display the framebuffer image on the ENTIRE window.
 	ImGui::Begin("Scene");
+
+	{
+		if (ImGui::RadioButton("Translate", currentImGizmoOperation == ImGuizmo::TRANSLATE))
+		{
+			currentImGizmoOperation = ImGuizmo::TRANSLATE;
+		}
+		ImGui::SameLine();
+		if (ImGui::RadioButton("Rotate", currentImGizmoOperation == ImGuizmo::ROTATE))
+		{
+			currentImGizmoOperation = ImGuizmo::ROTATE;
+		}
+		ImGui::SameLine();
+		if (ImGui::RadioButton("Scale", currentImGizmoOperation == ImGuizmo::SCALE))
+		{
+			currentImGizmoOperation = ImGuizmo::SCALE;
+		}
+
+		ImGui::SameLine();
+		ImGui::Text(" | ");
+		ImGui::SameLine();
+
+		if (ImGui::RadioButton("World", currentImGizmoMode == ImGuizmo::WORLD))
+		{
+			currentImGizmoMode = ImGuizmo::WORLD;
+		}
+		ImGui::SameLine();
+		if (ImGui::RadioButton("Local", currentImGizmoMode == ImGuizmo::LOCAL))
+		{
+			currentImGizmoMode = ImGuizmo::LOCAL;
+		}
+	}
+
 	ImGui::BeginChild("Scene2"); //child allows for larger area of window to be used.
 
 	ImGuizmo::SetDrawlist();
@@ -115,7 +150,7 @@ void EditorGUI::SceneWindow()
 	//glBindTexture(GL_TEXTURE_2D, Graphics::Get().sceneTexture);
 
 	ImTextureID texid = Graphics::Get().sceneTexture;
-	ImVec2 texsize = { sceneWindowWidth, sceneWindowHeight }; 
+	ImVec2 texsize = { sceneWindowWidth, sceneWindowHeight };
 	ImGui::Image(texid, texsize, ImVec2(0, 1), ImVec2(1, 0));
 
 	ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, sceneWindowWidth, sceneWindowHeight);
@@ -123,22 +158,24 @@ void EditorGUI::SceneWindow()
 	//this here is so stupid, Maybe I SHOULD make the TransformComponent an inherent trait to the GameObject class.	
 	if (currentlySelectedGameObject >= 0)
 	{
-		for (size_t i = 0; i < GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components.size(); i++)
+		if (!(currentlySelectedGameObject > GameObjectManager::Get().gameObjects.size() - 1))
 		{
-			if (dynamic_cast<TransformComponent*>(GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components[i])) //checking if owner has a component of type TransformComponent. Is of-type correct word-use in this case?
+			for (size_t i = 0; i < GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components.size(); i++)
 			{
-				TransformComponent* tComp = dynamic_cast<TransformComponent*>(GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components[i]);
-				//trans = dynamic_cast<TransformComponent*>(GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components[i])->transformMatrix;
-				//TransformStart(&Camera::Get().myView, &Camera::Get().projection, &dynamic_cast<TransformComponent*>(GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components[i])->transformMatrix);
-				EditTransform(&Camera::Get().myView, &Camera::Get().projection, *tComp);
+				if (dynamic_cast<TransformComponent*>(GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components[i])) //checking if owner has a component of type TransformComponent. Is of-type correct word-use in this case?
+				{
+					TransformComponent* tComp = dynamic_cast<TransformComponent*>(GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components[i]);
+					//trans = dynamic_cast<TransformComponent*>(GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components[i])->transformMatrix;
+					//TransformStart(&Camera::Get().myView, &Camera::Get().projection, &dynamic_cast<TransformComponent*>(GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components[i])->transformMatrix);
+					EditTransform(&Camera::Get().myView, &Camera::Get().projection, *tComp);
+				}
 			}
 		}
 	}
 
-	//TransformEnd();
-
 	ImGui::EndChild();
 	ImGui::End();
+	ImGui::PopStyleVar();
 }
 
 void EditorGUI::FrameRateWindow(float deltaTime)
@@ -227,6 +264,12 @@ void EditorGUI::InspectorWindow()
 		ImGui::End();
 		return;
 	}
+	if (currentlySelectedGameObject > GameObjectManager::Get().gameObjects.size() - 1)
+	{
+		ImGui::End();
+		return;
+	}
+
 	int componentIndex = 0;
 	for (Component* var : GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components) //for every component on the current index game object
 	{
@@ -401,24 +444,23 @@ void EditorGUI::TransformStart(glm::mat4* cameraView, glm::mat4* cameraProjectio
 
 void EditorGUI::EditTransform(glm::mat4* cameraView, glm::mat4* cameraProjection, TransformComponent& tComp)
 {
-	ImGuizmo::OPERATION operation = ImGuizmo::ROTATE;
 	float tmpMatrix[16]; //https://github.com/CedricGuillemet/ImGuizmo/issues/125 came in clutch, always try solutions that my brain feels I understand first.
 	ImGuizmo::RecomposeMatrixFromComponents(&tComp.position.x, &tComp.rotation.x, &tComp.scale.x, tmpMatrix);
-	ImGuizmo::Manipulate(glm::value_ptr(*cameraView), glm::value_ptr(*cameraProjection), operation, ImGuizmo::LOCAL, tmpMatrix);
-	
+	ImGuizmo::Manipulate(glm::value_ptr(*cameraView), glm::value_ptr(*cameraProjection), ImGuizmo::OPERATION(currentImGizmoOperation), ImGuizmo::MODE(currentImGizmoMode), tmpMatrix);
+
 	if (ImGuizmo::IsUsing())
 	{
 		float matrixTranslation[3], matrixRotation[3], matrixScale[3];
 		ImGuizmo::DecomposeMatrixToComponents(tmpMatrix, matrixTranslation, matrixRotation, matrixScale);
 
-		switch (operation)
+		switch (currentImGizmoOperation)
 		{
 		case ImGuizmo::TRANSLATE:
 			tComp.position = glm::vec3(matrixTranslation[0], matrixTranslation[1], matrixTranslation[2]);
 			break;
 		case ImGuizmo::ROTATE:
 			tComp.rotation = glm::vec3(matrixRotation[0], matrixRotation[1], matrixRotation[2]); //Note about rotation: gizmo behavior is as expected both for WORLD and LOCAL space compared with Unity, where two axes will affect every other axis when dragging the gizmo, while one axis will only affect itself.
-																								 //and setting rotation manually on the TransformComponent in the inspector (in world and local space) results in same behavior as Unity does it, where one axis is world aligned (when in world space), while the other two are either locally aligned or something because of the underlying code. And two axes will affect every other axis when dragging the gizmo, while one axis will only affect itself.
+			//and setting rotation manually on the TransformComponent in the inspector (in world and local space) results in same behavior as Unity does it, where one axis is world aligned (when in world space), while the other two are either locally aligned or something because of the underlying code. And two axes will affect every other axis when dragging the gizmo, while one axis will only affect itself.
 			break;
 		case ImGuizmo::SCALE:
 			tComp.scale = glm::vec3(matrixScale[0], matrixScale[1], matrixScale[2]);
