@@ -100,7 +100,7 @@ void EditorGUI::CloseImGui() //When shutting down program, make sure ImGui is sh
 //https://gamedev.stackexchange.com/questions/140693/how-can-i-render-an-opengl-scene-into-an-imgui-window
 void EditorGUI::SceneWindow()
 {
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0)); //gets rid of window padding so we can display the framebuffer image on the ENTIRE window.
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0)); //https://github.com/ocornut/imgui/issues/1490 gets rid of window padding so we can display the framebuffer image on the ENTIRE window.
 	ImGui::Begin("Scene");
 
 	{
@@ -460,7 +460,8 @@ void EditorGUI::EditTransform(glm::mat4* cameraView, glm::mat4* cameraProjection
 			break;
 		case ImGuizmo::ROTATE:
 			tComp.rotation = glm::vec3(matrixRotation[0], matrixRotation[1], matrixRotation[2]); //Note about rotation: gizmo behavior is as expected both for WORLD and LOCAL space compared with Unity, where two axes will affect every other axis when dragging the gizmo, while one axis will only affect itself.
-			//and setting rotation manually on the TransformComponent in the inspector (in world and local space) results in same behavior as Unity does it, where one axis is world aligned (when in world space), while the other two are either locally aligned or something because of the underlying code. And two axes will affect every other axis when dragging the gizmo, while one axis will only affect itself.
+																								 //and setting rotation manually on the TransformComponent in the inspector (in world and local space) results in same behavior as Unity does it, where one axis is world aligned (when in world space), 
+																								 //while the other two are either locally aligned or something because of the underlying code. And two axes will affect every other axis when dragging the gizmo, while one axis will only affect itself.
 			break;
 		case ImGuizmo::SCALE:
 			tComp.scale = glm::vec3(matrixScale[0], matrixScale[1], matrixScale[2]);
