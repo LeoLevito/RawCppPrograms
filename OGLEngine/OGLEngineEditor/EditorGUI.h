@@ -44,6 +44,8 @@ public:
 
 	int currentImGizmoOperation;
 	int currentImGizmoMode;
+
+	int currentPolygonMode;
 private:
 	Graphics* myGraphics;
 	//Camera myCamera;

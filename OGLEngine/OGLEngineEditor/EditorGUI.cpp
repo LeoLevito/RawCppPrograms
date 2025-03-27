@@ -21,6 +21,7 @@ EditorGUI::EditorGUI()
 {
 	currentImGizmoOperation = ImGuizmo::TRANSLATE;
 	currentImGizmoMode = ImGuizmo::WORLD;
+	currentPolygonMode = GL_FILL;
 }
 
 EditorGUI::~EditorGUI()
@@ -132,6 +133,30 @@ void EditorGUI::SceneWindow()
 		{
 			currentImGizmoMode = ImGuizmo::LOCAL;
 		}
+
+		ImGui::SameLine();
+		ImGui::Text(" | ");
+		ImGui::SameLine();
+
+		if (ImGui::RadioButton("Regular", currentPolygonMode == GL_FILL))
+		{
+			currentPolygonMode = GL_FILL;
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		}
+		ImGui::SameLine();
+		if (ImGui::RadioButton("Wireframe", currentPolygonMode == GL_LINE))
+		{
+			currentPolygonMode = GL_LINE;
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		}
+		ImGui::SameLine();
+		if (ImGui::RadioButton("Points", currentPolygonMode == GL_POINT))
+		{
+			currentPolygonMode = GL_POINT;
+			glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+		}
+
+
 	}
 
 	ImGui::BeginChild("Scene2"); //child allows for larger area of window to be used.
