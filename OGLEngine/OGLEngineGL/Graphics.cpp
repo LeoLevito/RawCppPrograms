@@ -21,6 +21,7 @@ void GLFW_window_size_callback(GLFWwindow* window, int width, int height) //rece
 
 Graphics::Graphics()
 {
+
 }
 
 Graphics::~Graphics()
@@ -70,6 +71,10 @@ void Graphics::Initialize(int width, int height)
 	glGenFramebuffers(1, &sceneFBO); //only wanna do this once, otherwise memory would be allocated each tick.
 	glGenTextures(1, &sceneTexture); //only wanna do this once, otherwise memory would be allocated each tick.
 	glGenRenderbuffers(1, &rbo);
+
+	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO);
+	glGenBuffers(1, &EBO);
 }
 
 void Graphics::Render()
@@ -79,21 +84,21 @@ void Graphics::Render()
 
 
 
-//1. depth texture scene from light's perspective.
-	////glCullFace(GL_FRONT);
-	//ShaderManager::Get().depthPass = true;
-	//ShaderManager::Get().depthShader->Use();
+	//1. depth texture scene from light's perspective.
+		////glCullFace(GL_FRONT);
+		//ShaderManager::Get().depthPass = true;
+		//ShaderManager::Get().depthShader->Use();
 
-	//glViewport(0, 0, ShaderManager::Get().shadowMap->SHADOW_WIDTH, ShaderManager::Get().shadowMap->SHADOW_HEIGHT);
-	//glBindFramebuffer(GL_FRAMEBUFFER, ShaderManager::Get().shadowMap->depthMapFBO);
-	//glClear(GL_DEPTH_BUFFER_BIT);
+		//glViewport(0, 0, ShaderManager::Get().shadowMap->SHADOW_WIDTH, ShaderManager::Get().shadowMap->SHADOW_HEIGHT);
+		//glBindFramebuffer(GL_FRAMEBUFFER, ShaderManager::Get().shadowMap->depthMapFBO);
+		//glClear(GL_DEPTH_BUFFER_BIT);
 
-	//for (int i = 0; i < GameObjectManager::Get().gameObjects.size(); i++) //Game.gameObjectVector calls Update() on every game object implementing Update() and that Update() can call Update() in every component implementing Update().
-	//{
-	//	GameObjectManager::Get().gameObjects[i]->Update();
-	//}
-	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	////glCullFace(GL_BACK);
+		//for (int i = 0; i < GameObjectManager::Get().gameObjects.size(); i++) //Game.gameObjectVector calls Update() on every game object implementing Update() and that Update() can call Update() in every component implementing Update().
+		//{
+		//	GameObjectManager::Get().gameObjects[i]->Update();
+		//}
+		//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		////glCullFace(GL_BACK);
 
 
 
@@ -124,6 +129,7 @@ void Graphics::Render()
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	ShaderManager::Get().depthPass = false;
+	DrawWorldGridLines();
 	ShaderManager::Get().shader->Use();
 
 	for (int i = 0; i < GameObjectManager::Get().gameObjects.size(); i++) //Game.gameObjectVector calls Update() on every game object implementing Update() and that Update() can call Update() in every component implementing Update().
@@ -138,12 +144,6 @@ void Graphics::Render()
 	//glfwPollEvents();
 }
 
-void Graphics::Cache() //this is being done in the Mesh now. Should delete this.
-{
-	glGenBuffers(1, &VBO); //GLAD helps us out here, creating our buffer object(s) with one function instead of doing a more complex setup in raw OpenGL.
-	glGenVertexArrays(1, &VAO);
-}
-
 bool Graphics::ShouldClose()
 {
 	if (glfwWindowShouldClose(window))
@@ -155,21 +155,21 @@ bool Graphics::ShouldClose()
 
 void Graphics::ExampleCube() //put this in Graphics. Currently this is orthographic.
 {
-    for (glm::vec3 v : myCubePositions)
-    {
-        glm::mat4 trans = glm::mat4(1.0f);
+	for (glm::vec3 v : myCubePositions)
+	{
+		glm::mat4 trans = glm::mat4(1.0f);
 		trans = glm::translate(trans, v); //translate first so that each object rotates independently.
-        //trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
+		//trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
 
 		//write to Vertex Shader
-		
+
 		ShaderManager::Get().shader->SetMatrix4(trans, "transform"); //apperently there's a better way to do this compared to using a Uniform type variable inside the vertex shader, Shader Buffer Storage Object, something like that, where we can have even more variables inside the shader and update them.
 		ShaderManager::Get().shader->SetMatrix4(Camera::Get().myView, "view");
 		ShaderManager::Get().shader->SetMatrix4(Camera::Get().projection, "projection");
 
-        myCube->Draw();
+		myCube->Draw();
 		//myTriangle->Draw(myShader);
-    }
+	}
 }
 
 void Graphics::EscapeToCloseWindow()
@@ -199,4 +199,62 @@ void Graphics::RenderToSceneTexture()
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void Graphics::DrawWorldGridLines()
+{
+	for (int i = 0; i < 3; i++)
+	{
+		glm::vec3 startPoint;
+		glm::vec3 endPoint;
+		glm::vec3 color;
+		if (i == 0) //X axis line
+		{
+			startPoint = { -500,0,0 };
+			endPoint = { 500,0,0 };
+			color = { 1, 0, 0 };
+		}
+		else if (i == 1) //Z axis line
+		{
+			startPoint = { 0,0,-500 };
+			endPoint = { 0,0,500 };
+			color = { 0, 0, 1 };
+		}
+		else if (i == 2) //Y axis line
+		{
+			startPoint = { 0,-500,0 };
+			endPoint = { 0,500,0 };
+			color = { 0, 1, 0 };
+		}
+
+		glm::vec3 vert1 = startPoint;
+		glm::vec3 vert2 = endPoint;
+
+		std::vector<glm::vec3> verts = { vert1, vert2 };
+		std::vector<unsigned int> indices = { 0 , 1 };
+
+		glBindVertexArray(VAO);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+		glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(glm::vec3), &verts[0], GL_STATIC_DRAW);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW); //the indices might be wrong
+
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0); //these are probably not right, need to modify to read correctly.
+
+		glBindVertexArray(0);
+
+		glBindVertexArray(VAO);
+		//use shader for line rendering
+		ShaderManager::Get().lineShader->Use();
+		glm::mat4 trans = glm::mat4(1.0f);
+		ShaderManager::Get().lineShader->SetMatrix4(trans, "transform"); //apperently there's a better way to do this compared to using a Uniform type variable inside the vertex shader, Shader Buffer Storage Object, something like that, where we can have even more variables inside the shader and update them.
+		ShaderManager::Get().lineShader->SetMatrix4(Camera::Get().myView, "view");
+		ShaderManager::Get().lineShader->SetMatrix4(Camera::Get().projection, "projection");
+		ShaderManager::Get().lineShader->SetVector3(color, "vertexColor");
+		glDrawElements(GL_LINES, indices.size(), GL_UNSIGNED_INT, 0); //cast?
+		glBindVertexArray(0);
+	}
 }

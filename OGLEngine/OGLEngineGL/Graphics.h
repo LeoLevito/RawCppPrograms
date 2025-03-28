@@ -19,11 +19,11 @@ public:
 	static Graphics& Get();
 	void Initialize(int width, int height);
 	void Render();
-	void Cache();
 	bool ShouldClose();
 	void ExampleCube();
 	void EscapeToCloseWindow();
 	void RenderToSceneTexture();
+	void DrawWorldGridLines();
 	GLFWwindow* window;
 
 	std::vector<glm::vec3> myCubePositions;
@@ -36,8 +36,10 @@ public:
 	float myWidth;
 	float myHeight;
 private:
-	unsigned int VBO; //vertex buffer object, OpenGL objects are unsigned ints. We can put a bunch of vertices in this object and send it to the GPU. You can have an array of VBOs.
 	unsigned int VAO;
+	unsigned int VBO;//vertex buffer object, OpenGL objects are unsigned ints. We can put a bunch of vertices in this object and send it to the GPU. You can have an array of VBOs.
+	unsigned int EBO;
+
 
 
 	Triangle* myTriangle;

@@ -45,7 +45,8 @@ void EditorGUI::Initialize(GLFWwindow* window, Graphics* graphics, Camera& camer
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // IF using Docking Branch
-
+	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;		  // Enable ImGui windows outside of the main window
+	io.ConfigWindowsMoveFromTitleBarOnly = true;
 	// Setup Platform/Renderer backends
 	ImGui_ImplGlfw_InitForOpenGL(window, true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
 	ImGui_ImplOpenGL3_Init();
@@ -89,6 +90,16 @@ void EditorGUI::RenderImGui()
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	// (Your code calls glfwSwapBuffers() etc.)
+
+	ImGuiIO& io = ImGui::GetIO();
+	//https://github.com/ocornut/imgui/wiki/Multi-Viewports
+	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) //one issue with floating imgui windows is that they don't map to the GLFW input context or whatever, so if I want to rotate the camera when the SceneWindow is floating, it won't work. In the future I may swap that part of the Input class with ImGui's input implementation. Or maybe I want to create a new GLFW window for every floating window, like how Unity does it. That would allow for docking the windows to MS Windows's area.
+	{
+		GLFWwindow* backup_current_context = glfwGetCurrentContext();
+		ImGui::UpdatePlatformWindows();
+		ImGui::RenderPlatformWindowsDefault();
+		glfwMakeContextCurrent(backup_current_context); //https://github.com/ocornut/imgui/blob/0c079e453bf74acebc6c8b4f64c4fa40e76af760/examples/example_glfw_opengl3/main.cpp#L213
+	}
 }
 
 void EditorGUI::CloseImGui() //When shutting down program, make sure ImGui is shut down properly as well. Could probably make this a destructor instead of a void function for it to automatically be called once the program closes!
@@ -103,6 +114,14 @@ void EditorGUI::SceneWindow()
 {
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0)); //https://github.com/ocornut/imgui/issues/1490 gets rid of window padding so we can display the framebuffer image on the ENTIRE window.
 	ImGui::Begin("Scene");
+
+	//if (!(ImGui::IsWindowDocked()))
+	//{
+	//	std::cout << "floating" << std::endl;
+	//	GLFWwindow* myWindow;
+	//	myWindow = glfwCreateWindow(500, 500, "SceneWindow", NULL, Graphics::Get().window); //create window.
+	//	//glfwMakeContextCurrent(myWindow); //make window current context of OpenGL calling thread.
+	//}
 
 	{
 		if (ImGui::RadioButton("Translate", currentImGizmoOperation == ImGuizmo::TRANSLATE))
@@ -155,13 +174,12 @@ void EditorGUI::SceneWindow()
 			currentPolygonMode = GL_POINT;
 			glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
 		}
-
-
 	}
 
 	ImGui::BeginChild("Scene2"); //child allows for larger area of window to be used.
 
 	ImGuizmo::SetDrawlist();
+	
 
 	if (ImGui::GetWindowSize().x != sceneWindowWidth || ImGui::GetWindowSize().y != sceneWindowHeight)
 	{
@@ -183,7 +201,8 @@ void EditorGUI::SceneWindow()
 	//this here is so stupid, Maybe I SHOULD make the TransformComponent an inherent trait to the GameObject class.	
 	if (currentlySelectedGameObject >= 0)
 	{
-		if (!(currentlySelectedGameObject > GameObjectManager::Get().gameObjects.size() - 1))
+		int gameObjectsSize = GameObjectManager::Get().gameObjects.size() - 1; //instance where setting an int before the if statement works better than having the full .size getter inside the if statement.
+		if (!(currentlySelectedGameObject > gameObjectsSize))
 		{
 			for (size_t i = 0; i < GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components.size(); i++)
 			{
@@ -197,7 +216,8 @@ void EditorGUI::SceneWindow()
 			}
 		}
 	}
-
+	/*glm::mat4 matrix = glm::mat4(1.0f);
+	ImGuizmo::DrawGrid(glm::value_ptr(Camera::Get().myView), glm::value_ptr(Camera::Get().projection), glm::value_ptr(matrix), 100.f);*/
 	ImGui::EndChild();
 	ImGui::End();
 	ImGui::PopStyleVar();
@@ -469,6 +489,7 @@ void EditorGUI::TransformStart(glm::mat4* cameraView, glm::mat4* cameraProjectio
 
 void EditorGUI::EditTransform(glm::mat4* cameraView, glm::mat4* cameraProjection, TransformComponent& tComp)
 {
+	
 	float tmpMatrix[16]; //https://github.com/CedricGuillemet/ImGuizmo/issues/125 came in clutch, always try solutions that my brain feels I understand first.
 	ImGuizmo::RecomposeMatrixFromComponents(&tComp.position.x, &tComp.rotation.x, &tComp.scale.x, tmpMatrix);
 	ImGuizmo::Manipulate(glm::value_ptr(*cameraView), glm::value_ptr(*cameraProjection), ImGuizmo::OPERATION(currentImGizmoOperation), ImGuizmo::MODE(currentImGizmoMode), tmpMatrix);
