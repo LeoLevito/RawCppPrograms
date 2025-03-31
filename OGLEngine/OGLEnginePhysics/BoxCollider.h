@@ -11,8 +11,10 @@ public:
 	virtual void SetRotation(glm::vec3 rot) override;
 	virtual void SetScale(glm::vec3 scaleIn) override;
 
+
 	void UpdateBounds();
 
+	virtual void Update() override;
 	virtual void DrawImgui() override;
 
 	glm::vec3 position; //center of box
@@ -40,6 +42,8 @@ public:
 	glm::vec3 forward;
 	glm::mat4 trans;
 	glm::mat4 transWithoutScale;
+
+	bool drawDebugLines;
 
 	void Serialization(std::fstream& file) override;
 	void Deserialization(std::fstream& file) override;

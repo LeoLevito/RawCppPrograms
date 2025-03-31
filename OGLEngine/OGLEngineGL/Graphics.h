@@ -23,7 +23,9 @@ public:
 	void ExampleCube();
 	void EscapeToCloseWindow();
 	void RenderToSceneTexture();
-	void DrawWorldGridLines();
+	void RenderWorldGrid();
+	void DrawLine(glm::vec3 startPoint, glm::vec3 endPoint);
+
 	GLFWwindow* window;
 
 	std::vector<glm::vec3> myCubePositions;

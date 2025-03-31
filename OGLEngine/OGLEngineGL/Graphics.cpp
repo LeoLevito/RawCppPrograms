@@ -129,7 +129,7 @@ void Graphics::Render()
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	ShaderManager::Get().depthPass = false;
-	DrawWorldGridLines();
+	RenderWorldGrid();
 	ShaderManager::Get().shader->Use();
 
 	for (int i = 0; i < GameObjectManager::Get().gameObjects.size(); i++) //Game.gameObjectVector calls Update() on every game object implementing Update() and that Update() can call Update() in every component implementing Update().
@@ -201,60 +201,116 @@ void Graphics::RenderToSceneTexture()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void Graphics::DrawWorldGridLines()
+void Graphics::RenderWorldGrid()
 {
-	for (int i = 0; i < 3; i++)
+	//use shader for line rendering
+	ShaderManager::Get().lineShader->Use();
+	glm::mat4 trans = glm::mat4(1.0f);
+	ShaderManager::Get().lineShader->SetMatrix4(trans, "transform"); //apperently there's a better way to do this compared to using a Uniform type variable inside the vertex shader, Shader Buffer Storage Object, something like that, where we can have even more variables inside the shader and update them.
+	ShaderManager::Get().lineShader->SetMatrix4(Camera::Get().myView, "view");
+	ShaderManager::Get().lineShader->SetMatrix4(Camera::Get().projection, "projection");
+
+	for (int i = 0; i < 5; i++)
 	{
 		glm::vec3 startPoint;
 		glm::vec3 endPoint;
 		glm::vec3 color;
+
+		int lineLength = 50000;
+		int lineAmount = 50000;
 		if (i == 0) //X axis line
 		{
-			startPoint = { -500,0,0 };
-			endPoint = { 500,0,0 };
+
+			startPoint = { -lineLength,0,0 };
+			endPoint = { lineLength,0,0 };
 			color = { 1, 0, 0 };
+			ShaderManager::Get().lineShader->SetVector3(color, "vertexColor");
+			DrawLine(startPoint, endPoint);
 		}
 		else if (i == 1) //Z axis line
 		{
-			startPoint = { 0,0,-500 };
-			endPoint = { 0,0,500 };
+			startPoint = { 0,0,-lineLength };
+			endPoint = { 0,0,lineLength };
 			color = { 0, 0, 1 };
+			ShaderManager::Get().lineShader->SetVector3(color, "vertexColor");
+			DrawLine(startPoint, endPoint);
 		}
 		else if (i == 2) //Y axis line
 		{
-			startPoint = { 0,-500,0 };
-			endPoint = { 0,500,0 };
+			startPoint = { 0,-lineLength,0 };
+			endPoint = { 0,lineLength,0 };
 			color = { 0, 1, 0 };
+			ShaderManager::Get().lineShader->SetVector3(color, "vertexColor");
+			DrawLine(startPoint, endPoint);
 		}
+		//else if (i == 3) //X axis grid
+		//{
+		//	color = { 0.2f, 0.2f, 0.2f };
+		//	ShaderManager::Get().lineShader->SetVector3(color, "vertexColor");
+		//	for (int i = 1; i < lineAmount; i++)
+		//	{
+		//		startPoint = { -lineLength,0,i };
+		//		endPoint = { lineLength,0,i };
 
-		glm::vec3 vert1 = startPoint;
-		glm::vec3 vert2 = endPoint;
+		//		DrawLine(startPoint, endPoint, color);
+		//	}
 
-		std::vector<glm::vec3> verts = { vert1, vert2 };
-		std::vector<unsigned int> indices = { 0 , 1 };
+		//	for (int i = -1; i > -lineAmount; i--)
+		//	{
+		//		startPoint = { -lineLength,0,i };
+		//		endPoint = { lineLength,0,i };
 
-		glBindVertexArray(VAO);
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		//		DrawLine(startPoint, endPoint, color);
+		//	}
 
-		glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(glm::vec3), &verts[0], GL_STATIC_DRAW);
+		//}
+		//else if (i == 4) //Z axis grid
+		//{
+		//	color = { 0.2f, 0.2f, 0.2f };
+		//	ShaderManager::Get().lineShader->SetVector3(color, "vertexColor");
 
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW); //the indices might be wrong
+		//	for (int i = 1; i < lineAmount; i++)
+		//	{
+		//		startPoint = { i,0,-lineLength };
+		//		endPoint = { i,0,lineLength };
 
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0); //these are probably not right, need to modify to read correctly.
+		//		DrawLine(startPoint, endPoint, color);
+		//	}
 
-		glBindVertexArray(0);
+		//	for (int i = -1; i > -lineAmount; i--)
+		//	{
+		//		startPoint = { i,0,-lineLength };
+		//		endPoint = { i,0,lineLength };
 
-		glBindVertexArray(VAO);
-		//use shader for line rendering
-		ShaderManager::Get().lineShader->Use();
-		glm::mat4 trans = glm::mat4(1.0f);
-		ShaderManager::Get().lineShader->SetMatrix4(trans, "transform"); //apperently there's a better way to do this compared to using a Uniform type variable inside the vertex shader, Shader Buffer Storage Object, something like that, where we can have even more variables inside the shader and update them.
-		ShaderManager::Get().lineShader->SetMatrix4(Camera::Get().myView, "view");
-		ShaderManager::Get().lineShader->SetMatrix4(Camera::Get().projection, "projection");
-		ShaderManager::Get().lineShader->SetVector3(color, "vertexColor");
-		glDrawElements(GL_LINES, indices.size(), GL_UNSIGNED_INT, 0); //cast?
-		glBindVertexArray(0);
+		//		DrawLine(startPoint, endPoint, color);
+		//	}
+		//}
 	}
+}
+
+void Graphics::DrawLine(glm::vec3 startPoint, glm::vec3 endPoint) //color needs to be sent to the lineShader before this.
+{
+	glm::vec3 vert1 = startPoint;
+	glm::vec3 vert2 = endPoint;
+
+	std::vector<glm::vec3> verts = { vert1, vert2 };
+	std::vector<unsigned int> indices = { 0 , 1 };
+
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+	glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(glm::vec3), &verts[0], GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW); //the indices might be wrong
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0); //these are probably not right, need to modify to read correctly.
+
+	glBindVertexArray(0);
+
+	glBindVertexArray(VAO);
+
+	glDrawElements(GL_LINES, indices.size(), GL_UNSIGNED_INT, 0); //cast?
+	glBindVertexArray(0);
 }

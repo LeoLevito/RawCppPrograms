@@ -1,5 +1,6 @@
 #include "MeshComponent.h"
 #include "Cube.h"
+#include "EditorGUI.h"
 #include "Texture.h"
 #include <GLFW/glfw3.h>
 #include <glm.hpp>
@@ -16,6 +17,7 @@
 #include <thread>
 #include <MeshManager.h>
 #include "ShaderManager.h"
+
 
 MeshComponent::MeshComponent()
 {
@@ -364,7 +366,17 @@ void MeshComponent::DrawMesh()
 	trans = glm::scale(trans, scale);
 
 	//write to Vertex Shader
-	if (ShaderManager::Get().depthPass == false)
+	if (EditorGUI::Get().currentPolygonMode == GL_LINE || EditorGUI::Get().currentPolygonMode == GL_POINT)
+	{
+		//use shader for line rendering
+		ShaderManager::Get().lineShader->Use();
+		ShaderManager::Get().lineShader->SetMatrix4(trans, "transform"); //apperently there's a better way to do this compared to using a Uniform type variable inside the vertex shader, Shader Buffer Storage Object, something like that, where we can have even more variables inside the shader and update them.
+		ShaderManager::Get().lineShader->SetMatrix4(Camera::Get().myView, "view");
+		ShaderManager::Get().lineShader->SetMatrix4(Camera::Get().projection, "projection");
+		glm::vec3 color = { 1,1,1 };
+		ShaderManager::Get().lineShader->SetVector3(color, "vertexColor");
+	}
+	else if (ShaderManager::Get().depthPass == false)
 	{
 		ShaderManager::Get().shader->SetMatrix4(trans, "transform"); //apperently there's a better way to do this compared to using a Uniform type variable inside the vertex shader, Shader Buffer Storage Object, something like that, where we can have even more variables inside the shader and update them.
 		ShaderManager::Get().shader->SetMatrix4(Camera::Get().myView, "view");

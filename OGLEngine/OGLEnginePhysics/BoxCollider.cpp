@@ -5,6 +5,9 @@
 #include <iostream>
 #include <gtc/quaternion.hpp>
 #include <gtx/quaternion.hpp>
+#include "ShaderManager.h"
+#include "Graphics.h"
+
 
 //https://textbooks.cs.ksu.edu/cis580/04-collisions/04-separating-axis-theorem/
 
@@ -12,6 +15,7 @@ BoxCollider::BoxCollider()
 {
 	position = glm::vec3(0, 0, 0);
 	scale = glm::vec3(1, 1, 1);
+	corners.resize(8);
 	//UpdateBounds();
 }
 
@@ -89,17 +93,25 @@ void BoxCollider::UpdateBounds()
 	glm::vec3 corner8world = glm::vec3(trans * glm::vec4(corner8, 1.0f));
 
 	//push back each corner into the corners vector.
-	corners.clear(); //this HAD a random chance of happening right when collisionmanager is in the process of accessing it, which would cause a vector subscript out of range error. I've fixed this by only running this function in the collision manager's Process() function.
+	//corners.clear(); //this HAD a random chance of happening right when collisionmanager is in the process of accessing it, which would cause a vector subscript out of range error. I've fixed this by only running this function in the collision manager's Process() function.
 	//front corners
-	corners.push_back(corner1world); //top left front
-	corners.push_back(corner2world); //top right front
-	corners.push_back(corner3world); //bottom right front
-	corners.push_back(corner4world); //bottom left front
+	corners[0] = corner1world;
+	corners[1] = corner2world;
+	corners[2] = corner3world;
+	corners[3] = corner4world;
+	//corners.push_back(corner1world); //top left front
+	//corners.push_back(corner2world); //top right front
+	//corners.push_back(corner3world); //bottom right front
+	//corners.push_back(corner4world); //bottom left front
 	//back corners
-	corners.push_back(corner5world); //top left back
-	corners.push_back(corner6world); //top right back
-	corners.push_back(corner7world); //bottom right back
-	corners.push_back(corner8world); //bottom left back
+	corners[4] = corner5world;
+	corners[5] = corner6world;
+	corners[6] = corner7world;
+	corners[7] = corner8world;
+	//corners.push_back(corner5world); //top left back
+	//corners.push_back(corner6world); //top right back
+	//corners.push_back(corner7world); //bottom right back
+	//corners.push_back(corner8world); //bottom left back
 
 	//set up local space corners for min and max extent calculations.
 	std::vector<glm::vec3> localCorners; 
@@ -260,6 +272,38 @@ void BoxCollider::UpdateBounds()
 	//faceCornerVector.push_back(faceVertices6);
 }
 
+void BoxCollider::Update()
+{
+	if (drawDebugLines)
+	{
+		glm::mat4 myTrans = glm::mat4(1.0f);
+
+		//use shader for line rendering
+		ShaderManager::Get().lineShader->Use();
+		ShaderManager::Get().lineShader->SetMatrix4(myTrans, "transform"); //apperently there's a better way to do this compared to using a Uniform type variable inside the vertex shader, Shader Buffer Storage Object, something like that, where we can have even more variables inside the shader and update them.
+		ShaderManager::Get().lineShader->SetMatrix4(Camera::Get().myView, "view");
+		ShaderManager::Get().lineShader->SetMatrix4(Camera::Get().projection, "projection");
+		//ShaderManager::Get().shader->SetVector3(Camera::Get().myPosition, "viewPos"); //Doesn't really make sense to update this here but whatever.
+		glm::vec3 color = { 0,1,0 };
+		ShaderManager::Get().lineShader->SetVector3(color, "vertexColor");
+
+		Graphics::Get().DrawLine(corners[0], corners[1]); 
+		Graphics::Get().DrawLine(corners[1], corners[2]);
+		Graphics::Get().DrawLine(corners[2], corners[3]);
+		Graphics::Get().DrawLine(corners[3], corners[0]);
+
+		Graphics::Get().DrawLine(corners[4], corners[5]); 
+		Graphics::Get().DrawLine(corners[5], corners[6]);
+		Graphics::Get().DrawLine(corners[6], corners[7]);
+		Graphics::Get().DrawLine(corners[7], corners[4]);
+
+		Graphics::Get().DrawLine(corners[0], corners[4]); 
+		Graphics::Get().DrawLine(corners[1], corners[5]);
+		Graphics::Get().DrawLine(corners[2], corners[6]);
+		Graphics::Get().DrawLine(corners[3], corners[7]);
+	}
+}
+
 void BoxCollider::DrawImgui()
 {
 	Collider::DrawImgui();
@@ -270,6 +314,10 @@ void BoxCollider::DrawImgui()
 	ImGui::Text(std::to_string(scale.x).c_str());
 	ImGui::Text(std::to_string(scale.y).c_str());
 	ImGui::Text(std::to_string(scale.z).c_str());
+
+	if (ImGui::Checkbox("Draw Debug Lines", &drawDebugLines))
+	{
+	}
 }
 
 void BoxCollider::Serialization(std::fstream& file)

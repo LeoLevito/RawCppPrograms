@@ -1,5 +1,6 @@
 #define GLFW_INCLUDE_NONE //fixes issue shit multiple GLAD opengl includes.
 #include "RaycastCollider.h"
+#include "EditorGUI.h"
 #include <GLFW/glfw3.h>
 #include <GLAD/glad.h>
 #include "ShaderManager.h"
@@ -55,40 +56,19 @@ void RaycastCollider::Update()
 	//write to Vertex Shader
 	if (ShaderManager::Get().depthPass == false)
 	{
-		ShaderManager::Get().shader->SetMatrix4(trans, "transform"); //apperently there's a better way to do this compared to using a Uniform type variable inside the vertex shader, Shader Buffer Storage Object, something like that, where we can have even more variables inside the shader and update them.
-		ShaderManager::Get().shader->SetMatrix4(Camera::Get().myView, "view");
-		ShaderManager::Get().shader->SetMatrix4(Camera::Get().projection, "projection");
-		ShaderManager::Get().shader->SetVector3(Camera::Get().myPosition, "viewPos"); //Doesn't really make sense to update this here but whatever.
+		//use shader for line rendering
+		ShaderManager::Get().lineShader->Use();
+		ShaderManager::Get().lineShader->SetMatrix4(trans, "transform"); //apperently there's a better way to do this compared to using a Uniform type variable inside the vertex shader, Shader Buffer Storage Object, something like that, where we can have even more variables inside the shader and update them.
+		ShaderManager::Get().lineShader->SetMatrix4(Camera::Get().myView, "view");
+		ShaderManager::Get().lineShader->SetMatrix4(Camera::Get().projection, "projection");
+		//ShaderManager::Get().shader->SetVector3(Camera::Get().myPosition, "viewPos"); //Doesn't really make sense to update this here but whatever.
+		glm::vec3 color = { 1,0,0 };
+		ShaderManager::Get().lineShader->SetVector3(color, "vertexColor");
 	}
 
 	if (drawDebugLine)
 	{
-		glm::vec3 vert1 = startPoint;
-		glm::vec3 vert2 = endPoint;
-
-		std::vector<glm::vec3> verts = { vert1, vert2 };
-		std::vector<unsigned int> indices = { 0 , 1 };
-
-		glBindVertexArray(VAO);
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-		glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(glm::vec3), &verts[0], GL_STATIC_DRAW);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW); //the indices might be wrong
-
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0); //these are probably not right, need to modify to read correctly.
-
-		glBindVertexArray(0);
-
-
-
-
-		glBindVertexArray(VAO);
-		glDrawElements(GL_LINES, indices.size(), GL_UNSIGNED_INT, 0); //cast?
-		glBindVertexArray(0);
-
+		Graphics::Get().DrawLine(startPoint, endPoint);
 	}
 }
 
