@@ -83,6 +83,8 @@ void Graphics::Render()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //used to clear various stuff, in this case we clear the color buffer bit first, every time the while loop loops, before writing a new color with the glClearColor function. I remember there being similar stuff needing to be done with Emil Ström's TinyEngine in order for us to render things and update them at runtime.
 
 
+	//THIS MIGHT ALSO BE THE REASON WHY SHADOWMAPS AREN'T WORKING PROPERLY, BECAUSE THIS IS COMMENTED OUT.
+	//Aside from the fact that I now need to do shader->Use() when I need it instead of doing it here in Graphics.
 
 	//1. depth texture scene from light's perspective.
 		////glCullFace(GL_FRONT);

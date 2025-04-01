@@ -378,6 +378,7 @@ void MeshComponent::DrawMesh()
 	}
 	else if (ShaderManager::Get().depthPass == false)
 	{
+		ShaderManager::Get().shader->Use();
 		ShaderManager::Get().shader->SetMatrix4(trans, "transform"); //apperently there's a better way to do this compared to using a Uniform type variable inside the vertex shader, Shader Buffer Storage Object, something like that, where we can have even more variables inside the shader and update them.
 		ShaderManager::Get().shader->SetMatrix4(Camera::Get().myView, "view");
 		ShaderManager::Get().shader->SetMatrix4(Camera::Get().projection, "projection");
@@ -385,7 +386,7 @@ void MeshComponent::DrawMesh()
 	}
 	else
 	{
-		//ShaderManager::Get().depthShader->SetMatrix4(trans, "transform"); //this is required for meshes to be rendered to depthMap.
+		ShaderManager::Get().depthCubeMapShader->Use(); //this might be the issue with my lighting, I now need to use this shader here and for my lights for it to work correctly, otherwise they will be overridden by other shaders in use.
 		ShaderManager::Get().depthCubeMapShader->SetMatrix4(trans, "transform"); //this is required for meshes to be rendered to depthMap.
 	}
 

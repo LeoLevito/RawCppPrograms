@@ -34,6 +34,8 @@ public:
 	virtual void Update();
 	virtual void DrawImgui();
 
+	virtual void DrawDebugLines();
+
 	virtual void Serialization(std::fstream& file);
 	virtual void Deserialization(std::fstream& file);
 

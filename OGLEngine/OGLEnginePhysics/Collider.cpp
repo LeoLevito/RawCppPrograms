@@ -28,6 +28,10 @@ void Collider::DrawImgui()
 {
 }
 
+void Collider::DrawDebugLines()
+{
+}
+
 void Collider::Serialization(std::fstream& file)
 {
 }

@@ -276,31 +276,7 @@ void BoxCollider::Update()
 {
 	if (drawDebugLines)
 	{
-		glm::mat4 myTrans = glm::mat4(1.0f);
-
-		//use shader for line rendering
-		ShaderManager::Get().lineShader->Use();
-		ShaderManager::Get().lineShader->SetMatrix4(myTrans, "transform"); //apperently there's a better way to do this compared to using a Uniform type variable inside the vertex shader, Shader Buffer Storage Object, something like that, where we can have even more variables inside the shader and update them.
-		ShaderManager::Get().lineShader->SetMatrix4(Camera::Get().myView, "view");
-		ShaderManager::Get().lineShader->SetMatrix4(Camera::Get().projection, "projection");
-		//ShaderManager::Get().shader->SetVector3(Camera::Get().myPosition, "viewPos"); //Doesn't really make sense to update this here but whatever.
-		glm::vec3 color = { 0,1,0 };
-		ShaderManager::Get().lineShader->SetVector3(color, "vertexColor");
-
-		Graphics::Get().DrawLine(corners[0], corners[1]); 
-		Graphics::Get().DrawLine(corners[1], corners[2]);
-		Graphics::Get().DrawLine(corners[2], corners[3]);
-		Graphics::Get().DrawLine(corners[3], corners[0]);
-
-		Graphics::Get().DrawLine(corners[4], corners[5]); 
-		Graphics::Get().DrawLine(corners[5], corners[6]);
-		Graphics::Get().DrawLine(corners[6], corners[7]);
-		Graphics::Get().DrawLine(corners[7], corners[4]);
-
-		Graphics::Get().DrawLine(corners[0], corners[4]); 
-		Graphics::Get().DrawLine(corners[1], corners[5]);
-		Graphics::Get().DrawLine(corners[2], corners[6]);
-		Graphics::Get().DrawLine(corners[3], corners[7]);
+		DrawDebugLines();
 	}
 }
 
@@ -318,6 +294,35 @@ void BoxCollider::DrawImgui()
 	if (ImGui::Checkbox("Draw Debug Lines", &drawDebugLines))
 	{
 	}
+}
+
+void BoxCollider::DrawDebugLines()
+{
+	glm::mat4 myTrans = glm::mat4(1.0f);
+
+	//use shader for line rendering
+	ShaderManager::Get().lineShader->Use();
+	ShaderManager::Get().lineShader->SetMatrix4(myTrans, "transform"); //apperently there's a better way to do this compared to using a Uniform type variable inside the vertex shader, Shader Buffer Storage Object, something like that, where we can have even more variables inside the shader and update them.
+	ShaderManager::Get().lineShader->SetMatrix4(Camera::Get().myView, "view");
+	ShaderManager::Get().lineShader->SetMatrix4(Camera::Get().projection, "projection");
+	//ShaderManager::Get().shader->SetVector3(Camera::Get().myPosition, "viewPos"); //Doesn't really make sense to update this here but whatever.
+	glm::vec3 color = { 0,1,0 };
+	ShaderManager::Get().lineShader->SetVector3(color, "vertexColor");
+
+	Graphics::Get().DrawLine(corners[0], corners[1]);
+	Graphics::Get().DrawLine(corners[1], corners[2]);
+	Graphics::Get().DrawLine(corners[2], corners[3]);
+	Graphics::Get().DrawLine(corners[3], corners[0]);
+
+	Graphics::Get().DrawLine(corners[4], corners[5]);
+	Graphics::Get().DrawLine(corners[5], corners[6]);
+	Graphics::Get().DrawLine(corners[6], corners[7]);
+	Graphics::Get().DrawLine(corners[7], corners[4]);
+
+	Graphics::Get().DrawLine(corners[0], corners[4]);
+	Graphics::Get().DrawLine(corners[1], corners[5]);
+	Graphics::Get().DrawLine(corners[2], corners[6]);
+	Graphics::Get().DrawLine(corners[3], corners[7]);
 }
 
 void BoxCollider::Serialization(std::fstream& file)

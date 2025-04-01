@@ -23,7 +23,7 @@ public:
 	bool useDirectionAndDistanceAsEndPoint = false;
 	bool usePositionAsStartPoint = false;
 	bool useRotationAsDirection = false;
-	bool drawDebugLine = false;
+	bool drawDebugLines = false;
 
 
 	virtual void SetPosition(glm::vec3 pos) override;
@@ -33,6 +33,7 @@ public:
 
 	virtual void Update() override;
 	virtual void DrawImgui() override;
+	virtual void DrawDebugLines() override;
 
 	void CalculateStartAndEndPoints();
 

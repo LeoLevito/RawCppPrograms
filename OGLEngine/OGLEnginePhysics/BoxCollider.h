@@ -16,6 +16,7 @@ public:
 
 	virtual void Update() override;
 	virtual void DrawImgui() override;
+	virtual void DrawDebugLines() override;
 
 	glm::vec3 position; //center of box
 	glm::vec3 rotation;

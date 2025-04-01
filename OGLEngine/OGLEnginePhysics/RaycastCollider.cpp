@@ -44,31 +44,9 @@ void RaycastCollider::SetScale(glm::vec3 scaleIn)
 
 void RaycastCollider::Update()
 {
-
-	glm::mat4 trans = glm::mat4(1.0f);
-
-	trans = glm::translate(trans, glm::vec3(0, 0, 0)); //translate first so that each object rotates independently.
-	//trans = glm::rotate(trans, rotation.x, glm::vec3(1, 0, 0));
-	//trans = glm::rotate(trans, rotation.y, glm::vec3(0, 1, 0));
-	//trans = glm::rotate(trans, rotation.z, glm::vec3(0, 0, 1));
-	//trans = glm::scale(trans, scale);
-
-	//write to Vertex Shader
-	if (ShaderManager::Get().depthPass == false)
+	if (drawDebugLines)
 	{
-		//use shader for line rendering
-		ShaderManager::Get().lineShader->Use();
-		ShaderManager::Get().lineShader->SetMatrix4(trans, "transform"); //apperently there's a better way to do this compared to using a Uniform type variable inside the vertex shader, Shader Buffer Storage Object, something like that, where we can have even more variables inside the shader and update them.
-		ShaderManager::Get().lineShader->SetMatrix4(Camera::Get().myView, "view");
-		ShaderManager::Get().lineShader->SetMatrix4(Camera::Get().projection, "projection");
-		//ShaderManager::Get().shader->SetVector3(Camera::Get().myPosition, "viewPos"); //Doesn't really make sense to update this here but whatever.
-		glm::vec3 color = { 1,0,0 };
-		ShaderManager::Get().lineShader->SetVector3(color, "vertexColor");
-	}
-
-	if (drawDebugLine)
-	{
-		Graphics::Get().DrawLine(startPoint, endPoint);
+		DrawDebugLines();
 	}
 }
 
@@ -105,10 +83,25 @@ void RaycastCollider::DrawImgui()
 		if (ImGui::DragFloat3("Specify end point manually", &endPoint.x, .01f));
 	}
 
-	if (ImGui::Checkbox("Draw Debug Line", &drawDebugLine))
+	if (ImGui::Checkbox("Draw Debug Line", &drawDebugLines))
 	{
 	}
 
+}
+
+void RaycastCollider::DrawDebugLines()
+{
+	//use shader for line rendering
+	glm::mat4 trans = glm::mat4(1.0f);
+	ShaderManager::Get().lineShader->Use();
+	ShaderManager::Get().lineShader->SetMatrix4(trans, "transform"); //apperently there's a better way to do this compared to using a Uniform type variable inside the vertex shader, Shader Buffer Storage Object, something like that, where we can have even more variables inside the shader and update them.
+	ShaderManager::Get().lineShader->SetMatrix4(Camera::Get().myView, "view");
+	ShaderManager::Get().lineShader->SetMatrix4(Camera::Get().projection, "projection");
+	//ShaderManager::Get().shader->SetVector3(Camera::Get().myPosition, "viewPos"); //Doesn't really make sense to update this here but whatever.
+	glm::vec3 color = { 1,0,0 };
+	ShaderManager::Get().lineShader->SetVector3(color, "vertexColor");
+
+	Graphics::Get().DrawLine(startPoint, endPoint);
 }
 
 void RaycastCollider::CalculateStartAndEndPoints()
@@ -122,7 +115,7 @@ void RaycastCollider::CalculateStartAndEndPoints()
 
 void RaycastCollider::Serialization(std::fstream& file)
 {
-	file.write(reinterpret_cast<char*>(&drawDebugLine), sizeof(int));
+	file.write(reinterpret_cast<char*>(&drawDebugLines), sizeof(int));
 	file.write(reinterpret_cast<char*>(&usePositionAsStartPoint), sizeof(int));
 	file.write(reinterpret_cast<char*>(&useDirectionAndDistanceAsEndPoint), sizeof(int));
 	file.write(reinterpret_cast<char*>(&useRotationAsDirection), sizeof(int));
@@ -139,7 +132,7 @@ void RaycastCollider::Serialization(std::fstream& file)
 	{
 		file.write(reinterpret_cast<char*>(&distance), sizeof(float));
 	}
-	if (!useRotationAsDirection) 
+	if (!useRotationAsDirection)
 	{
 		file.write(reinterpret_cast<char*>(&direction[0]), sizeof(glm::vec3));
 	}
@@ -147,7 +140,7 @@ void RaycastCollider::Serialization(std::fstream& file)
 
 void RaycastCollider::Deserialization(std::fstream& file)
 {
-	file.read(reinterpret_cast<char*>(&drawDebugLine), sizeof(int));
+	file.read(reinterpret_cast<char*>(&drawDebugLines), sizeof(int));
 	file.read(reinterpret_cast<char*>(&usePositionAsStartPoint), sizeof(int));
 	file.read(reinterpret_cast<char*>(&useDirectionAndDistanceAsEndPoint), sizeof(int));
 	file.read(reinterpret_cast<char*>(&useRotationAsDirection), sizeof(int));
@@ -164,7 +157,7 @@ void RaycastCollider::Deserialization(std::fstream& file)
 	{
 		file.read(reinterpret_cast<char*>(&distance), sizeof(float));
 	}
-	if (!useRotationAsDirection) 
+	if (!useRotationAsDirection)
 	{
 		file.read(reinterpret_cast<char*>(&direction[0]), sizeof(glm::vec3));
 	}

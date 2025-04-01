@@ -88,10 +88,12 @@ void PointLight::SetLightSpaceMatrix()
 
 	if (ShaderManager::Get().depthPass == false)
 	{
+		ShaderManager::Get().shader->Use();
 		ShaderManager::Get().shader->SetFloat(far_plane, "far_plane");
 	}
 	else
 	{
+		ShaderManager::Get().depthCubeMapShader->Use();
 		for (unsigned int i = 0; i < 6; i++)
 		{
 			ShaderManager::Get().depthCubeMapShader->SetMatrix4(shadowTransforms[i], "shadowMatrices[" + std::to_string(i) + "]"); //this is not going to work without the geometry shader initialized.

@@ -101,14 +101,15 @@ void DirectionalLight::SetLightSpaceMatrix()
 	glm::vec3 normalizedup = glm::normalize(up);
 	lightView = glm::lookAt(position, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)); //should probably put this in light component.
 	lightSpaceMatrix = lightProjection * lightView;
-	//ShaderManager::Get().depthShader->Use();
 
 	if (ShaderManager::Get().depthPass == false)
 	{
+		ShaderManager::Get().shader->Use();
 		ShaderManager::Get().shader->SetMatrix4(lightSpaceMatrix, "lightSpaceMatrix");
 	}
 	else
 	{
+		ShaderManager::Get().depthShader->Use();
 		ShaderManager::Get().depthShader->SetMatrix4(lightSpaceMatrix, "lightSpaceMatrix");
 	}
 }
