@@ -84,7 +84,7 @@ void SphereCollider::DrawDebugLines()
 	//calculate position and radius of circle facing the camera. Principle is this: https://astronomy.stackexchange.com/questions/37068/how-to-calculate-how-much-of-the-earths-or-another-planets-surface-is-visibl image from user Yellow Sky helped me visualize my trigonometry calculations below.
 	float fraction; //fraction of sphere surface seen by camera. Not used anywhere asid from std::cout below.
 	float D = glm::distance(position, Camera::Get().myPosition);
-	fraction = ((D - radius) / (2 * D));
+	fraction = ((D - radius) / (2 * D)); //https://www.phpsciencelabs.com/sphere-visible-fraction-of-surface-calculator/index.php
 
 	float b;
 	float c = glm::distance(position, Camera::Get().myPosition); //distance to closest point on surface
