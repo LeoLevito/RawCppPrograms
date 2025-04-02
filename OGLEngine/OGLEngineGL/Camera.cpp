@@ -9,13 +9,13 @@ glm::vec3 WorldUp = glm::vec3(0.0f, 1.0f, 0.0f); //like is this allowed in C++?
 Camera::Camera()
 {
 	FOV = 45.f;
-	nearClipLane = 0.1f;
+	nearClipLane = 0.001f;
 	farClipLane = 1000.f;
 	isOrthographic = false;
 	projection = glm::perspective(glm::radians(FOV), 1280.f / 720.f, nearClipLane, farClipLane); //should make variables out of 1280 / 720.
 
 	myDirection = glm::vec3(0.0f, 0.0f, -1.0f);
-	myPosition = glm::vec3(0.0f, 0.0f, 3.0f);
+	myPosition = glm::vec3(0.0f, 0.0f, 3.0f); //Oh okay so that's wy my camera is offset when starting the editor.
 	myUp = glm::vec3(0.0f, 1.0f, 0.0f);
 }
 

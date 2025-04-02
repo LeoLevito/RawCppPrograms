@@ -218,8 +218,8 @@ void Graphics::RenderWorldGrid()
 		glm::vec3 endPoint;
 		glm::vec3 color;
 
-		int lineLength = 50000;
-		int lineAmount = 50000;
+		int lineLength = 500;
+		int lineAmount = 500;
 		if (i == 0) //X axis line
 		{
 
@@ -254,7 +254,7 @@ void Graphics::RenderWorldGrid()
 		//		startPoint = { -lineLength,0,i };
 		//		endPoint = { lineLength,0,i };
 
-		//		DrawLine(startPoint, endPoint, color);
+		//		DrawLine(startPoint, endPoint);
 		//	}
 
 		//	for (int i = -1; i > -lineAmount; i--)
@@ -262,7 +262,7 @@ void Graphics::RenderWorldGrid()
 		//		startPoint = { -lineLength,0,i };
 		//		endPoint = { lineLength,0,i };
 
-		//		DrawLine(startPoint, endPoint, color);
+		//		DrawLine(startPoint, endPoint);
 		//	}
 
 		//}
@@ -276,7 +276,7 @@ void Graphics::RenderWorldGrid()
 		//		startPoint = { i,0,-lineLength };
 		//		endPoint = { i,0,lineLength };
 
-		//		DrawLine(startPoint, endPoint, color);
+		//		DrawLine(startPoint, endPoint);
 		//	}
 
 		//	for (int i = -1; i > -lineAmount; i--)
@@ -284,7 +284,7 @@ void Graphics::RenderWorldGrid()
 		//		startPoint = { i,0,-lineLength };
 		//		endPoint = { i,0,lineLength };
 
-		//		DrawLine(startPoint, endPoint, color);
+		//		DrawLine(startPoint, endPoint);
 		//	}
 		//}
 	}
