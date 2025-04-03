@@ -5,6 +5,9 @@
 #include "ShaderManager.h"
 #include "ShadowMap.h"
 #include "EditorGUI.h"
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 
 //https://www.glfw.org/docs/3.3/group__window.html#gab3fb7c3366577daef18c0023e2a8591f
 //https://stackoverflow.com/questions/45880238/how-to-draw-while-resizing-glfw-window
@@ -79,7 +82,8 @@ void Graphics::Initialize(int width, int height)
 
 void Graphics::Render()
 {
-	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+	
+	glClearColor(SceneBackgroundColor.x, SceneBackgroundColor.y, SceneBackgroundColor.z, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //used to clear various stuff, in this case we clear the color buffer bit first, every time the while loop loops, before writing a new color with the glClearColor function. I remember there being similar stuff needing to be done with Emil Ström's TinyEngine in order for us to render things and update them at runtime.
 
 
@@ -315,4 +319,9 @@ void Graphics::DrawLine(glm::vec3 startPoint, glm::vec3 endPoint) //color needs 
 
 	glDrawElements(GL_LINES, indices.size(), GL_UNSIGNED_INT, 0); //cast?
 	glBindVertexArray(0);
+}
+
+void Graphics::DrawImgui()
+{
+	ImGui::DragFloat3("Scene Background Color", &SceneBackgroundColor.x, .01f, 0.0, 1.0f);
 }

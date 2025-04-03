@@ -451,7 +451,7 @@ void EditorGUI::QuickGUITesting()
 	MeshManager::Get().ErrorGUI();
 	CollisionManager::Get().DebugGUI();
 	LightManager::Get().DrawImgui();
-
+	Graphics::Get().DrawImgui();
 
 
 
