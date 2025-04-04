@@ -19,6 +19,8 @@ void ShaderManager::Initialize()
 	depthCubeMapShader->Initialize("../Shaders/SimpleDepthCubeMapShader.vertexs", "../Shaders/SimpleDepthCubeMapShader.fragments", "../Shaders/SimpleDepthCubeMapShader.geometrys");
 	lineShader = new Shader();
 	lineShader->Initialize("../Shaders/LineShader.vertexs", "../Shaders/LineShader.fragments");
+	gridShader = new Shader();
+	gridShader->Initialize("../Shaders/GridShader.vertexs", "../Shaders/GridShader.fragments");
 	shadowMap = new ShadowMap();
 	shadowCubeMap = new ShadowCubeMap();
 	depthPass = false;

@@ -1,0 +1,94 @@
+#version 330 core
+//https://github.com/DDexxeDD/glsl-grid/blob/main/source/grid.glsl
+
+in mat4 frag_view;
+in mat4 frag_projection;
+in vec3 near_point;
+in vec3 far_point;
+//in float near;
+//in float far;
+
+uniform	float grid_height;
+
+out vec4 frag_color;
+
+vec4 grid(vec3 frag_position_3d, float scale)
+{
+		// dont want the grid to be infinite?
+	// 	uncomment this bit, set your boundaries to whatever you want
+	//if (frag_position_3d.x > 10
+	//	|| frag_position_3d.x < -10
+	//	|| frag_position_3d.z > 10
+	//	|| frag_position_3d.z < -10)
+	//{
+	//	return vec4 (0, 0, 0, 0);
+	//}
+
+	vec2 coord = frag_position_3d.xz * scale;
+	vec2 derivative = fwidth(coord);
+	vec2 grid = abs(fract(coord - 0.5) - 0.5) / derivative;
+	float line = min(grid.x, grid.y);
+	float minimum_z = min(derivative.y, 1);
+	float minimum_x = min(derivative.x, 1);
+	vec4 color = vec4(0.2, 0.2, 0.2, 1.0 - min(line, 1.0));
+
+	// z axis color
+	//if (frag_position_3d.x > -0.1 * minimum_x
+	//	&& frag_position_3d.x < 0.1 * minimum_x)
+	//{
+	//	color.z = 1.0;
+	//}
+
+	//// x axis color
+	//if (frag_position_3d.z > -0.1 * minimum_z
+	//	&& frag_position_3d.z < 0.1 * minimum_z)
+	//{
+	//	color.x = 1.0;
+	//}
+	
+	return color;
+}
+
+float compute_depth(vec3 position)
+{
+
+	vec4 clip_space_position = frag_projection * frag_view * vec4 (position.xyz, 1.0);
+
+	// the depth calculation in the original article is for vulkan //https://asliceofrendering.com/scene%20helper/2020/01/05/InfiniteGrid/
+	// the depth calculation for opengl is:
+	// 	(far - near) * 0.5 * ndc_depth + (far + near) * 0.5
+	// 	far = 1.0  (opengl max depth)
+	// 	near = 0.0  (opengl min depth)
+	//		ndc_depth = clip_space_position.z / clip_space_position.w
+	//	since our near and far are fixed, we can reduce the above formula to the following
+	return 0.5 + 0.5 * (clip_space_position.z / clip_space_position.w);
+	// this could also be (ndc_depth + 1.0) * 0.5
+}
+
+float compute_linear_depth(vec3 position)
+{
+	float near = 0.001;
+	float far = 1000;
+	vec4 clip_space_position = frag_projection * frag_view * vec4(position.xyz, 1.0);
+	float clip_space_depth = (clip_space_position.z / clip_space_position.w) * 2.0 - 1.0;
+	float linear_depth = (2.0 * near * far) / (far + near - clip_space_depth * (far - near));
+
+	return linear_depth / far;
+}
+
+void main()
+{
+	float t = (grid_height - near_point.y) / (far_point.y - near_point.y);
+	vec3 frag_position_3d = near_point + t * (far_point - near_point);
+
+	gl_FragDepth = compute_depth(frag_position_3d);
+
+	float linear_depth = compute_linear_depth(frag_position_3d);
+	float fading = max(0, (0.5 - linear_depth));
+
+	frag_color = (grid(frag_position_3d, 10) + grid(frag_position_3d, 1) + grid(frag_position_3d, 0.1)) * float(t > 0);
+	frag_color.a *= fading;
+
+	//frag_color = vec4(linear_depth, fading, 0.0f, 1.0f);
+
+}

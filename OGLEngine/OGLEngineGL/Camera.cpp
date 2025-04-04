@@ -9,7 +9,7 @@ glm::vec3 WorldUp = glm::vec3(0.0f, 1.0f, 0.0f); //like is this allowed in C++?
 Camera::Camera()
 {
 	FOV = 45.f;
-	nearClipLane = 0.001f;
+	nearClipLane = 0.001f; //lower and lower near clip lanes makes it so far away objects, right at the edge of the far clip lane, become distorted in their polygons to be culled.
 	farClipLane = 1000.f;
 	isOrthographic = false;
 	projection = glm::perspective(glm::radians(FOV), 1280.f / 720.f, nearClipLane, farClipLane); //should make variables out of 1280 / 720.

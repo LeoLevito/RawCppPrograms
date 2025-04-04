@@ -1,0 +1,35 @@
+#version 330 core
+//https://github.com/DDexxeDD/glsl-grid/blob/main/source/grid.glsl
+
+layout (location = 0) in vec3 aPos;
+//in vec3 position;
+
+out mat4 frag_view;
+out mat4 frag_projection;
+out vec3 near_point;
+out vec3 far_point;
+
+uniform	mat4 view;
+uniform	mat4 projection;
+uniform	mat4 model;
+uniform	vec3 camera_position;
+
+
+vec3 unproject_point(float x, float y, float z, mat4 view, mat4 projection)
+{
+	mat4 view_inverse = inverse(view);
+	mat4 projection_inverse = inverse(projection);
+	vec4 unprojected_point = view_inverse * projection_inverse * vec4(x, y, z, 1.0);
+	
+	return unprojected_point.xyz / unprojected_point.w;
+}
+
+void main()
+{
+	near_point = unproject_point(aPos.x, aPos.y, 0.0, view, projection).xyz;
+	far_point = unproject_point(aPos.x, aPos.y, 1.0, view, projection).xyz;
+	frag_view = view;
+	frag_projection = projection;
+
+	gl_Position = vec4(aPos, 1.0);
+}

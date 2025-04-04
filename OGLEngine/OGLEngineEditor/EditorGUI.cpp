@@ -194,7 +194,7 @@ void EditorGUI::SceneWindow()
 
 	ImTextureID texid = Graphics::Get().sceneTexture;
 	ImVec2 texsize = { sceneWindowWidth, sceneWindowHeight };
-	ImGui::Image(texid, texsize, ImVec2(0, 1), ImVec2(1, 0));
+	ImGui::Image(texid, texsize, ImVec2(0, 1), ImVec2(1, 0)); //Display framebuffer image.
 
 	ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, sceneWindowWidth, sceneWindowHeight);
 
