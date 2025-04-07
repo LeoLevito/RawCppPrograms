@@ -3,6 +3,10 @@
 #include "Input.h" 
 #include "FlyingCamera.h" 
 #include "EngineTime.h" 
+
+class FlyingCamera;
+
+
 class Engine
 {
 
@@ -16,6 +20,9 @@ public:
 	float lastY;
 	FlyingCamera* myFlyingCamera;
 	float deltaTime;
+
+	bool mouseWasWithinSceneWindow;
+	bool mouseWasOutsideSceneWindow;
 private:
 	Graphics* graphics;
 	Engine* engine;

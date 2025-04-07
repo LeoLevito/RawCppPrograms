@@ -112,6 +112,8 @@ void EditorGUI::CloseImGui() //When shutting down program, make sure ImGui is sh
 //https://gamedev.stackexchange.com/questions/140693/how-can-i-render-an-opengl-scene-into-an-imgui-window
 void EditorGUI::SceneWindow()
 {
+	//Camera view can become stretched for a fraction of a second when resizing this window (not resizing main GLFW window), presumably because there's a delay from when sceneWindowWidth and sceneWindowHeight are set below and when they're used to render the framebuffer image.
+	
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0)); //https://github.com/ocornut/imgui/issues/1490 gets rid of window padding so we can display the framebuffer image on the ENTIRE window.
 	ImGui::Begin("Scene");
 
@@ -185,8 +187,16 @@ void EditorGUI::SceneWindow()
 	{
 		sceneWindowWidth = ImGui::GetWindowSize().x;
 		sceneWindowHeight = ImGui::GetWindowSize().y;
+
 		Camera::Get().UpdateCameraProjection();
 	}
+
+	if (ImGui::GetWindowPos().x != sceneWindowPosX || ImGui::GetWindowPos().y != sceneWindowPosY)
+	{
+		sceneWindowPosX = ImGui::GetWindowPos().x;
+		sceneWindowPosY = ImGui::GetWindowPos().y;
+	}
+
 
 	//glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	//glClear(GL_COLOR_BUFFER_BIT);

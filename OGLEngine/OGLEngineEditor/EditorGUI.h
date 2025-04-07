@@ -35,8 +35,11 @@ public:
 	void Serialization(const std::string& filename);
 	void Deserialization(const std::string& filename);
 
-	float sceneWindowWidth;
-	float sceneWindowHeight;
+	float sceneWindowWidth = 0.f;
+	float sceneWindowHeight = 0.f;
+	float sceneWindowPosX = 0.f;
+	float sceneWindowPosY = 0.f;
+
 
 	int currentlySelectedGameObject = -1;
 
@@ -46,6 +49,7 @@ public:
 	int currentImGizmoMode;
 
 	int currentPolygonMode;
+
 private:
 	Graphics* myGraphics;
 	//Camera myCamera;

@@ -86,7 +86,7 @@ void main()
 	float linear_depth = compute_linear_depth(frag_position_3d);
 	float fading = max(0, (0.5 - linear_depth));
 
-	frag_color = (grid(frag_position_3d, 10) + grid(frag_position_3d, 1) + grid(frag_position_3d, 0.1)) * float(t > 0);
+	frag_color = (grid(frag_position_3d, 10) + grid(frag_position_3d, 1) + grid(frag_position_3d, 0.1)) * float(t > 0); //render 3 grids by doing (grid() + grid() + grid()) * float(t > 0);
 	frag_color.a *= fading;
 
 	//frag_color = vec4(linear_depth, fading, 0.0f, 1.0f);

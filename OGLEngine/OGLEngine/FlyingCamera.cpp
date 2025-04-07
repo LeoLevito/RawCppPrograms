@@ -2,6 +2,7 @@
 #include <glm.hpp>
 #include <iostream>
 
+
 const float Sensitivity = 0.5f;
 const float MoveSpeed = 1.0f;
 
@@ -19,8 +20,11 @@ void FlyingCamera::Update() //maybe this entire update should be run only if the
 {
 	if (myInput->IsMouseButtonDown(GLFW_MOUSE_BUTTON_2))
 	{
-		MoveCamera();
-		RotateCamera(false);
+		if (Engine::Get().mouseWasWithinSceneWindow == true && Engine::Get().mouseWasOutsideSceneWindow == false)
+		{
+			MoveCamera();
+			RotateCamera(false);
+		}
 	}
 	myCamera->CameraUpdate();
 }
@@ -57,7 +61,7 @@ void FlyingCamera::RotateCamera(bool firstTimeRun)
 
 
 	//rotate camera
-	double* myX = new double;
+	double* myX = new double; // what the hell am I doing here? Why am I doing [new] double?
 	double* myY = new double;
 
 	float xpos = 0;
