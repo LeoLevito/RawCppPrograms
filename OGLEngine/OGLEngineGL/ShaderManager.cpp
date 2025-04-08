@@ -21,9 +21,12 @@ void ShaderManager::Initialize()
 	lineShader->Initialize("../Shaders/LineShader.vertexs", "../Shaders/LineShader.fragments");
 	gridShader = new Shader();
 	gridShader->Initialize("../Shaders/GridShader.vertexs", "../Shaders/GridShader.fragments");
+	pickingShader = new Shader();
+	pickingShader->Initialize("../Shaders/PickingShader.vertexs", "../Shaders/PickingShader.fragments");
 	shadowMap = new ShadowMap();
 	shadowCubeMap = new ShadowCubeMap();
 	depthPass = false;
+	pickingPass = false;
 }
 
 ShaderManager& ShaderManager::Get()

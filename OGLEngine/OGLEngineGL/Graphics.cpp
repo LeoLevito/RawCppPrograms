@@ -91,10 +91,17 @@ void Graphics::Initialize(int width, int height)
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
+
+	glGenFramebuffers(1, &pickingFBO);
+	glGenTextures(1, &sceneTexturePicking);
 }
 
 void Graphics::Render()
 {
+	//glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	//RenderToSceneTexture(pickingFBO, sceneTexturePicking);
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//RenderPickingPass();
 
 	glClearColor(SceneBackgroundColor.x, SceneBackgroundColor.y, SceneBackgroundColor.z, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //used to clear various stuff, in this case we clear the color buffer bit first, every time the while loop loops, before writing a new color with the glClearColor function. I remember there being similar stuff needing to be done with Emil Ström's TinyEngine in order for us to render things and update them at runtime.
@@ -120,8 +127,6 @@ void Graphics::Render()
 		////glCullFace(GL_BACK);
 
 
-
-
 	ShaderManager::Get().depthPass = true;
 	ShaderManager::Get().depthCubeMapShader->Use();
 
@@ -142,7 +147,7 @@ void Graphics::Render()
 
 
 //2. render scene like usual, now using the generated depth texture/shadowmap.
-	RenderToSceneTexture();
+	RenderToSceneTexture(sceneFBO, sceneTexture);
 	glViewport(0, 0, EditorGUI::Get().sceneWindowWidth, EditorGUI::Get().sceneWindowHeight);
 	glBindFramebuffer(GL_FRAMEBUFFER, sceneFBO);
 	glEnable(GL_DEPTH_TEST);
@@ -202,14 +207,15 @@ void Graphics::EscapeToCloseWindow()
 }
 
 //https://learnopengl.com/Advanced-OpenGL/Framebuffers
-void Graphics::RenderToSceneTexture()
+void Graphics::RenderToSceneTexture(unsigned int FBO, unsigned int texture)
 {
-	glBindTexture(GL_TEXTURE_2D, sceneTexture);
+	
+	glBindTexture(GL_TEXTURE_2D, texture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, EditorGUI::Get().sceneWindowWidth, EditorGUI::Get().sceneWindowHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL); //is this okay to do on tick?
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glBindFramebuffer(GL_FRAMEBUFFER, sceneFBO);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, sceneTexture, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
 
 	// create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
 	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
@@ -378,4 +384,71 @@ void Graphics::DrawLine(glm::vec3 startPoint, glm::vec3 endPoint) //color needs 
 void Graphics::DrawImgui()
 {
 	ImGui::DragFloat3("Scene Background Color", &SceneBackgroundColor.x, .01f, 0.0, 1.0f);
+}
+
+void Graphics::RenderPickingPass()
+{
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	RenderToSceneTexture(pickingFBO, sceneTexturePicking);
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+	//RenderPickingPass();
+
+	// I also need to bind frame buffer texture before this. Or maybe not since I don't want to display the pickingShader in the SceneWindow.
+	ShaderManager::Get().pickingPass = true;
+	ShaderManager::Get().pickingShader->Use();
+
+	glViewport(0, 0, EditorGUI::Get().sceneWindowWidth, EditorGUI::Get().sceneWindowHeight);
+	glBindFramebuffer(GL_FRAMEBUFFER, pickingFBO);
+	//glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	for (int i = 0; i < GameObjectManager::Get().gameObjects.size(); i++) //Game.gameObjectVector calls Update() on every game object implementing Update() and that Update() can call Update() in every component implementing Update().
+	{
+		GameObjectManager::Get().gameObjects[i]->Update();
+	}
+	ShaderManager::Get().pickingPass = false;
+
+
+	// Wait until all the pending drawing commands are really done.
+	// Ultra-mega-over slow ! 
+	// There are usually a long time between glDrawElements() and
+	// all the fragments completely rasterized.
+	glFlush();
+	glFinish();
+
+
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+	ImGuiIO& io = ImGui::GetIO();
+	int currentMousePosXInPickingFrameBuffer = io.MousePos.x - EditorGUI::Get().sceneWindowPosX;
+	int currentMousePosYInPickingFrameBuffer = EditorGUI::Get().sceneWindowHeight - (io.MousePos.y - EditorGUI::Get().sceneWindowPosY); //Need to invert mouse Y pos since the framebuffer's Y axis is opposite of the io.MousePos.y.
+
+	//std::cout << currentMousePosYInPickingFrameBuffer << std::endl;
+
+	// Read the pixel at the center of the screen.
+	// You can also use glfwGetMousePos().
+	// Ultra-mega-over slow too, even for 1 pixel, 
+	// because the framebuffer is on the GPU.
+	unsigned char data[4];
+	glReadPixels(currentMousePosXInPickingFrameBuffer, currentMousePosYInPickingFrameBuffer, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	//glReadPixels((int)EditorGUI::Get().sceneWindowWidth/2, (int)EditorGUI::Get().sceneWindowHeight/2, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+	// Convert the color back to an integer ID
+	int pickedID =
+		data[0] +
+		data[1] * 256 +
+		data[2] * 256 * 256;
+
+	if (pickedID == 0x00ffffff) { // Full white, must be the background !
+		std::cout << "background" << std::endl;
+	}
+	else {
+		EditorGUI::Get().currentlySelectedGameObject = pickedID;
+		std::ostringstream oss;
+		oss << "mesh " << pickedID;
+		std::cout << oss.str() << std::endl;
+	}
+	glBindFramebuffer(GL_FRAMEBUFFER, 0); //need to unbind framebuffer after glReadPixels because glReadPixels is supposed to read pixels from a frame buffer.
 }

@@ -22,7 +22,6 @@ Input::Input(GLFWwindow* window)
 	lastY = height / 2.0f;
 
 	glfwSetKeyCallback(window, KeyCallBack);
-	glfwSetCursorPosCallback(window, MouseCallBack);
 	glfwSetScrollCallback(window, ScrollCallBack);
 
 }
@@ -39,12 +38,6 @@ void Input::KeyCallBack(GLFWwindow* window, int key, int scancode, int action, i
 	}
 }
 
-void Input::MouseCallBack(GLFWwindow* window, double xPos, double yPos)
-{
-	lastX = xPos;
-	lastY = yPos;
-}
-
 void Input::ScrollCallBack(GLFWwindow* window, double xOffset, double yOffset)
 {
 	scrollIterator += yOffset; 
@@ -52,31 +45,6 @@ void Input::ScrollCallBack(GLFWwindow* window, double xOffset, double yOffset)
 	{
 		scrollIterator = 1; //I should make this psuedo exponential when at camera MoveSpeeds lower than 1.
 	}
-}
-
-float Input::GetCursorX()
-{
-	return lastX;
-}
-
-float Input::GetCursorY()
-{
-	return lastY;
-}
-
-void Input::SetCursorX(float x)
-{
-	lastX = x;
-}
-
-void Input::SetCursorY(float y)
-{
-	lastY = y;
-}
-
-void Input::SetCursorXY(float x, float y)
-{
-	glfwSetCursorPos(myWindow,x, y);
 }
 
 bool Input::IsKeyPressed(const int& key)

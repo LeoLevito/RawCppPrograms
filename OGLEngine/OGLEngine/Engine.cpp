@@ -5,6 +5,47 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+{
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		if (io.MousePos.x >= EditorGUI::Get().sceneWindowPosX
+			&& io.MousePos.x <= EditorGUI::Get().sceneWindowPosX + EditorGUI::Get().sceneWindowWidth
+			&& io.MousePos.y >= EditorGUI::Get().sceneWindowPosY
+			&& io.MousePos.y <= EditorGUI::Get().sceneWindowPosY + EditorGUI::Get().sceneWindowHeight)
+		{
+			Graphics::Get().RenderPickingPass(); //Render scene once when clicking inside the SceneWindow, determine what object was clicked.
+		}
+	}
+
+	//if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
+	//{
+	//	ImGuiIO& io = ImGui::GetIO();
+	//	if (io.MousePos.x >= EditorGUI::Get().sceneWindowPosX
+	//		&& io.MousePos.x <= EditorGUI::Get().sceneWindowPosX + EditorGUI::Get().sceneWindowWidth
+	//		&& io.MousePos.y >= EditorGUI::Get().sceneWindowPosY
+	//		&& io.MousePos.y <= EditorGUI::Get().sceneWindowPosY + EditorGUI::Get().sceneWindowHeight)
+	//	{
+	//		std::cout << "Inside of window" << std::endl;
+	//		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	//		io.ConfigFlags |= ImGuiConfigFlags_NoMouse;
+	//		Engine::Get().myFlyingCamera->SetNewCursorPosition();
+	//		Engine::Get().mouseWasWithinSceneWindow = true;
+	//	}
+	//}
+
+	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE)
+	{
+		std::cout << "Not clicking mouse one or two" << std::endl;
+		ImGuiIO& io = ImGui::GetIO();
+		Engine::Get().DoOnce = false;
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		io.ConfigFlags &= ~ImGuiConfigFlags_NoMouse;
+		Engine::Get().mouseWasWithinSceneWindow = false;
+	}
+}
+
 Engine& Engine::Get()
 {
 	static Engine instance;
@@ -17,11 +58,12 @@ void Engine::Initialize(GLFWwindow* window, Camera* camera)
 	myEngineTime = new EngineTime();
 	myFlyingCamera = new FlyingCamera(camera, myInput, myEngineTime, window);
 	myFlyingCamera->RotateCamera(true);
+	glfwSetMouseButtonCallback(window, mouse_button_callback);
 }
 
 void Engine::Update(GLFWwindow* window, float inDeltaTime)
 {
-	if (myInput->IsMouseButtonDown(GLFW_MOUSE_BUTTON_2)) //right click
+	if (myInput->IsMouseButtonDown(GLFW_MOUSE_BUTTON_RIGHT)) //right click
 	{
 		if (DoOnce == false)
 		{
@@ -37,49 +79,8 @@ void Engine::Update(GLFWwindow* window, float inDeltaTime)
 				myFlyingCamera->SetNewCursorPosition();
 				mouseWasWithinSceneWindow = true;
 			}
-			else
-			{
-				std::cout << "Outside of window" << std::endl;
-				DoOnce = true;
-				mouseWasOutsideSceneWindow = true;
-			}
 		}
 	}
-	else if (myInput->IsMouseButtonDown(GLFW_MOUSE_BUTTON_1)) //left click
-	{
-		if (DoOnce == false)
-		{
-			ImGuiIO& io = ImGui::GetIO();
-			if (io.MousePos.x >= EditorGUI::Get().sceneWindowPosX
-				&& io.MousePos.x <= EditorGUI::Get().sceneWindowPosX + EditorGUI::Get().sceneWindowWidth
-				&& io.MousePos.y >= EditorGUI::Get().sceneWindowPosY
-				&& io.MousePos.y <= EditorGUI::Get().sceneWindowPosY + EditorGUI::Get().sceneWindowHeight)
-			{
-				std::cout << "clicked mouse one Inside of window" << std::endl;
-				DoOnce = true;
-				mouseWasWithinSceneWindow = true;
-			}
-			else
-			{
-				std::cout << "clicked mouse one Outside of window" << std::endl;
-				DoOnce = true;
-				mouseWasOutsideSceneWindow = true;
-			}
-		}
-	}
-	else //no click
-	{
-		if (DoOnce == true)
-		{
-			std::cout << "Not clicking mouse one or two" << std::endl;
-
-			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-			DoOnce = false;
-			mouseWasWithinSceneWindow = false;
-			mouseWasOutsideSceneWindow = false;
-		}
-	}
-
 	myFlyingCamera->Update();
 	myEngineTime->UpdateDeltaTime(deltaTime);
 	deltaTime = inDeltaTime;

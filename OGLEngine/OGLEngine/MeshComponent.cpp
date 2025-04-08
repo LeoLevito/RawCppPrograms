@@ -376,6 +376,23 @@ void MeshComponent::DrawMesh()
 		glm::vec3 color = { 1,1,1 };
 		ShaderManager::Get().lineShader->SetVector3(color, "vertexColor");
 	}
+	else if(ShaderManager::Get().pickingPass == true)
+	{
+		ShaderManager::Get().pickingShader->Use();
+		ShaderManager::Get().pickingShader->SetMatrix4(trans, "transform"); //apperently there's a better way to do this compared to using a Uniform type variable inside the vertex shader, Shader Buffer Storage Object, something like that, where we can have even more variables inside the shader and update them.
+		ShaderManager::Get().pickingShader->SetMatrix4(Camera::Get().myView, "view");
+		ShaderManager::Get().pickingShader->SetMatrix4(Camera::Get().projection, "projection");
+
+		//here I want to write to the fragment shader with my unique color.
+		int r = (owner->ID & 0x000000FF) >> 0;
+		int g = (owner->ID & 0x0000FF00) >> 8;
+		int b = (owner->ID & 0x00FF0000) >> 16;
+
+		glm::vec4 color = { r/255.0f, g/255.0f, b/255.0f , 1.0f}; //change to r/5.0f for a more noticeable color with a small amount of meshes in the scene.
+
+		ShaderManager::Get().pickingShader->SetVector4(color, "pickingColor");
+
+	}
 	else if (ShaderManager::Get().depthPass == false)
 	{
 		ShaderManager::Get().shader->Use();

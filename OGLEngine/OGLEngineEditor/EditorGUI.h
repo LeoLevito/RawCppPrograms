@@ -42,6 +42,7 @@ public:
 
 
 	int currentlySelectedGameObject = -1;
+	int lastSelectedGameObject = -1;
 
 	glm::mat4 trans;
 

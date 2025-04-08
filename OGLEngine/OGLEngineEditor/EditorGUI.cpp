@@ -305,7 +305,13 @@ void EditorGUI::HierarchyWindow()
 		{
 			selection_mask = (1 << node_clicked);           // Click to single-select
 			currentlySelectedGameObject = node_clicked;
+			lastSelectedGameObject = currentlySelectedGameObject;
 		}
+	}
+	if (lastSelectedGameObject != currentlySelectedGameObject)
+	{
+		lastSelectedGameObject = currentlySelectedGameObject;
+		selection_mask = (1 << currentlySelectedGameObject);
 	}
 
 	ImGui::End(); //stop rendering new ImGui window
@@ -474,6 +480,11 @@ void EditorGUI::QuickGUITesting()
 
 	ImGuiIO& io = ImGui::GetIO();
 	ImGui::Text("X: %f Y: %f", io.MousePos.x, io.MousePos.y);
+	double* glfwPosX = new double;
+	double* glfwPosY = new double;
+	//glfwGetWindowPos(Graphics::Get().window, windowPosX, windowPosY);
+	glfwGetCursorPos(Graphics::Get().window, glfwPosX, glfwPosY);
+	ImGui::Text("X: %f Y: %f", (float)*glfwPosX, (float)*glfwPosY);
 	if (ImGuizmo::IsUsing())
 	{
 		ImGui::Text("Using gizmo");

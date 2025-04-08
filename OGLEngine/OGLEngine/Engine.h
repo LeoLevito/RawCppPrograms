@@ -22,7 +22,7 @@ public:
 	float deltaTime;
 
 	bool mouseWasWithinSceneWindow;
-	bool mouseWasOutsideSceneWindow;
+	bool DoOnce = false;
 private:
 	Graphics* graphics;
 	Engine* engine;
@@ -30,7 +30,7 @@ private:
 
 	EngineTime* myEngineTime;
 
-	bool DoOnce = false;
+
 
 };
 

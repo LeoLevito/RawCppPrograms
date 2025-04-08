@@ -14,6 +14,8 @@ public:
 	void RotateCamera(bool firstTimeRun);
 	void MyScrollCallback(GLFWwindow* window, double xOffset, double yOffset);
 	Input* myInput;
+
+	double lastX, lastY;
 private:
 	Camera* myCamera;
 
@@ -21,7 +23,7 @@ private:
 
 	float yaw, pitch;
 
-	double lastX, lastY;
+
 
 	GLFWwindow* myWindow;
 };

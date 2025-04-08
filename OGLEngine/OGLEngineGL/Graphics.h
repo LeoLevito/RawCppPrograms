@@ -22,10 +22,11 @@ public:
 	bool ShouldClose();
 	void ExampleCube();
 	void EscapeToCloseWindow();
-	void RenderToSceneTexture();
+	void RenderToSceneTexture(unsigned int FBO, unsigned int texture);
 	void RenderWorldGrid();
 	void DrawLine(glm::vec3 startPoint, glm::vec3 endPoint);
 	void DrawImgui();
+	void RenderPickingPass();
 
 	GLFWwindow* window;
 
@@ -40,6 +41,9 @@ public:
 	float myHeight;
 
 	glm::vec3 SceneBackgroundColor{0.1f, 0.1f, 0.1f};
+
+	unsigned int pickingFBO;
+	unsigned int sceneTexturePicking;
 private:
 	unsigned int VAO;
 	unsigned int VBO;//vertex buffer object, OpenGL objects are unsigned ints. We can put a bunch of vertices in this object and send it to the GPU. You can have an array of VBOs.

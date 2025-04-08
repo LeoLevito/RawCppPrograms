@@ -16,10 +16,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "My Shaders", "My Shaders", "{AED4FC76-6231-4DF3-A019-3A95887EB951}"
 	ProjectSection(SolutionItems) = preProject
 		Shaders\FragmentShader.fragments = Shaders\FragmentShader.fragments
-		Shaders\LineShader.fragments = Shaders\LineShader.fragments
-		Shaders\GridShader.vertexs = Shaders\GridShader.vertexs
 		Shaders\GridShader.fragments = Shaders\GridShader.fragments
+		Shaders\GridShader.vertexs = Shaders\GridShader.vertexs
+		Shaders\LineShader.fragments = Shaders\LineShader.fragments
 		Shaders\LineShader.vertexs = Shaders\LineShader.vertexs
+		Shaders\PickingShader.fragments = Shaders\PickingShader.fragments
+		Shaders\PickingShader.vertexs = Shaders\PickingShader.vertexs
 		Shaders\SimpleDepthCubeMapShader.fragments = Shaders\SimpleDepthCubeMapShader.fragments
 		Shaders\SimpleDepthCubeMapShader.geometrys = Shaders\SimpleDepthCubeMapShader.geometrys
 		Shaders\SimpleDepthCubeMapShader.vertexs = Shaders\SimpleDepthCubeMapShader.vertexs

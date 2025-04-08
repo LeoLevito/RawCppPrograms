@@ -1,6 +1,9 @@
 #include "FlyingCamera.h"
 #include <glm.hpp>
 #include <iostream>
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 
 
 const float Sensitivity = 0.5f;
@@ -18,22 +21,35 @@ FlyingCamera::FlyingCamera(Camera* camera, Input* input, EngineTime* engineTime,
 
 void FlyingCamera::Update() //maybe this entire update should be run only if the right mouse button is down. 
 {
-	if (myInput->IsMouseButtonDown(GLFW_MOUSE_BUTTON_2))
-	{
-		if (Engine::Get().mouseWasWithinSceneWindow == true && Engine::Get().mouseWasOutsideSceneWindow == false)
+	//if (myInput->IsMouseButtonDown(GLFW_MOUSE_BUTTON_RIGHT))
+	//{
+		if (Engine::Get().mouseWasWithinSceneWindow == true)
 		{
 			MoveCamera();
 			RotateCamera(false);
 		}
-	}
+	/*}*/
 	myCamera->CameraUpdate();
 }
 
 void FlyingCamera::SetNewCursorPosition()
 {
-	myInput->SetCursorXY(lastX, lastY);
-	myInput->SetCursorX(lastX);
-	myInput->SetCursorX(lastY);
+	ImGuiIO& io = ImGui::GetIO();
+	//lastX = io.MousePos.x;
+	//lastY = io.MousePos.y;
+
+
+
+	//double* glfwPosX = new double;
+	//double* glfwPosY = new double;
+	////glfwGetWindowPos(Graphics::Get().window, windowPosX, windowPosY);
+	//glfwGetCursorPos(Graphics::Get().window, glfwPosX, glfwPosY);
+
+	////imgui: (0,0)
+	////glfw:(-1, -31);
+	//lastX = *glfwPosX + io.MousePos.x;
+	//lastY = *glfwPosY + io.MousePos.y;
+	glfwSetCursorPos(Graphics::Get().window, lastX, lastY);
 }
 
 void FlyingCamera::MoveCamera()
@@ -69,10 +85,13 @@ void FlyingCamera::RotateCamera(bool firstTimeRun)
 
 	if (!firstTimeRun) //special condition for straightening the camera at start.
 	{
-		glfwGetCursorPos(myWindow, myX, myY);
-
-		xpos = *myX;
-		ypos = *myY;
+		/*ImGuiIO& io = ImGui::GetIO();*/
+		//xpos = io.MousePos.x;
+		//ypos = io.MousePos.y;
+		//glfwGetCursorPos(myWindow, myX, myY);
+		glfwGetCursorPos(Graphics::Get().window, myX, myY);
+		xpos = *myX /*+ io.MousePos.x*/;
+		ypos = *myY /*+ io.MousePos.y*/;
 	}
 
 
