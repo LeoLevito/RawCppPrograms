@@ -18,6 +18,7 @@ public:
 	Shader* lineShader;	
 	Shader* gridShader;
 	Shader* pickingShader;
+	Shader* outlineShader;
 	ShadowMap* shadowMap;
 	ShadowCubeMap* shadowCubeMap;
 	bool depthPass;

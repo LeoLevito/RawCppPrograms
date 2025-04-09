@@ -365,6 +365,30 @@ void MeshComponent::DrawMesh()
 	trans = trans * rotationMatrix;
 	trans = glm::scale(trans, scale);
 
+	if (EditorGUI::Get().currentlySelectedGameObject == owner->ID)
+	{
+		//use shader for line rendering
+		ShaderManager::Get().lineShader->Use();
+		ShaderManager::Get().lineShader->SetMatrix4(trans, "transform"); //apperently there's a better way to do this compared to using a Uniform type variable inside the vertex shader, Shader Buffer Storage Object, something like that, where we can have even more variables inside the shader and update them.
+		ShaderManager::Get().lineShader->SetMatrix4(Camera::Get().myView, "view");
+		ShaderManager::Get().lineShader->SetMatrix4(Camera::Get().projection, "projection");
+		glm::vec3 color = { 1,1,0 };
+		ShaderManager::Get().lineShader->SetVector3(color, "vertexColor");
+
+		glEnable(GL_CULL_FACE);
+		glLineWidth(10);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glCullFace(GL_FRONT);
+		//glDisable(GL_LIGHTING);
+		mesh->Draw();
+		glCullFace(GL_BACK);
+		//glEnable(GL_LIGHTING);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glDisable(GL_CULL_FACE);
+		glLineWidth(1);
+	}
+
+
 	//write to Vertex Shader
 	if (EditorGUI::Get().currentPolygonMode == GL_LINE || EditorGUI::Get().currentPolygonMode == GL_POINT)
 	{
@@ -406,8 +430,8 @@ void MeshComponent::DrawMesh()
 		ShaderManager::Get().depthCubeMapShader->Use(); //this might be the issue with my lighting, I now need to use this shader here and for my lights for it to work correctly, otherwise they will be overridden by other shaders in use.
 		ShaderManager::Get().depthCubeMapShader->SetMatrix4(trans, "transform"); //this is required for meshes to be rendered to depthMap.
 	}
-
 	mesh->Draw();
+
 }
 
 void MeshComponent::Update()

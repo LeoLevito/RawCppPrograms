@@ -386,7 +386,7 @@ void Graphics::DrawImgui()
 	ImGui::DragFloat3("Scene Background Color", &SceneBackgroundColor.x, .01f, 0.0, 1.0f);
 }
 
-void Graphics::RenderPickingPass()
+void Graphics::RenderPickingPass() //https://www.opengl-tutorial.org/miscellaneous/clicking-on-objects/picking-with-an-opengl-hack/
 {
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	RenderToSceneTexture(pickingFBO, sceneTexturePicking);
@@ -433,7 +433,8 @@ void Graphics::RenderPickingPass()
 	// because the framebuffer is on the GPU.
 	unsigned char data[4];
 	glReadPixels(currentMousePosXInPickingFrameBuffer, currentMousePosYInPickingFrameBuffer, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, data);
-	//glReadPixels((int)EditorGUI::Get().sceneWindowWidth/2, (int)EditorGUI::Get().sceneWindowHeight/2, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0); //need to unbind framebuffer after glReadPixels because glReadPixels is supposed to read pixels from a frame buffer.
 
 	// Convert the color back to an integer ID
 	int pickedID =
@@ -441,14 +442,15 @@ void Graphics::RenderPickingPass()
 		data[1] * 256 +
 		data[2] * 256 * 256;
 
-	if (pickedID == 0x00ffffff) { // Full white, must be the background !
+	if (pickedID == 0x00ffffff) // Full white, must be the background !
+	{ 
 		std::cout << "background" << std::endl;
 	}
-	else {
+	else 
+	{
 		EditorGUI::Get().currentlySelectedGameObject = pickedID;
 		std::ostringstream oss;
 		oss << "mesh " << pickedID;
 		std::cout << oss.str() << std::endl;
 	}
-	glBindFramebuffer(GL_FRAMEBUFFER, 0); //need to unbind framebuffer after glReadPixels because glReadPixels is supposed to read pixels from a frame buffer.
 }

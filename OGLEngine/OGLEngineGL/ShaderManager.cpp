@@ -23,6 +23,8 @@ void ShaderManager::Initialize()
 	gridShader->Initialize("../Shaders/GridShader.vertexs", "../Shaders/GridShader.fragments");
 	pickingShader = new Shader();
 	pickingShader->Initialize("../Shaders/PickingShader.vertexs", "../Shaders/PickingShader.fragments");
+	outlineShader = new Shader();
+	outlineShader->Initialize("../Shaders/OutlineShader.vertexs", "../Shaders/OutlineShader.fragments");
 	shadowMap = new ShadowMap();
 	shadowCubeMap = new ShadowCubeMap();
 	depthPass = false;
