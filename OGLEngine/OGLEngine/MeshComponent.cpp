@@ -135,7 +135,6 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 			ImGui::PopID();
 		}
 		ImGui::EndPopup();
-		
 	}
 
 	if (MeshManager::Get().currentlyLoadingMesh != false)
@@ -289,7 +288,7 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 			}
 			else
 			{
-				ImGui::Image(texid, texsize, ImVec2(0,1), ImVec2(1,0)); //Display image. I need a texture manager. ImVec2 is for manipulating uv, we invert vertical so opengl displays the image correctly.
+				ImGui::Image(texid, texsize, ImVec2(0, 1), ImVec2(1, 0)); //Display image. I need a texture manager. ImVec2 is for manipulating uv, we invert vertical so opengl displays the image correctly.
 				ImGui::SameLine();
 				std::string textureName = textureVector[i].path().string().c_str();
 				textureName.erase(textureName.length() - 4);
@@ -357,36 +356,13 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 
 void MeshComponent::DrawMesh()
 {
-	
+
 	glm::mat4 trans = glm::mat4(1.0f);
 	glm::quat myRotationQuaternion = glm::quat(glm::radians(rotation)); //https://www.opengl-tutorial.org/intermediate-tutorials/tutorial-17-quaternions/
 	glm::mat4 rotationMatrix = glm::toMat4(myRotationQuaternion);
 	trans = glm::translate(trans, position); //translate first so that each object rotates independently.
 	trans = trans * rotationMatrix;
 	trans = glm::scale(trans, scale);
-
-	if (EditorGUI::Get().currentlySelectedGameObject == owner->ID)
-	{
-		//use shader for line rendering
-		ShaderManager::Get().lineShader->Use();
-		ShaderManager::Get().lineShader->SetMatrix4(trans, "transform"); //apperently there's a better way to do this compared to using a Uniform type variable inside the vertex shader, Shader Buffer Storage Object, something like that, where we can have even more variables inside the shader and update them.
-		ShaderManager::Get().lineShader->SetMatrix4(Camera::Get().myView, "view");
-		ShaderManager::Get().lineShader->SetMatrix4(Camera::Get().projection, "projection");
-		glm::vec3 color = { 1,1,0 };
-		ShaderManager::Get().lineShader->SetVector3(color, "vertexColor");
-
-		glEnable(GL_CULL_FACE);
-		glLineWidth(10);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		glCullFace(GL_FRONT);
-		//glDisable(GL_LIGHTING);
-		mesh->Draw();
-		glCullFace(GL_BACK);
-		//glEnable(GL_LIGHTING);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		glDisable(GL_CULL_FACE);
-		glLineWidth(1);
-	}
 
 
 	//write to Vertex Shader
@@ -412,7 +388,7 @@ void MeshComponent::DrawMesh()
 		int g = (owner->ID & 0x0000FF00) >> 8;
 		int b = (owner->ID & 0x00FF0000) >> 16;
 
-		glm::vec4 color = { r/255.0f, g/255.0f, b/255.0f , 1.0f}; //change to r/5.0f for a more noticeable color with a small amount of meshes in the scene.
+		glm::vec4 color = { r/255.0f, g/255.0f, b/255.0f, 1.0f }; //change to r/5.0f for a more noticeable color with a small amount of meshes in the scene.
 
 		ShaderManager::Get().pickingShader->SetVector4(color, "pickingColor");
 
@@ -430,8 +406,18 @@ void MeshComponent::DrawMesh()
 		ShaderManager::Get().depthCubeMapShader->Use(); //this might be the issue with my lighting, I now need to use this shader here and for my lights for it to work correctly, otherwise they will be overridden by other shaders in use.
 		ShaderManager::Get().depthCubeMapShader->SetMatrix4(trans, "transform"); //this is required for meshes to be rendered to depthMap.
 	}
-	mesh->Draw();
 
+	if (ShaderManager::Get().outlinePass == true)
+	{
+		ShaderManager::Get().outlineShader->Use();
+		ShaderManager::Get().outlineShader->SetMatrix4(trans, "transform"); //apperently there's a better way to do this compared to using a Uniform type variable inside the vertex shader, Shader Buffer Storage Object, something like that, where we can have even more variables inside the shader and update them.
+		ShaderManager::Get().outlineShader->SetMatrix4(Camera::Get().myView, "view");
+		ShaderManager::Get().outlineShader->SetMatrix4(Camera::Get().projection, "projection");
+		glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f }; 
+		ShaderManager::Get().outlineShader->SetVector4(color, "outlineColor");
+	}
+
+	mesh->Draw();
 }
 
 void MeshComponent::Update()
@@ -518,13 +504,13 @@ void MeshComponent::Deserialization(std::fstream& file)
 		MeshManager::Get().currentlyLoadingMesh = true;
 		MeshManager::Get().IsAvailableMemoryOK = true; //okay, this may become an edge case problem if the computer's RAM is already filled up when loading the scene.
 		MeshManager::Get().IsObjSizeOK = true; //we know this to be true because we've loaded it before.
-		
+
 		mesh = MeshManager::Get().LoadMesh(lastLoadableMeshName);
 		MeshManager::Get().currentlyLoadingMesh = false;
 		mesh->bufferMesh();
 
 		//do (TEXTURE):
-		diffuseMap = new Texture(diffuseMapPath.c_str(), selectedMinType, selectedMagType); 
+		diffuseMap = new Texture(diffuseMapPath.c_str(), selectedMinType, selectedMagType);
 		specularMap = new Texture(specularMapPath.c_str(), selectedMinType, selectedMagType);
 		mesh->ApplyDiffuseMap(diffuseMap); //BUG!!! (nothing's wrong with the deserialization, but actually the texture application in general, the latest texture is applied to all game objects which shouldn't be the case)
 		mesh->ApplySpecularMap(specularMap);

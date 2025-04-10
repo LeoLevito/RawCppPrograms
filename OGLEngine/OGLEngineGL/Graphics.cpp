@@ -8,6 +8,7 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#include "MeshComponent.h"
 
 //https://www.glfw.org/docs/3.3/group__window.html#gab3fb7c3366577daef18c0023e2a8591f
 //https://stackoverflow.com/questions/45880238/how-to-draw-while-resizing-glfw-window
@@ -31,7 +32,7 @@ void GLFW_window_pos_callback(GLFWwindow* window, int xpos, int ypos) //receives
 	EditorGUI::Get().RenderImGui();
 	glfwSwapBuffers(window); //moved from Graphics::Render().
 
-	std::cout << "Moved window " << " " <<xpos << " " << ypos <<std::endl;
+	std::cout << "Moved window " << " " << xpos << " " << ypos << std::endl;
 }
 
 Graphics::Graphics()
@@ -94,6 +95,12 @@ void Graphics::Initialize(int width, int height)
 
 	glGenFramebuffers(1, &pickingFBO);
 	glGenTextures(1, &sceneTexturePicking);
+
+	glGenFramebuffers(1, &outlineMaskFBO);
+	glGenTextures(1, &sceneTextureOutlineMask);
+
+	glGenFramebuffers(1, &outlineActualFBO);
+	glGenTextures(1, &sceneTextureOutlineActual);
 }
 
 void Graphics::Render()
@@ -147,7 +154,7 @@ void Graphics::Render()
 
 
 //2. render scene like usual, now using the generated depth texture/shadowmap.
-	RenderToSceneTexture(sceneFBO, sceneTexture);
+	RenderToSceneTexture(sceneFBO, sceneTexture, GL_RGB);
 	glViewport(0, 0, EditorGUI::Get().sceneWindowWidth, EditorGUI::Get().sceneWindowHeight);
 	glBindFramebuffer(GL_FRAMEBUFFER, sceneFBO);
 	glEnable(GL_DEPTH_TEST);
@@ -163,6 +170,8 @@ void Graphics::Render()
 	RenderWorldGrid();
 	ShaderManager::Get().shader->Use();
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	RenderOutlinePass();
 
 	//we need to swap buffers
 	//glfwSwapBuffers(window); //swap front and back buffers on the window. (Info: our framebuffer has two sides, the back buffer is what we add, the front buffer is what we see. Basically.). So we can see everything that was added before this function was called!
@@ -207,11 +216,11 @@ void Graphics::EscapeToCloseWindow()
 }
 
 //https://learnopengl.com/Advanced-OpenGL/Framebuffers
-void Graphics::RenderToSceneTexture(unsigned int FBO, unsigned int texture)
+void Graphics::RenderToSceneTexture(unsigned int FBO, unsigned int texture, int rgbMode)
 {
-	
+
 	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, EditorGUI::Get().sceneWindowWidth, EditorGUI::Get().sceneWindowHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL); //is this okay to do on tick?
+	glTexImage2D(GL_TEXTURE_2D, 0, rgbMode, EditorGUI::Get().sceneWindowWidth, EditorGUI::Get().sceneWindowHeight, 0, rgbMode, GL_UNSIGNED_BYTE, NULL); //is this okay to do on tick?
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
@@ -270,48 +279,6 @@ void Graphics::RenderWorldGrid()
 			ShaderManager::Get().lineShader->SetVector3(color, "vertexColor");
 			DrawLine(startPoint, endPoint);
 		}
-		//else if (i == 3) //X axis grid
-		//{
-		//	color = { 0.2f, 0.2f, 0.2f };
-		//	ShaderManager::Get().lineShader->SetVector3(color, "vertexColor");
-		//	for (int i = 1; i < lineAmount; i++)
-		//	{
-		//		startPoint = { -lineLength,0,i };
-		//		endPoint = { lineLength,0,i };
-
-		//		DrawLine(startPoint, endPoint);
-		//	}
-
-		//	for (int i = -1; i > -lineAmount; i--)
-		//	{
-		//		startPoint = { -lineLength,0,i };
-		//		endPoint = { lineLength,0,i };
-
-		//		DrawLine(startPoint, endPoint);
-		//	}
-
-		//}
-		//else if (i == 4) //Z axis grid
-		//{
-		//	color = { 0.2f, 0.2f, 0.2f };
-		//	ShaderManager::Get().lineShader->SetVector3(color, "vertexColor");
-
-		//	for (int i = 1; i < lineAmount; i++)
-		//	{
-		//		startPoint = { i,0,-lineLength };
-		//		endPoint = { i,0,lineLength };
-
-		//		DrawLine(startPoint, endPoint);
-		//	}
-
-		//	for (int i = -1; i > -lineAmount; i--)
-		//	{
-		//		startPoint = { i,0,-lineLength };
-		//		endPoint = { i,0,lineLength };
-
-		//		DrawLine(startPoint, endPoint);
-		//	}
-		//}
 	}
 
 	// positions of two triangle plane vertices
@@ -389,19 +356,14 @@ void Graphics::DrawImgui()
 void Graphics::RenderPickingPass() //https://www.opengl-tutorial.org/miscellaneous/clicking-on-objects/picking-with-an-opengl-hack/
 {
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-	RenderToSceneTexture(pickingFBO, sceneTexturePicking);
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	RenderToSceneTexture(pickingFBO, sceneTexturePicking, GL_RGB);
 
-
-	//RenderPickingPass();
-
-	// I also need to bind frame buffer texture before this. Or maybe not since I don't want to display the pickingShader in the SceneWindow.
 	ShaderManager::Get().pickingPass = true;
 	ShaderManager::Get().pickingShader->Use();
 
 	glViewport(0, 0, EditorGUI::Get().sceneWindowWidth, EditorGUI::Get().sceneWindowHeight);
 	glBindFramebuffer(GL_FRAMEBUFFER, pickingFBO);
-	//glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	for (int i = 0; i < GameObjectManager::Get().gameObjects.size(); i++) //Game.gameObjectVector calls Update() on every game object implementing Update() and that Update() can call Update() in every component implementing Update().
@@ -443,14 +405,117 @@ void Graphics::RenderPickingPass() //https://www.opengl-tutorial.org/miscellaneo
 		data[2] * 256 * 256;
 
 	if (pickedID == 0x00ffffff) // Full white, must be the background !
-	{ 
+	{
 		std::cout << "background" << std::endl;
 	}
-	else 
+	else
 	{
 		EditorGUI::Get().currentlySelectedGameObject = pickedID;
 		std::ostringstream oss;
 		oss << "mesh " << pickedID;
 		std::cout << oss.str() << std::endl;
+	}
+}
+
+void Graphics::RenderOutlinePass()
+{
+	//https://io7m.com/documents/outline-glsl/ 'Outlines Using Masking' chapter.
+	//http://geoffprewett.com/blog/software/opengl-outline/ 'Post-Processing' chapter. General method part, not the code part. Helped me understand what I needed to do here. I don't do it the same way since I draw framebuffer images in the SceneWindow but the structure is similar to where I render my selected object to a mask texture and then permorm edge detection on that texture and then draw that image to the SceneWindow.
+
+	if (!(EditorGUI::Get().currentlySelectedGameObject <= GameObjectManager::Get().gameObjects.size()))
+	{
+		allowOutline = false;
+		return;
+	}
+	allowOutline = true;
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); //switch to GL_FILL so we don't have any wireframes rendering to the sceneTextureOutline.
+
+	//First render outline mask to texture.
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	RenderToSceneTexture(outlineMaskFBO, sceneTextureOutlineMask, GL_RGBA);
+	ShaderManager::Get().outlinePass = true;
+	ShaderManager::Get().outlineShader->Use();
+	glViewport(0, 0, EditorGUI::Get().sceneWindowWidth, EditorGUI::Get().sceneWindowHeight);
+	glBindFramebuffer(GL_FRAMEBUFFER, outlineMaskFBO);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	GameObject* owner = GameObjectManager::Get().gameObjects[EditorGUI::Get().currentlySelectedGameObject];
+	for (size_t i = 0; i < owner->components.size(); i++)
+	{
+		if (dynamic_cast<MeshComponent*>(owner->components[i])) //checking if owner has a component of type MeshComponent. Is of-type correct word-use in this case?
+		{
+			dynamic_cast<MeshComponent*>(owner->components[i])->Update(); //call mesh component update, so only mesh renders to sceneTextureOutline and not anything else like debug line drawings from a Collider.
+			//multiple casts, in UPDATE()? not sure how efficient this is. EDIT 5 dec 2024, apparently this dynamic_cast is better than other types of casts, even Emil has used them multiple times.
+		}
+	}
+	ShaderManager::Get().outlinePass = false;
+	glBindFramebuffer(GL_FRAMEBUFFER, 0); //need to unbind framebuffer after glReadPixels because glReadPixels is supposed to read pixels from a frame buffer.
+
+
+
+
+
+	//Then render actual outline to texture.
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	RenderToSceneTexture(outlineActualFBO, sceneTextureOutlineActual, GL_RGBA);
+	glViewport(0, 0, EditorGUI::Get().sceneWindowWidth, EditorGUI::Get().sceneWindowHeight);
+	glBindFramebuffer(GL_FRAMEBUFFER, outlineActualFBO);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	ShaderManager::Get().outlineActualShader->Use();
+
+	
+		//copied from RenderWorldGrid(), we need to have a two triangle plane so the OutlineActualShader can do its magic using the Normalized Device Coordinates positions of these vertices:
+		//doing draw elements to a shader that ONLY HAS VERTEX POSITION (aPos) and not multiplying with a transform, projection or view, means that the vertices will be layed out in Normalized Device Coordinates: https://learnopengl.com/Getting-started/Hello-Triangle
+		glm::vec3 vert1 = { 1.0f,  1.0f,  0.0f };
+		glm::vec3 vert2 = { 1.0f, -1.0f,  0.0f };
+		glm::vec3 vert3 = { -1.0f,-1.0f,  0.0f };
+		glm::vec3 vert4 = { -1.0f, 1.0f,  0.0f };
+
+		std::vector<glm::vec3> verts = { vert1, vert2, vert3, vert4 };
+		std::vector<unsigned int> indices = { 0, 1, 3, 1, 2, 3 };
+
+		glBindVertexArray(VAO);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+		glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(glm::vec3), &verts[0], GL_STATIC_DRAW);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW); //the indices might be wrong
+
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0); //these are probably not right, need to modify to read correctly.
+
+		glBindVertexArray(0);
+
+
+
+	glActiveTexture(GL_TEXTURE4);
+	glBindTexture(GL_TEXTURE_2D, sceneTextureOutlineMask); //so we have a new texture binding in Draw() because otherwise fragment shader would take the last binded texture, this allows us to use different textures for different objects (in the future).
+	ShaderManager::Get().outlineActualShader->SetInt(4, "gbufferMask");
+
+	glm::vec2 viewportSize = { EditorGUI::Get().sceneWindowWidth, EditorGUI::Get().sceneWindowHeight };
+	ShaderManager::Get().outlineActualShader->SetVector2(viewportSize, "viewportSize");
+
+
+		glBindVertexArray(VAO); //only bind VAO when drawing the mesh since it already has a VBO reference already.
+		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0); //doing draw elements to a shader that only has vertex position and not a transform, projection or view, means that the vertices will be layed out in Normalized Device Coordinates: https://learnopengl.com/Getting-started/Hello-Triangle
+		glBindVertexArray(0);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0); //need to unbind framebuffer after glReadPixels because glReadPixels is supposed to read pixels from a frame buffer.
+
+
+	switch (EditorGUI::Get().currentPolygonMode) //revert back to the currentPolygonMode.
+	{
+	case GL_FILL:
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		break;
+	case GL_LINE:
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		break;
+	case GL_POINT:
+		glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+		break;
+	default:
+		break;
 	}
 }

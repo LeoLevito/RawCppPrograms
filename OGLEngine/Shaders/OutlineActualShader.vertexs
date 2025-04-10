@@ -1,0 +1,12 @@
+#version 330 core 
+//https://io7m.com/documents/outline-glsl/ 'Outlines Using Masking' chapter.
+
+layout (location = 0) in vec3 position;
+
+out vec2 vsUV;
+
+void main() 
+{
+   gl_Position = vec4(position, 1.0);
+   vsUV        = (position.xy * 0.5) + 0.5;
+}

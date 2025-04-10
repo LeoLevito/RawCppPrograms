@@ -1,0 +1,51 @@
+#version 330 core
+//https://io7m.com/documents/outline-glsl/ 'Outlines Using Masking' chapter.
+
+out vec4 fsColor;
+
+in vec2 vsUV;
+
+uniform vec2 viewportSize;
+
+#define LINE_WEIGHT 5.0
+
+//uniform sampler2D gbufferAlbedo;
+uniform sampler2D gbufferMask;
+
+void main()
+{
+   float dx = (1.0 / viewportSize.x) * LINE_WEIGHT;
+   float dy = (1.0 / viewportSize.y) * LINE_WEIGHT;
+
+   vec2 uvCenter   = vsUV;
+   vec2 uvRight    = vec2(uvCenter.x + dx, uvCenter.y);
+   vec2 uvTop      = vec2(uvCenter.x,      uvCenter.y - dx);
+   vec2 uvTopRight = vec2(uvCenter.x + dx, uvCenter.y - dx);
+
+   float mCenter   = texture(gbufferMask, uvCenter).r;
+   float mTop      = texture(gbufferMask, uvTop).r;
+   float mRight    = texture(gbufferMask, uvRight).r;
+   float mTopRight = texture(gbufferMask, uvTopRight).r;
+   
+   float dT  = abs(mCenter - mTop);
+   float dR  = abs(mCenter - mRight);
+   float dTR = abs(mCenter - mTopRight);
+   
+   float delta = 0.0;
+   delta = max(delta, dT);
+   delta = max(delta, dR);
+   delta = max(delta, dTR);
+
+   vec4 outline;
+   if(delta == 0.0) //https://tenor.com/en-GB/view/smart-gif-9596539
+   {
+		outline = vec4(delta, delta, delta, 0.0);
+   }
+   else
+   {
+		outline = vec4(delta, delta, delta, 1.0);
+   }
+
+   fsColor = outline; //bruh, after all this time, I just needed to do this and not faff about with the gBufferAlbedo texture...
+
+}

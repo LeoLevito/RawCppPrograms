@@ -198,13 +198,17 @@ void EditorGUI::SceneWindow()
 	}
 
 
-	//glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-	//glClear(GL_COLOR_BUFFER_BIT);
-	//glBindTexture(GL_TEXTURE_2D, Graphics::Get().sceneTexture);
-
 	ImTextureID texid = Graphics::Get().sceneTexture;
 	ImVec2 texsize = { sceneWindowWidth, sceneWindowHeight };
 	ImGui::Image(texid, texsize, ImVec2(0, 1), ImVec2(1, 0)); //Display framebuffer image.
+
+	if (Graphics::Get().allowOutline) //Display outline framebuffer image on top of sceneTexture.
+	{
+		ImTextureID texid2 = Graphics::Get().sceneTextureOutlineActual;
+		ImVec2 texsize2 = { sceneWindowWidth, sceneWindowHeight };
+		ImGui::GetWindowDrawList()->AddImage(texid2, ImVec2(sceneWindowPosX, sceneWindowPosY), ImVec2(sceneWindowPosX + sceneWindowWidth, sceneWindowPosY + sceneWindowHeight), ImVec2(0, 1), ImVec2(1, 0));
+	}
+
 
 	ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, sceneWindowWidth, sceneWindowHeight);
 
@@ -219,15 +223,11 @@ void EditorGUI::SceneWindow()
 				if (dynamic_cast<TransformComponent*>(GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components[i])) //checking if owner has a component of type TransformComponent. Is of-type correct word-use in this case?
 				{
 					TransformComponent* tComp = dynamic_cast<TransformComponent*>(GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components[i]);
-					//trans = dynamic_cast<TransformComponent*>(GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components[i])->transformMatrix;
-					//TransformStart(&Camera::Get().myView, &Camera::Get().projection, &dynamic_cast<TransformComponent*>(GameObjectManager::Get().gameObjects.at(currentlySelectedGameObject)->components[i])->transformMatrix);
 					EditTransform(&Camera::Get().myView, &Camera::Get().projection, *tComp);
 				}
 			}
 		}
 	}
-	/*glm::mat4 matrix = glm::mat4(1.0f);
-	ImGuizmo::DrawGrid(glm::value_ptr(Camera::Get().myView), glm::value_ptr(Camera::Get().projection), glm::value_ptr(matrix), 100.f);*/
 	ImGui::EndChild();
 	ImGui::End();
 	ImGui::PopStyleVar();

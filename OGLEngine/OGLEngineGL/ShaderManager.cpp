@@ -25,10 +25,13 @@ void ShaderManager::Initialize()
 	pickingShader->Initialize("../Shaders/PickingShader.vertexs", "../Shaders/PickingShader.fragments");
 	outlineShader = new Shader();
 	outlineShader->Initialize("../Shaders/OutlineShader.vertexs", "../Shaders/OutlineShader.fragments");
+	outlineActualShader = new Shader();
+	outlineActualShader->Initialize("../Shaders/OutlineActualShader.vertexs", "../Shaders/OutlineActualShader.fragments");
 	shadowMap = new ShadowMap();
 	shadowCubeMap = new ShadowCubeMap();
 	depthPass = false;
 	pickingPass = false;
+	outlinePass = false;
 }
 
 ShaderManager& ShaderManager::Get()
