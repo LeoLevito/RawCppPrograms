@@ -420,6 +420,7 @@ void Graphics::RenderPickingPass() //https://www.opengl-tutorial.org/miscellaneo
 void Graphics::RenderOutlinePass()
 {
 	//https://io7m.com/documents/outline-glsl/ 'Outlines Using Masking' chapter.
+	//https://stackoverflow.com/questions/41421229/what-other-ways-can-i-draw-the-outline-of-an-object see prewett's answer. Helped me understand what I needed to do here.
 	//http://geoffprewett.com/blog/software/opengl-outline/ 'Post-Processing' chapter. General method part, not the code part. Helped me understand what I needed to do here. I don't do it the same way since I draw framebuffer images in the SceneWindow but the structure is similar to where I render my selected object to a mask texture and then permorm edge detection on that texture and then draw that image to the SceneWindow.
 
 	if (!(EditorGUI::Get().currentlySelectedGameObject <= GameObjectManager::Get().gameObjects.size()))
