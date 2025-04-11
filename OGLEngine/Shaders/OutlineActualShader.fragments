@@ -7,7 +7,7 @@ in vec2 vsUV;
 
 uniform vec2 viewportSize;
 
-#define LINE_WEIGHT 5.0
+#define LINE_WEIGHT 3.0
 
 //uniform sampler2D gbufferAlbedo;
 uniform sampler2D gbufferMask;
@@ -27,25 +27,65 @@ void main()
    float mRight    = texture(gbufferMask, uvRight).r;
    float mTopRight = texture(gbufferMask, uvTopRight).r;
    
+   //Okay so if I understand this correctly, mCenter is the current pixel brightness. mTop, mRight mTopRight are the pixels being sampled as per the link at the top.
+   //But wait, they are textures. Oh, textures.r.
    float dT  = abs(mCenter - mTop);
    float dR  = abs(mCenter - mRight);
    float dTR = abs(mCenter - mTopRight);
    
+   //Then we get the delta here to determine where the white and black pixels are beside one another.
    float delta = 0.0;
    delta = max(delta, dT);
    delta = max(delta, dR);
    delta = max(delta, dTR);
 
+
+
+
+   vec4 color = vec4(1.0, 0.5, 0.0, 1.0); //orange color
+   vec4 noColor = vec4(0.0, 0.0, 0.0, 0.0);  //black / transparent color
    vec4 outline;
+
+   //Add outline to the edges of the mesh.
    if(delta == 0.0) //https://tenor.com/en-GB/view/smart-gif-9596539
    {
-		outline = vec4(delta, delta, delta, 0.0);
+		outline = noColor;
    }
    else
    {
-		outline = vec4(delta, delta, delta, 1.0);
+		outline = color;
+   }
+
+
+   //Add outline to the edges of the viewport when mesh is touching any one of the sides of the viewport.
+   if(gl_FragCoord.y >= (viewportSize.y - LINE_WEIGHT) && mCenter == 1.0) ////https://tenor.com/en-GB/view/smart-gif-9596539
+   {
+		outline = color;
+   }
+   if(gl_FragCoord.x >= (viewportSize.x - LINE_WEIGHT) && mCenter == 1.0) //the resulting outline on the right side of the viewport doesn't align perfectly with the mesh in some instances but this is just a result of the sampling method above.
+   {
+   		outline = color;
+   }
+   if(gl_FragCoord.y <= LINE_WEIGHT && mCenter == 1.0) //the resulting outline on the bottom side of the viewport doesn't align perfectly with the mesh in some instances but this is just a result of the sampling method above.
+   {
+   		outline = color;
+   }
+   if(gl_FragCoord.x <= LINE_WEIGHT && mCenter == 1.0)
+   {
+		outline = color;
+   }
+
+
+   //fix for artifacts when mesh is touching the top of the viewport but not the bottom, or is touching the left of the viewport but not the right, or both but not the bottom or right.
+   //artifacts would be an outline on the bottom or right edges of the viewport when they really shouldn't be there because the mesh isn't touching those sides at all.
+   if(gl_FragCoord.x >= (viewportSize.x - LINE_WEIGHT) && mCenter == 0.0)
+   {
+   		outline = noColor;
+   }
+   if(gl_FragCoord.y <= LINE_WEIGHT && mCenter == 0.0)
+   {
+   		outline = noColor;
    }
 
    fsColor = outline; //bruh, after all this time, I just needed to do this and not faff about with the gBufferAlbedo texture...
-
 }
