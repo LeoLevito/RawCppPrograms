@@ -40,3 +40,8 @@ void TextureManager::ReloadSpecifiedTexture(int i, int minType, int magType)
 	Texture* texture = new Texture(texturePaths[i].path().string().c_str(), minType, magType);
 	textures[i] = texture;
 }
+
+
+//Maybe I can write smaller versions of the loaded texture images to disk using stb_image_write.h (jpg is possible),
+//I would need a way to downscale the texture images to 32x32, either using some function in stb,
+//or using imgui like I do to display the images in the MeshComponent texture selection menu.
