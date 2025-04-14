@@ -31,6 +31,7 @@ void PointLight::UpdateIDBasedStrings()
 
 void PointLight::SetToDefault()
 {
+	ShaderManager::Get().shader->Use();
 	ambient = glm::vec3(0, 0, 0);
 	diffuse = glm::vec3(1, 1, 1);
 	specular = glm::vec3(1, 1, 1);
@@ -46,6 +47,7 @@ void PointLight::SetToDefault()
 
 void PointLight::SetToCurrent()
 {
+	ShaderManager::Get().shader->Use();
 	ShaderManager::Get().shader->SetVector3(ambient, ambientString);
 	ShaderManager::Get().shader->SetVector3(diffuse, diffuseString);
 	ShaderManager::Get().shader->SetVector3(specular, specularString);
@@ -56,6 +58,7 @@ void PointLight::SetToCurrent()
 
 void PointLight::SetToZero()
 {
+	ShaderManager::Get().shader->Use();
 	ShaderManager::Get().shader->SetVector3(glm::vec3(0, 0, 0), ambientString);
 	ShaderManager::Get().shader->SetVector3(glm::vec3(0, 0, 0), diffuseString);
 	ShaderManager::Get().shader->SetVector3(glm::vec3(0, 0, 0), specularString);
@@ -67,6 +70,7 @@ void PointLight::SetToZero()
 void PointLight::SetPosition(glm::vec3 pos)
 {
 	position = pos;
+	ShaderManager::Get().shader->Use();
 	ShaderManager::Get().shader->SetVector3(position, positionString);
 }
 
@@ -118,23 +122,28 @@ void PointLight::DrawImgui()
 
 	if (ImGui::DragFloat3("ambient", &ambient.x, .01f))
 	{
+		ShaderManager::Get().shader->Use();
 		ShaderManager::Get().shader->SetVector3(ambient, ambientString);
 	}
 	if (ImGui::DragFloat3("diffuse", &diffuse.x, .01f))
 	{
+		ShaderManager::Get().shader->Use();
 		ShaderManager::Get().shader->SetVector3(diffuse, diffuseString);
 	}
 	if (ImGui::DragFloat3("specular", &specular.x, .01f))
 	{
+		ShaderManager::Get().shader->Use();
 		ShaderManager::Get().shader->SetVector3(specular, specularString);
 	}
 
 	if (ImGui::DragFloat("linear", &linear, .01f))
 	{
+		ShaderManager::Get().shader->Use();
 		ShaderManager::Get().shader->SetFloat(linear, linearString);
 	}
 	if (ImGui::DragFloat("quadratic", &quadratic, .01f))
 	{
+		ShaderManager::Get().shader->Use();
 		ShaderManager::Get().shader->SetFloat(quadratic, quadraticString);
 	}
 }
@@ -159,6 +168,7 @@ void PointLight::Deserialization(std::fstream& file)
 
 	if (ShaderManager::Get().depthPass == false)
 	{
+		ShaderManager::Get().shader->Use();
 		ShaderManager::Get().shader->SetVector3(ambient, ambientString);
 		ShaderManager::Get().shader->SetVector3(diffuse, diffuseString);
 		ShaderManager::Get().shader->SetVector3(specular, specularString);

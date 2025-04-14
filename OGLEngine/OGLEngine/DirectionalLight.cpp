@@ -9,6 +9,7 @@ DirectionalLight::~DirectionalLight()
 {
 	position = glm::vec3(0, 0, 0);
 	direction = glm::vec3(0, 0, 0);
+	ShaderManager::Get().shader->Use();
 	ShaderManager::Get().shader->SetVector3(position, positionString);
 	ShaderManager::Get().shader->SetVector3(direction, directionString);
 }
@@ -43,6 +44,7 @@ void DirectionalLight::SetToDefault()
 
 	if (ShaderManager::Get().depthPass == false)
 	{
+		ShaderManager::Get().shader->Use();
 		ShaderManager::Get().shader->SetVector3(ambient, ambientString);
 		ShaderManager::Get().shader->SetVector3(diffuse, diffuseString);
 		ShaderManager::Get().shader->SetVector3(specular, specularString);
@@ -53,6 +55,7 @@ void DirectionalLight::SetToCurrent()
 {
 	if (ShaderManager::Get().depthPass == false)
 	{
+		ShaderManager::Get().shader->Use();
 		ShaderManager::Get().shader->SetVector3(ambient, ambientString);
 		ShaderManager::Get().shader->SetVector3(diffuse, diffuseString);
 		ShaderManager::Get().shader->SetVector3(specular, specularString);
@@ -63,6 +66,7 @@ void DirectionalLight::SetToZero()
 {
 	if (ShaderManager::Get().depthPass == false)
 	{
+		ShaderManager::Get().shader->Use();
 		ShaderManager::Get().shader->SetVector3(glm::vec3(0, 0, 0), ambientString);
 		ShaderManager::Get().shader->SetVector3(glm::vec3(0, 0, 0), diffuseString);
 		ShaderManager::Get().shader->SetVector3(glm::vec3(0, 0, 0), specularString);
@@ -74,6 +78,7 @@ void DirectionalLight::SetPosition(glm::vec3 pos)
 	position = pos;
 	if (ShaderManager::Get().depthPass == false)
 	{
+		ShaderManager::Get().shader->Use();
 		ShaderManager::Get().shader->SetVector3(position, positionString);
 	}
 }
@@ -83,6 +88,7 @@ void DirectionalLight::SetDirection(glm::vec3 dir)
 	direction = dir;
 	if (ShaderManager::Get().depthPass == false)
 	{
+		ShaderManager::Get().shader->Use();
 		ShaderManager::Get().shader->SetVector3(direction, directionString);
 	}
 }
@@ -131,6 +137,7 @@ void DirectionalLight::DrawImgui()
 	{
 		if (ShaderManager::Get().depthPass == false)
 		{
+			ShaderManager::Get().shader->Use();
 			ShaderManager::Get().shader->SetVector3(ambient, ambientString);
 		}
 	}
@@ -138,6 +145,7 @@ void DirectionalLight::DrawImgui()
 	{
 		if (ShaderManager::Get().depthPass == false)
 		{
+			ShaderManager::Get().shader->Use();
 			ShaderManager::Get().shader->SetVector3(diffuse, diffuseString);
 		}
 	}
@@ -145,6 +153,7 @@ void DirectionalLight::DrawImgui()
 	{
 		if (ShaderManager::Get().depthPass == false)
 		{
+			ShaderManager::Get().shader->Use();
 			ShaderManager::Get().shader->SetVector3(specular, specularString);
 		}
 	}
@@ -165,6 +174,7 @@ void DirectionalLight::Deserialization(std::fstream& file)
 
 	if (ShaderManager::Get().depthPass == false)
 	{
+		ShaderManager::Get().shader->Use();
 		ShaderManager::Get().shader->SetVector3(ambient, ambientString);
 		ShaderManager::Get().shader->SetVector3(diffuse, diffuseString);
 		ShaderManager::Get().shader->SetVector3(specular, specularString);

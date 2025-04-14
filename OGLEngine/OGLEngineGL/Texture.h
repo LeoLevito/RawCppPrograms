@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 class Texture
 {
 public:
@@ -7,6 +8,7 @@ public:
 	int Width;
 	int Height;
 	
+	std::string name;
 	unsigned int TextureObject;
 	//GLenum imageFormat;
 };

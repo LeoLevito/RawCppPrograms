@@ -151,6 +151,7 @@
     <ClCompile Include="ShadowMap.cpp" />
     <ClCompile Include="stb_image.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="Triangle.cpp" />
     <ClCompile Include="vboindexer.cpp" />
   </ItemGroup>
@@ -166,6 +167,7 @@
     <ClInclude Include="ShadowMap.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="TextureManager.h" />
     <ClInclude Include="Triangle.h" />
     <ClInclude Include="vboindexer.h" />
   </ItemGroup>

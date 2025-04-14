@@ -7,6 +7,7 @@
 
 Texture::Texture(const char* path, int minfilter, int magfilter)
 {
+	name = path;
 	int Channels = 0;
 	Width = 0; //set in stbi_load.
 	Height = 0; //set in stbi_load.

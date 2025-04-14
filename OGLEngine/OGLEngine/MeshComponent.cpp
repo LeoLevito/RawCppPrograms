@@ -17,6 +17,7 @@
 #include <thread>
 #include <MeshManager.h>
 #include "ShaderManager.h"
+#include "TextureManager.h"
 
 
 MeshComponent::MeshComponent()
@@ -24,10 +25,15 @@ MeshComponent::MeshComponent()
 	name = "Mesh component";
 	type = ComponentType::Mesh;
 
-	diffuseMapPath = "../Textures/Bliss/Bliss.jpg";
-	specularMapPath = "../Textures/Bliss/Bliss2.jpg";
-	diffuseMap = new Texture(diffuseMapPath.c_str(), 5, 1);
-	specularMap = new Texture(specularMapPath.c_str(), 5, 1);
+	//diffuseMapPath = "../Textures/Bliss/Bliss.jpg";
+	//specularMapPath = "../Textures/Bliss/Bliss2.jpg";
+	//diffuseMap = new Texture(diffuseMapPath.c_str(), 5, 1);
+	//specularMap = new Texture(specularMapPath.c_str(), 5, 1);
+	diffuseMapPath = TextureManager::Get().textures[7]->name;
+	specularMapPath = TextureManager::Get().textures[8]->name;
+	diffuseMap = TextureManager::Get().textures[7];
+	specularMap = TextureManager::Get().textures[8];
+
 	//mesh = MeshManager::Get().LoadMesh("../Models/TreeTrunk");
 	//mesh->bufferMesh();
 	//mesh->ApplyTexture(myTexture);
@@ -62,13 +68,14 @@ MeshComponent::MeshComponent()
 	}
 
 	//setting default values for material light behavior. Also, why does the Light Component only work properly when I add a new Mesh Component to the same GameObject? Need to investigate futher.
-	ambient = glm::vec3(0, 0, 0);
-	diffuse = glm::vec3(1, 1, 1);
-	specular = glm::vec3(1, 1, 1);
+	//ambient = glm::vec3(0, 0, 0);
+	//diffuse = glm::vec3(1, 1, 1);
+	//specular = glm::vec3(1, 1, 1);
 	shininess = 128.0f;
-	ShaderManager::Get().shader->SetVector3(ambient, "material.ambient");
-	ShaderManager::Get().shader->SetVector3(diffuse, "material.diffuse");
-	ShaderManager::Get().shader->SetVector3(specular, "material.specular");
+	//ShaderManager::Get().shader->SetVector3(ambient, "material.ambient"); //does this even do anything?
+	//ShaderManager::Get().shader->SetVector3(diffuse, "material.diffuse");
+	//ShaderManager::Get().shader->SetVector3(specular, "material.specular");
+	ShaderManager::Get().shader->Use();
 	ShaderManager::Get().shader->SetFloat(shininess, "material.shininess"); //Emil said I should make the shininess property dependent on the specular map, for example it's RED values, like other people have done.
 
 	selectedMinType = 0;
@@ -199,14 +206,14 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 		ImGui::OpenPopup("Texture Popup");
 	}
 
-	if (ImGui::Button("Choose shadow map")) //do I even need this anymore?
-	{
-		if (ShaderManager::Get().depthPass == false)
-		{
-			ShaderManager::Get().shader->SetInt(2, "material.shadowMap"); //why do I need to do this again? time to re-read https://learnopengl.com/Lighting/Lighting-maps
-			mesh->ApplyShadowMap(*(ShaderManager::Get().shadowMap));
-		}
-	}
+	//if (ImGui::Button("Choose shadow map")) //do I even need this anymore?
+	//{
+	//	if (ShaderManager::Get().depthPass == false)
+	//	{
+	//		ShaderManager::Get().shader->SetInt(2, "material.shadowMap"); //why do I need to do this again? time to re-read https://learnopengl.com/Lighting/Lighting-maps
+	//		mesh->ApplyShadowMap(*(ShaderManager::Get().shadowMap));
+	//	}
+	//}
 
 	if (ImGui::Button("Choose texture Min filter"))
 	{
@@ -239,6 +246,36 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 			if (ImGui::Selectable(minNames[i]))
 			{
 				selectedMinType = i;
+				for (int i = 0; i < TextureManager::Get().textures.size(); i++)
+				{
+					if (diffuseMap->name == TextureManager::Get().textures[i]->name)
+					{
+						if (ShaderManager::Get().depthPass == false)
+						{
+							TextureManager::Get().ReloadSpecifiedTexture(i, selectedMinType, selectedMagType);
+							diffuseMap = TextureManager::Get().textures[i];
+							//glBindTexture(GL_TEXTURE_2D, diffuseMap->TextureObject);
+							ShaderManager::Get().shader->Use();
+							ShaderManager::Get().shader->SetInt(0, "material.diffuse");
+							//glBindTexture(GL_TEXTURE_2D, 0);
+							mesh->ApplyDiffuseMap(diffuseMap);
+						}
+					}
+
+					if (specularMap->name == TextureManager::Get().textures[i]->name)
+					{
+						if (ShaderManager::Get().depthPass == false)
+						{
+							TextureManager::Get().ReloadSpecifiedTexture(i, selectedMinType, selectedMagType);
+							specularMap = TextureManager::Get().textures[i];
+							//glBindTexture(GL_TEXTURE_2D, specularMap->TextureObject);
+							ShaderManager::Get().shader->Use();
+							ShaderManager::Get().shader->SetInt(1, "material.specular");
+							//glBindTexture(GL_TEXTURE_2D, 0);
+							mesh->ApplySpecularMap(specularMap);
+						}
+					}
+				}
 			}
 			//ImGui::EndDisabled();
 		}
@@ -261,6 +298,38 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 			if (ImGui::Selectable(magNames[i]))
 			{
 				selectedMagType = i;
+				for (int i = 0; i < TextureManager::Get().textures.size(); i++)
+				{
+					if (diffuseMap->name == TextureManager::Get().textures[i]->name)
+					{
+						if (ShaderManager::Get().depthPass == false)
+						{
+							delete TextureManager::Get().textures[i];
+							TextureManager::Get().ReloadSpecifiedTexture(i, selectedMinType, selectedMagType);
+							diffuseMap = TextureManager::Get().textures[i];
+							//glBindTexture(GL_TEXTURE_2D, diffuseMap->TextureObject);
+							ShaderManager::Get().shader->Use();
+							ShaderManager::Get().shader->SetInt(0, "material.diffuse");
+							//glBindTexture(GL_TEXTURE_2D, 0);
+							mesh->ApplyDiffuseMap(diffuseMap);
+						}
+					}
+
+					if (specularMap->name == TextureManager::Get().textures[i]->name)
+					{
+						if (ShaderManager::Get().depthPass == false)
+						{
+							delete TextureManager::Get().textures[i];
+							TextureManager::Get().ReloadSpecifiedTexture(i, selectedMinType, selectedMagType);
+							specularMap = TextureManager::Get().textures[i];
+							//glBindTexture(GL_TEXTURE_2D, specularMap->TextureObject);
+							ShaderManager::Get().shader->Use();
+							ShaderManager::Get().shader->SetInt(1, "material.specular");
+							//glBindTexture(GL_TEXTURE_2D, 0);
+							mesh->ApplySpecularMap(specularMap);
+						}
+					}
+				}
 			}
 			//ImGui::EndDisabled();
 		}
@@ -269,28 +338,31 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 
 	if (ImGui::BeginPopup("Texture Popup"))
 	{
-		ImTextureID texid = diffuseMap->TextureObject;
-		ImVec2 texsize = ImVec2(32, 32);
+		/*ImTextureID texid = diffuseMap->TextureObject;
+		ImVec2 texsize = ImVec2(32, 32);*/
 
 		ImGui::SeparatorText("TEXTURES:");
 
 		std::string currentDirectoryName;
 
-		for (int i = 0; i < textureVector.size(); i++)
+		for (int i = 0; i < TextureManager::Get().texturePaths.size(); i++)
 		{
 			ImGui::PushID(i);
 
-			if (!textureVector[i].path().has_extension())
+			if (!TextureManager::Get().texturePaths[i].path().has_extension())
 			{
-				currentDirectoryName = textureVector[i].path().string().c_str();
+				currentDirectoryName = TextureManager::Get().texturePaths[i].path().string().c_str();
 				ImGui::SeparatorText(currentDirectoryName.c_str()); //Display new SeparatorText for directories.
 
 			}
 			else
 			{
+				ImTextureID texid = TextureManager::Get().textures[i]->TextureObject;
+				ImVec2 texsize = ImVec2(32, 32);
+
 				ImGui::Image(texid, texsize, ImVec2(0, 1), ImVec2(1, 0)); //Display image. I need a texture manager. ImVec2 is for manipulating uv, we invert vertical so opengl displays the image correctly.
 				ImGui::SameLine();
-				std::string textureName = textureVector[i].path().string().c_str();
+				std::string textureName = TextureManager::Get().texturePaths[i].path().string().c_str();
 				textureName.erase(textureName.length() - 4);
 				textureName.erase(textureName.begin(), textureName.begin() + currentDirectoryName.length() + 1);
 				if (ImGui::Selectable(textureName.c_str())) //Display new Selectable for texture files.
@@ -300,23 +372,29 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 						switch (textureChoice)
 						{
 						case MeshComponent::choice_diffuse:
-							delete diffuseMap;
-							diffuseMapPath = textureVector[i].path().string().c_str();
-							diffuseMap = new Texture(diffuseMapPath.c_str(), selectedMinType, selectedMagType); //full path with file extension needed for stbi_load to work.
+							//delete diffuseMap;
+							diffuseMapPath = TextureManager::Get().textures[i]->name.c_str();
+							diffuseMap = TextureManager::Get().textures[i];//new Texture(diffuseMapPath.c_str(), selectedMinType, selectedMagType); //full path with file extension needed for stbi_load to work.
 							if (ShaderManager::Get().depthPass == false)
 							{
+								//glBindTexture(GL_TEXTURE_2D, diffuseMap->TextureObject); //need to bind for the shader to get the last bound texture.
+								ShaderManager::Get().shader->Use();
 								ShaderManager::Get().shader->SetInt(0, "material.diffuse"); //why do I need to do this again? time to re-read https://learnopengl.com/Lighting/Lighting-maps
+								//glBindTexture(GL_TEXTURE_2D, 0);
 								mesh->ApplyDiffuseMap(diffuseMap);
 							}
 
 							break;
 						case MeshComponent::choice_specular:
-							delete specularMap;
-							specularMapPath = textureVector[i].path().string().c_str();
-							specularMap = new Texture(specularMapPath.c_str(), selectedMinType, selectedMagType); //full path with file extension needed for stbi_load to work.
+							//delete specularMap;
+							specularMapPath = TextureManager::Get().textures[i]->name.c_str();
+							specularMap = TextureManager::Get().textures[i];// new Texture(specularMapPath.c_str(), selectedMinType, selectedMagType); //full path with file extension needed for stbi_load to work.
 							if (ShaderManager::Get().depthPass == false)
 							{
+								//glBindTexture(GL_TEXTURE_2D, specularMap->TextureObject);
+								ShaderManager::Get().shader->Use();
 								ShaderManager::Get().shader->SetInt(1, "material.specular"); //why do I need to do this again? time to re-read https://learnopengl.com/Lighting/Lighting-maps
+								//glBindTexture(GL_TEXTURE_2D, 0);
 								mesh->ApplySpecularMap(specularMap);
 							}
 							break;
@@ -349,6 +427,7 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 	{
 		if (ShaderManager::Get().depthPass == false)
 		{
+			ShaderManager::Get().shader->Use();
 			ShaderManager::Get().shader->SetFloat(shininess, "material.shininess");
 		}
 	}
@@ -376,7 +455,7 @@ void MeshComponent::DrawMesh()
 		glm::vec3 color = { 1,1,1 };
 		ShaderManager::Get().lineShader->SetVector3(color, "vertexColor");
 	}
-	else if(ShaderManager::Get().pickingPass == true)
+	else if (ShaderManager::Get().pickingPass == true)
 	{
 		ShaderManager::Get().pickingShader->Use();
 		ShaderManager::Get().pickingShader->SetMatrix4(trans, "transform"); //apperently there's a better way to do this compared to using a Uniform type variable inside the vertex shader, Shader Buffer Storage Object, something like that, where we can have even more variables inside the shader and update them.
@@ -388,7 +467,7 @@ void MeshComponent::DrawMesh()
 		int g = (owner->ID & 0x0000FF00) >> 8;
 		int b = (owner->ID & 0x00FF0000) >> 16;
 
-		glm::vec4 color = { r/255.0f, g/255.0f, b/255.0f, 1.0f }; //change to r/5.0f for a more noticeable color with a small amount of meshes in the scene.
+		glm::vec4 color = { r / 255.0f, g / 255.0f, b / 255.0f, 1.0f }; //change to r/5.0f for a more noticeable color with a small amount of meshes in the scene.
 
 		ShaderManager::Get().pickingShader->SetVector4(color, "pickingColor");
 
@@ -413,7 +492,7 @@ void MeshComponent::DrawMesh()
 		ShaderManager::Get().outlineShader->SetMatrix4(trans, "transform"); //apperently there's a better way to do this compared to using a Uniform type variable inside the vertex shader, Shader Buffer Storage Object, something like that, where we can have even more variables inside the shader and update them.
 		ShaderManager::Get().outlineShader->SetMatrix4(Camera::Get().myView, "view");
 		ShaderManager::Get().outlineShader->SetMatrix4(Camera::Get().projection, "projection");
-		glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f }; 
+		glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
 		ShaderManager::Get().outlineShader->SetVector4(color, "outlineColor");
 	}
 
@@ -445,6 +524,7 @@ void MeshComponent::ReloadTextures()
 	diffuseMap = new Texture(diffuseMapPath.c_str(), selectedMinType, selectedMagType); //full path with file extension needed for stbi_load to work.
 	if (ShaderManager::Get().depthPass == false)
 	{
+		ShaderManager::Get().shader->Use();
 		ShaderManager::Get().shader->SetInt(0, "material.diffuse"); //why do I need to do this again? time to re-read https://learnopengl.com/Lighting/Lighting-maps
 		mesh->ApplyDiffuseMap(diffuseMap);
 	}
@@ -452,6 +532,7 @@ void MeshComponent::ReloadTextures()
 	specularMap = new Texture(specularMapPath.c_str(), selectedMinType, selectedMagType); //full path with file extension needed for stbi_load to work.
 	if (ShaderManager::Get().depthPass == false)
 	{
+		ShaderManager::Get().shader->Use();
 		ShaderManager::Get().shader->SetInt(1, "material.specular"); //why do I need to do this again? time to re-read https://learnopengl.com/Lighting/Lighting-maps
 		mesh->ApplySpecularMap(specularMap);
 	}
@@ -510,16 +591,51 @@ void MeshComponent::Deserialization(std::fstream& file)
 		mesh->bufferMesh();
 
 		//do (TEXTURE):
-		diffuseMap = new Texture(diffuseMapPath.c_str(), selectedMinType, selectedMagType);
-		specularMap = new Texture(specularMapPath.c_str(), selectedMinType, selectedMagType);
-		mesh->ApplyDiffuseMap(diffuseMap); //BUG!!! (nothing's wrong with the deserialization, but actually the texture application in general, the latest texture is applied to all game objects which shouldn't be the case)
-		mesh->ApplySpecularMap(specularMap);
+		for (int i = 0; i < TextureManager::Get().textures.size(); i++)
+		{
+			if (diffuseMapPath == TextureManager::Get().textures[i]->name)
+			{
+				if (ShaderManager::Get().depthPass == false)
+				{
+					delete TextureManager::Get().textures[i];
+					TextureManager::Get().ReloadSpecifiedTexture(i, selectedMinType, selectedMagType);
+					diffuseMap = TextureManager::Get().textures[i];
+					//glBindTexture(GL_TEXTURE_2D, diffuseMap->TextureObject);
+					ShaderManager::Get().shader->Use();
+					ShaderManager::Get().shader->SetInt(0, "material.diffuse");
+					//glBindTexture(GL_TEXTURE_2D, 0);
+					mesh->ApplyDiffuseMap(diffuseMap);
+				}
+			}
+
+			if (specularMapPath == TextureManager::Get().textures[i]->name)
+			{
+				if (ShaderManager::Get().depthPass == false)
+				{
+					delete TextureManager::Get().textures[i];
+					TextureManager::Get().ReloadSpecifiedTexture(i, selectedMinType, selectedMagType);
+					specularMap = TextureManager::Get().textures[i];
+					//glBindTexture(GL_TEXTURE_2D, specularMap->TextureObject);
+					ShaderManager::Get().shader->Use();
+					ShaderManager::Get().shader->SetInt(1, "material.specular");
+					//glBindTexture(GL_TEXTURE_2D, 0);
+					mesh->ApplySpecularMap(specularMap);
+				}
+			}
+		}
+		//BUG!!! (nothing's wrong with the deserialization, but actually the texture application in general, the latest texture is applied to all game objects which shouldn't be the case). EDIT: actually, the texture is applied to all objects with the same mesh, meaning that mesh* from MeshManager is not doing me a favour in this case.
+
+		//diffuseMap = new Texture(diffuseMapPath.c_str(), selectedMinType, selectedMagType);
+		//specularMap = new Texture(specularMapPath.c_str(), selectedMinType, selectedMagType);
+		//mesh->ApplyDiffuseMap(diffuseMap); //BUG!!! (nothing's wrong with the deserialization, but actually the texture application in general, the latest texture is applied to all game objects which shouldn't be the case). EDIT: actually, the texture is applied to all objects with the same mesh, meaning that mesh* from MeshManager is not doing me a favour in this case.
+		//mesh->ApplySpecularMap(specularMap);
 	}
 
 
 	//do (MATERIAL):
 	if (ShaderManager::Get().depthPass == false)
 	{
+		ShaderManager::Get().shader->Use();
 		ShaderManager::Get().shader->SetFloat(shininess, "material.shininess");
 	}
 }
