@@ -9,9 +9,12 @@ private:
 	~TextureManager();
 public:
 	static TextureManager& Get();
-	void ReloadSpecifiedTexture(int i, int minType, int magType);
+	void RefreshTexturePreviews(); 
+	void LoadTexturePreviews();
 
+	std::string path;
 	std::vector<Texture*> textures;
+	std::vector<Texture*> texturePreviews;
 	std::vector<std::filesystem::directory_entry> texturePaths;
 private:
 };

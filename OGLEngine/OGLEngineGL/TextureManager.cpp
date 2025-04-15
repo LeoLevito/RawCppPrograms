@@ -2,27 +2,13 @@
 
 TextureManager::TextureManager()
 {
-	std::string path = "../Textures/";
+	path = "../Textures/";
 	for (const std::filesystem::directory_entry& entry : std::filesystem::recursive_directory_iterator(path))
 	{
 		texturePaths.push_back(entry);
 	}
-
-	for (int i = 0; i < texturePaths.size(); i++)
-	{
-		if (texturePaths[i].path().has_extension()) //if does have extension
-		{
-			Texture* texture = new Texture(texturePaths[i].path().string().c_str(), 5, 1);
-			textures.push_back(texture);
-		}
-		else
-		{
-			Texture* texture = new Texture(texturePaths[i].path().string().c_str(), 5, 1);
-			textures.push_back(texture);
-		}
-	}
-
-	int rama = 0;
+	//RefreshTexturePreviews();
+	LoadTexturePreviews();
 }
 
 TextureManager::~TextureManager()
@@ -35,10 +21,38 @@ TextureManager& TextureManager::Get()
 	return instance;
 }
 
-void TextureManager::ReloadSpecifiedTexture(int i, int minType, int magType)
+void TextureManager::RefreshTexturePreviews()
 {
-	Texture* texture = new Texture(texturePaths[i].path().string().c_str(), minType, magType);
-	textures[i] = texture;
+	for (const std::filesystem::directory_entry& entry : std::filesystem::recursive_directory_iterator(path))
+	{
+		texturePaths.push_back(entry);
+	}
+
+	for (int i = 0; i < texturePaths.size(); i++)
+	{
+		if (texturePaths[i].path().has_extension()) //if does have extension
+		{
+			if (texturePaths[i].path().string().find("_preview.jpg") == std::string::npos) //if we don't find "_preview.jpg" in the path name.
+			{
+				Texture preview(texturePaths[i].path().string().c_str(), 5, 1, true);
+			}
+		}
+	}
+}
+
+void TextureManager::LoadTexturePreviews()
+{
+	for (int i = 0; i < texturePaths.size(); i++)
+	{
+		if (texturePaths[i].path().has_extension()) //if does have extension
+		{
+			if (texturePaths[i].path().string().find("_preview.jpg") != std::string::npos) //if we find "_preview.jpg" in the path name.
+			{
+				Texture* texture = new Texture(texturePaths[i].path().string().c_str(), 5, 1, false);
+				texturePreviews.push_back(texture); 
+			}
+		}
+	}
 }
 
 

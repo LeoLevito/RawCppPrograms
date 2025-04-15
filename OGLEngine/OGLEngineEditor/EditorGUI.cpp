@@ -517,6 +517,7 @@ void EditorGUI::EditTransform(glm::mat4* cameraView, glm::mat4* cameraProjection
 
 	if (ImGuizmo::IsUsing())
 	{
+		manipulatingImGuizmo = true;
 		float matrixTranslation[3], matrixRotation[3], matrixScale[3];
 		ImGuizmo::DecomposeMatrixToComponents(tmpMatrix, matrixTranslation, matrixRotation, matrixScale);
 
@@ -536,6 +537,10 @@ void EditorGUI::EditTransform(glm::mat4* cameraView, glm::mat4* cameraProjection
 		default:
 			break;
 		}
+	}
+	else
+	{
+		manipulatingImGuizmo = false;
 	}
 }
 

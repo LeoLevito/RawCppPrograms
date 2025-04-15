@@ -44,6 +44,8 @@ public:
 	std::vector<std::filesystem::directory_entry> textureVector;
 	std::vector<std::filesystem::directory_entry> meshVector;
 
+	std::string lastDirectoryName;
+
 	//material properties.
 	glm::vec3 ambient;
 	glm::vec3 diffuse;

@@ -51,6 +51,7 @@ public:
 
 	int currentPolygonMode;
 
+	bool manipulatingImGuizmo;
 private:
 	Graphics* myGraphics;
 	//Camera myCamera;

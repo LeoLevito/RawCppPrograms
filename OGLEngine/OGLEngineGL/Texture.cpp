@@ -3,11 +3,20 @@
 #include <GLAD/glad.h>
 #include <GLFW/glfw3.h> //GLAD ALWAYS COMES BEFORE GLFW!!!
 #include <iostream>
+#include "stb_image_write.h"
+#include "stb_image_resize2.h"
+#include <filesystem>
 
 
-Texture::Texture(const char* path, int minfilter, int magfilter)
+
+Texture::Texture(const char* path, int minfilter, int magfilter, bool writePreview)
 {
 	name = path;
+	if (name.find(".jpg") == std::string::npos) //if ".jpg" doesn't exist at any position in the string
+	{
+		return;
+	}
+
 	int Channels = 0;
 	Width = 0; //set in stbi_load.
 	Height = 0; //set in stbi_load.
@@ -100,6 +109,37 @@ Texture::Texture(const char* path, int minfilter, int magfilter)
 	}
 
 	glBindTexture(GL_TEXTURE_2D, 0); //unbind when we're done with the setup.
+
+
+
+
+	if (writePreview)
+	{
+		int pos = std::string(path).find("\\");
+		if (std::string(path).find("_preview.jpg") == std::string::npos) //extra check for if "_preview.jpg" doesn't exist in the string name
+		{
+
+			std::string newDirectoryName = path;
+			newDirectoryName.erase(pos, newDirectoryName.length());
+			newDirectoryName.append("/_previews");
+
+			std::filesystem::create_directory(newDirectoryName);
+
+			std::string fileName = path;
+			fileName.erase(0, pos);
+			fileName.erase(fileName.length() - 4); //remove ".jpg"
+			fileName.append("_preview.jpg"); //Add "_preview.jpg"
+
+			std::string newName;
+			newName.append(newDirectoryName);
+			newName.append(fileName); 
+
+			unsigned char* data2 = stbir_resize_uint8_srgb(data, Width, Height, 0, 0, 32, 32, 0, stbir_pixel_layout::STBIR_RGB);
+			stbi_flip_vertically_on_write(true);
+			stbi_write_jpg(newName.c_str(), 32, 32, Channels, data2, 100);
+		}
+	}
+
 	stbi_image_free(data); //free up data when we're done.
 }
 

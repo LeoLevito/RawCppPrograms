@@ -9,13 +9,16 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
 	{
-		ImGuiIO& io = ImGui::GetIO();
-		if (io.MousePos.x >= EditorGUI::Get().sceneWindowPosX
-			&& io.MousePos.x <= EditorGUI::Get().sceneWindowPosX + EditorGUI::Get().sceneWindowWidth
-			&& io.MousePos.y >= EditorGUI::Get().sceneWindowPosY
-			&& io.MousePos.y <= EditorGUI::Get().sceneWindowPosY + EditorGUI::Get().sceneWindowHeight)
+		if (!EditorGUI::Get().manipulatingImGuizmo)
 		{
-			Graphics::Get().RenderPickingPass(); //Render scene once when clicking inside the SceneWindow, determine what object was clicked.
+			ImGuiIO& io = ImGui::GetIO();
+			if (io.MousePos.x >= EditorGUI::Get().sceneWindowPosX
+				&& io.MousePos.x <= EditorGUI::Get().sceneWindowPosX + EditorGUI::Get().sceneWindowWidth
+				&& io.MousePos.y >= EditorGUI::Get().sceneWindowPosY
+				&& io.MousePos.y <= EditorGUI::Get().sceneWindowPosY + EditorGUI::Get().sceneWindowHeight)
+			{
+				Graphics::Get().RenderPickingPass(); //Render scene once when clicking inside the SceneWindow, determine what object was clicked.
+			}
 		}
 	}
 
