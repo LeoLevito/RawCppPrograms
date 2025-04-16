@@ -4,6 +4,7 @@
 #include "Message.h"
 #include <thread>
 #include <filesystem>
+
 class MeshManager
 {
 private:
@@ -15,7 +16,6 @@ public:
 	Mesh* LoadMesh(const std::string& filename); //include load from file or load from memory if requested mesh has been cached.
 	void RequestMemoryCheck(std::filesystem::directory_entry directoryEntry);
 	//I have a question, how do I make it so multiple objects can have the same mesh while effectively only allocating and using memory for one mesh?
-	void CacheMesh(); //isn't this done by adding it to the vector?
 
 	//Should I just cache every mesh? No that's a bad idea.
 	//but maybe I can just get an element of this vector and set the mesh to that?

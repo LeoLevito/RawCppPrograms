@@ -1,6 +1,5 @@
 #pragma once
 #include "Message.h"
-#include "MeshComponent.h"
 #include <filesystem>
 
 class Mesh;
@@ -15,6 +14,7 @@ public:
 	std::string meshToLoad;
 	std::filesystem::directory_entry directoryEntry;
 	~MeshMessage();
+
 private:
 };
 

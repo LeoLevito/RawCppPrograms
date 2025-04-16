@@ -81,6 +81,30 @@ MeshComponent::~MeshComponent()
 	delete specularMap;
 }
 
+void MeshComponent::ReceiveRequestedMesh() //same code as ApplyMesh button.
+{
+	mesh = MeshManager::Get().lastAccessedMesh;
+	if (mesh != nullptr)
+	{
+		if (mesh->meshLoadedCorrectly == false)
+		{
+			meshInvalid = true;
+			//ImGui::OpenPopup("MeshInvalidPopupModal");
+		}
+		else
+		{
+			meshInvalid = false;
+			mesh->bufferMesh();
+			mesh->ApplyDiffuseMap(diffuseMap);
+			mesh->ApplySpecularMap(specularMap);
+		}
+	}
+	else
+	{
+		std::cout << "MESH IS NULLPTR" << std::endl;
+	}
+}
+
 void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 {
 	Component::DrawComponentSpecificImGuiHierarchyAdjustables();
@@ -140,6 +164,19 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 	{
 		ImGui::SameLine();
 		ImGui::Text("Loading mesh into memory...");
+
+		if (DoOnce == true)
+		{
+			DoOnce = false;
+		}
+	}
+	else
+	{
+		if (DoOnce == false)
+		{
+			ReceiveRequestedMesh(); //this shit is so stupid, why can't I just call this from the MeshManager? Everything seems to load correctly when I do it that way but the mesh just doesn't want to draw, and the DrawMesh/mesh->Draw also seems to work properly as well.
+			DoOnce = true;
+		}
 	}
 
 	ImGui::BeginDisabled(MeshManager::Get().currentlyLoadingMesh != false);
@@ -353,7 +390,6 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 
 void MeshComponent::DrawMesh()
 {
-
 	glm::mat4 trans = glm::mat4(1.0f);
 	glm::quat myRotationQuaternion = glm::quat(glm::radians(rotation)); //https://www.opengl-tutorial.org/intermediate-tutorials/tutorial-17-quaternions/
 	glm::mat4 rotationMatrix = glm::toMat4(myRotationQuaternion);

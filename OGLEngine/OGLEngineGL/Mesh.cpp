@@ -121,10 +121,10 @@ void Mesh::Draw() //Draw mesh;
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0); //note the 36, hard coded for a cube right now, we need to specify how many indices we use for it. In the future we will automate this.
 	}
 
-	if (EBO == 0) //Draw Triangle
-	{
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-	}
+	//if (EBO == 0) //Draw Triangle
+	//{
+	//	glDrawArrays(GL_TRIANGLES, 0, 3);
+	//}
 	
 	glBindVertexArray(0); //unbind vertex array after we're done drawing. This will help us in the future if we want to render a different mesh with the vertex array, I guess.
 	glBindTexture(GL_TEXTURE_2D, 0); //unbind texture after we're done drawing. This allows us to use different textures for different objects (in the future), since the fragment shader used for this specific mesh will use basically it's own binded texture, if I understand correctly.

@@ -29,6 +29,8 @@ public:
 	std::string diffuseMapPath; //important for serialization
 	std::string specularMapPath; //important for serialization
 
+	void ReceiveRequestedMesh();
+
 	void DrawComponentSpecificImGuiHierarchyAdjustables() override;
 
 	void DrawMesh();
@@ -47,9 +49,10 @@ public:
 	std::string lastDirectoryName;
 
 	//material properties.
-	glm::vec3 ambient;
-	glm::vec3 diffuse;
-	glm::vec3 specular;
+	glm::vec3 ambient{ 0, 0, 0 };
+	glm::vec3 diffuse{ 1, 1, 1 };
+	glm::vec3 specular{ 1, 1, 1 };
+
 	float shininess;//important for serialization
 
 	enum TextureChoice
@@ -68,6 +71,8 @@ public:
 
 	void Serialization(std::fstream& file) override;
 	void Deserialization(std::fstream& file) override;
+
+	bool DoOnce = true;
 
 private:
 };
