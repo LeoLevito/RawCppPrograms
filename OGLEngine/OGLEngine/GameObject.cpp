@@ -71,7 +71,17 @@ void GameObject::DrawObjectSpecificImGuiHierarchyAdjustables(std::vector<GameObj
 
 		for (int i = 0; i < IM_ARRAYSIZE(componentNames); i++)
 		{
-			//ImGui::BeginDisabled();
+			bool disableSelectable = false;
+
+			for (int j = 0; j < components.size(); j++) //man why I gotta do a for loop each time here? Is there no better way?
+			{
+				if (components[j]->name == componentNames[i]) //any typo or case difference will make this not work as intended.
+				{
+					disableSelectable = true;
+				}
+			}
+
+			ImGui::BeginDisabled(disableSelectable);
 			if (ImGui::Selectable(componentNames[i]))
 			{
 				selectedComponent = i;
@@ -96,18 +106,64 @@ void GameObject::DrawObjectSpecificImGuiHierarchyAdjustables(std::vector<GameObj
 					AddComponent(new RigidbodyComponent);
 				}
 			}
-			//ImGui::EndDisabled();
+			ImGui::EndDisabled();
+
 		}
 		ImGui::EndPopup();
 	}
 
-	if (ImGui::Button("Add EVERY component"))
+	if (ImGui::Button("Add EVERY component")) //I've written this very lazily.
 	{
-		AddComponent(new TransformComponent);
-		AddComponent(new MeshComponent);
-		AddComponent(new LightComponent);
-		AddComponent(new ColliderComponent);
-		AddComponent(new RigidbodyComponent);
+		bool hasTransform = false;
+		bool hasMesh = false;
+		bool hasLight = false;
+		bool hasCollider = false;
+		bool hasRigidbody = false;
+
+		for (int i = 0; i < components.size(); i++)
+		{
+			if (components[i]->type == ComponentType::Transform)
+			{
+				hasTransform = true;
+			}
+			if (components[i]->type == ComponentType::Mesh)
+			{
+				hasMesh = true;
+			}
+			if (components[i]->type == ComponentType::Light)
+			{
+				hasLight = true;
+			}
+			if (components[i]->type == ComponentType::Collider)
+			{
+				hasCollider = true;
+			}
+			if (components[i]->type == ComponentType::Rigidbody)
+			{
+				hasRigidbody = true;
+			}
+		}
+
+		if (!hasTransform)
+		{
+			AddComponent(new TransformComponent);
+		}
+		if (!hasMesh)
+		{
+			AddComponent(new MeshComponent);
+		}
+		if (!hasLight)
+		{
+			AddComponent(new LightComponent);
+		}
+		if (!hasCollider)
+		{
+			AddComponent(new ColliderComponent);
+		}
+		if (!hasRigidbody)
+		{
+			AddComponent(new RigidbodyComponent);
+		}
 	}
 
 
