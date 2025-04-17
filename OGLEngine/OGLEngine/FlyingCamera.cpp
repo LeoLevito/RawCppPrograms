@@ -94,6 +94,8 @@ void FlyingCamera::RotateCamera(bool firstTimeRun)
 		ypos = *myY /*+ io.MousePos.y*/;
 	}
 
+	delete myX;
+	delete myY;
 
 	float xoffset = xpos - lastX;
 	float yoffset = lastY - ypos; // reversed since y-coordinates range from bottom to top

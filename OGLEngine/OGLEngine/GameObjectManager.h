@@ -12,6 +12,7 @@ public:
 	static GameObjectManager& Get();
 	GameObject* CreateGameObject();
 	void DeleteGameObject(GameObject* gameObject);
+	void DeleteAllGameObjects();
 
 	std::vector<GameObject*> gameObjects;
 

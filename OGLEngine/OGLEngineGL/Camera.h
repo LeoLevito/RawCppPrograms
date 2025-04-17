@@ -23,6 +23,8 @@ public:
 	glm::vec3 myPosition;
 	glm::vec3 myUp;
 	glm::vec3 myRight;
+
+	glm::vec3 startPosition{ 0,0,3 };
 private:
 
 };

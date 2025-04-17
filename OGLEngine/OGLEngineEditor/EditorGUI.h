@@ -32,8 +32,8 @@ public:
 	bool gammaCorrection;
 
 	//testing if writing whole game objects will work.
-	void Serialization(const std::string& filename);
-	void Deserialization(const std::string& filename);
+	//void Serialization(const std::string& filename);
+	//void Deserialization(const std::string& filename);
 
 	float sceneWindowWidth = 0.f;
 	float sceneWindowHeight = 0.f;

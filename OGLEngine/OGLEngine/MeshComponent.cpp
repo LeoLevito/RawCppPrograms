@@ -545,7 +545,8 @@ void MeshComponent::Deserialization(std::fstream& file)
 		mesh->bufferMesh();
 
 		//do (TEXTURE):
-
+		delete diffuseMap;
+		delete specularMap;
 		diffuseMap = new Texture(diffuseMapPath.c_str(), selectedMinType, selectedMagType, false);
 		specularMap = new Texture(specularMapPath.c_str(), selectedMinType, selectedMagType, false);
 	}

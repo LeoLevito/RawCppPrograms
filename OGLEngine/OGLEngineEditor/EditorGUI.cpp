@@ -397,17 +397,21 @@ void EditorGUI::MainMenuBar()
 	{
 		if (ImGui::BeginMenu("File"))
 		{
-			if (ImGui::MenuItem("New"))
+			if (ImGui::MenuItem("New scene"))
+			{
+				GameObjectManager::Get().DeleteAllGameObjects();
+				Camera::Get().myPosition = Camera::Get().startPosition;
+
+			}
+			if (ImGui::MenuItem("Open scene"))
 			{
 
 			}
-			if (ImGui::MenuItem("Open"))
+			if (ImGui::MenuItem("Save this scene", "Ctrl+S"))
 			{
+				GameObjectManager::Get().Serialization("../Levels/LevelSaveTest2.scene");
 
-			}
-			if (ImGui::MenuItem("Save", "Ctrl+S"))
-			{
-				Serialization("../Levels/LevelSaveTest.test");
+				//Serialization("../Levels/LevelSaveTest.test");
 			}
 			if (ImGui::MenuItem("Save As..."))
 			{
@@ -415,7 +419,9 @@ void EditorGUI::MainMenuBar()
 			}
 			if (ImGui::MenuItem("Load"))
 			{
-				Deserialization("../Levels/LevelSaveTest.test");
+				GameObjectManager::Get().Deserialization("../Levels/LevelSaveTest2.scene");
+
+				//Deserialization("../Levels/LevelSaveTest.test");
 			}
 			ImGui::EndMenu();
 		}
@@ -485,6 +491,9 @@ void EditorGUI::QuickGUITesting()
 	//glfwGetWindowPos(Graphics::Get().window, windowPosX, windowPosY);
 	glfwGetCursorPos(Graphics::Get().window, glfwPosX, glfwPosY);
 	ImGui::Text("X: %f Y: %f", (float)*glfwPosX, (float)*glfwPosY);
+	delete glfwPosX;
+	delete glfwPosY;
+
 	if (ImGuizmo::IsUsing())
 	{
 		ImGui::Text("Using gizmo");
@@ -548,63 +557,63 @@ void EditorGUI::TransformEnd()
 {
 }
 
-void EditorGUI::Serialization(const std::string& filename) //not functional at the moment.
-{
-	//I could try to write the entire GameObjectManager, if it's possible to even do something like that. Like, getting everything in it and writing/reading all of the data to a binary file.
-	std::fstream file;
-	file.open(filename.c_str(), std::ios_base::out | std::ios_base::binary);
-	static const size_t DATA_CAPACITY = 0x1000;
-
-	if (file.is_open())
-	{
-		//get size of vectors to integers.
-		int a = GameObjectManager::Get().gameObjects.size();
-
-		//write sizes of vectors, https://stackoverflow.com/a/31213593
-		file.write(reinterpret_cast<char*>(&a), sizeof(a));
-		//write contents of vectors, https://stackoverflow.com/a/31213593
-		file.write(reinterpret_cast<char*>(&GameObjectManager::Get().gameObjects[0]), sizeof(GameObject) * GameObjectManager::Get().gameObjects.size());
-
-		for (size_t i = 0; i < a; i++)
-		{
-			int b = GameObjectManager::Get().gameObjects[i]->components.size();
-			if (b > 0)
-			{
-				file.write(reinterpret_cast<char*>(&b), sizeof(b));
-				file.write(reinterpret_cast<char*>(&GameObjectManager::Get().gameObjects[i]->components[0]), sizeof(Component) * GameObjectManager::Get().gameObjects[i]->components.size());
-			}
-		}
-	}
-	file.close();
-}
-
-void EditorGUI::Deserialization(const std::string& filename) //not functional at the moment.
-{
-	std::fstream file;
-	file.open(filename.c_str(), std::ios_base::in | std::ios_base::binary);
-	if (file.is_open())
-	{
-		int a;
-
-		//read sizes of vectors, https://stackoverflow.com/a/31213593
-		file.read(reinterpret_cast<char*>(&a), sizeof(a)); //I see the issue now, we don't know the size of the vector when we want to read it, and since we input the size of an empty vector right now, it's gonna return nothing as well. so maybe we need to write the size to the file for us to retrieve when reading it.
-		GameObjectManager::Get().gameObjects.clear();
-		GameObjectManager::Get().gameObjects.resize(a);
-
-		//read contents of vectors, https://stackoverflow.com/a/31213593
-		file.read(reinterpret_cast<char*>(&GameObjectManager::Get().gameObjects[0]), sizeof(GameObject) * GameObjectManager::Get().gameObjects.size());
-
-		for (size_t i = 0; i < a; i++)
-		{
-			int b;
-			file.read(reinterpret_cast<char*>(&b), sizeof(b));
-			if (b > 0)
-			{
-				GameObjectManager::Get().gameObjects[i]->components.clear();
-				GameObjectManager::Get().gameObjects[i]->components.resize(b);
-				file.write(reinterpret_cast<char*>(&GameObjectManager::Get().gameObjects[i]->components[0]), sizeof(Component) * GameObjectManager::Get().gameObjects[i]->components.size());
-			}
-		}
-	}
-	file.close();
-}
+//void EditorGUI::Serialization(const std::string& filename) //not functional at the moment.
+//{
+//	//I could try to write the entire GameObjectManager, if it's possible to even do something like that. Like, getting everything in it and writing/reading all of the data to a binary file.
+//	std::fstream file;
+//	file.open(filename.c_str(), std::ios_base::out | std::ios_base::binary);
+//	static const size_t DATA_CAPACITY = 0x1000;
+//
+//	if (file.is_open())
+//	{
+//		//get size of vectors to integers.
+//		int a = GameObjectManager::Get().gameObjects.size();
+//
+//		//write sizes of vectors, https://stackoverflow.com/a/31213593
+//		file.write(reinterpret_cast<char*>(&a), sizeof(a));
+//		//write contents of vectors, https://stackoverflow.com/a/31213593
+//		file.write(reinterpret_cast<char*>(&GameObjectManager::Get().gameObjects[0]), sizeof(GameObject) * GameObjectManager::Get().gameObjects.size());
+//
+//		for (size_t i = 0; i < a; i++)
+//		{
+//			int b = GameObjectManager::Get().gameObjects[i]->components.size();
+//			if (b > 0)
+//			{
+//				file.write(reinterpret_cast<char*>(&b), sizeof(b));
+//				file.write(reinterpret_cast<char*>(&GameObjectManager::Get().gameObjects[i]->components[0]), sizeof(Component) * GameObjectManager::Get().gameObjects[i]->components.size());
+//			}
+//		}
+//	}
+//	file.close();
+//}
+//
+//void EditorGUI::Deserialization(const std::string& filename) //not functional at the moment.
+//{
+//	std::fstream file;
+//	file.open(filename.c_str(), std::ios_base::in | std::ios_base::binary);
+//	if (file.is_open())
+//	{
+//		int a;
+//
+//		//read sizes of vectors, https://stackoverflow.com/a/31213593
+//		file.read(reinterpret_cast<char*>(&a), sizeof(a)); //I see the issue now, we don't know the size of the vector when we want to read it, and since we input the size of an empty vector right now, it's gonna return nothing as well. so maybe we need to write the size to the file for us to retrieve when reading it.
+//		GameObjectManager::Get().gameObjects.clear();
+//		GameObjectManager::Get().gameObjects.resize(a);
+//
+//		//read contents of vectors, https://stackoverflow.com/a/31213593
+//		file.read(reinterpret_cast<char*>(&GameObjectManager::Get().gameObjects[0]), sizeof(GameObject) * GameObjectManager::Get().gameObjects.size());
+//
+//		for (size_t i = 0; i < a; i++)
+//		{
+//			int b;
+//			file.read(reinterpret_cast<char*>(&b), sizeof(b));
+//			if (b > 0)
+//			{
+//				GameObjectManager::Get().gameObjects[i]->components.clear();
+//				GameObjectManager::Get().gameObjects[i]->components.resize(b);
+//				file.write(reinterpret_cast<char*>(&GameObjectManager::Get().gameObjects[i]->components[0]), sizeof(Component) * GameObjectManager::Get().gameObjects[i]->components.size());
+//			}
+//		}
+//	}
+//	file.close();
+//}

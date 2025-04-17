@@ -58,6 +58,18 @@ void GameObjectManager::DeleteGameObject(GameObject* gameObject)
 	std::cout << "Deletion of Game Object completed." << std::endl;
 }
 
+void GameObjectManager::DeleteAllGameObjects()
+{
+	for (int i = 0; i < gameObjects.size(); i++) //refresh IDs of remaining GameObjects in the scene.
+	{
+		EditorGUI::Get().currentlySelectedGameObject = -1;
+		//gameObjects.erase(std::remove(gameObjects.begin(), gameObjects.end(), gameObjects[i]));
+
+		delete gameObjects[i];
+		std::cout << "Deletion of ALL Game Objects completed." << std::endl;
+	}
+}
+
 void GameObjectManager::ProcessMessage(Message* message)
 {
 	std::string& msg = message->msg;
@@ -180,8 +192,10 @@ void GameObjectManager::Serialization(const std::string& filename)
 	file.close();
 }
 
-void GameObjectManager::Deserialization(const std::string& filename)
+void GameObjectManager::Deserialization(const std::string& filename) //there may be an issue here: as I understand it, when I'm loading a scene I just replace the game objects in the gameObjects vector with the ones read from binary file, but I don't do anything with the ones being replaced. They are probably still in memory. 
 {
+	DeleteAllGameObjects(); //I think we're still allocating memory that isn't being deleted, need to check every component and gameobject and light and collider class.
+
 	std::fstream file;
 	file.open(filename.c_str(), std::ios_base::in | std::ios_base::binary);
 

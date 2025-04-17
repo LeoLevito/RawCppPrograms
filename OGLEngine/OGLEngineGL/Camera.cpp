@@ -15,7 +15,7 @@ Camera::Camera()
 	projection = glm::perspective(glm::radians(FOV), 1280.f / 720.f, nearClipLane, farClipLane); //should make variables out of 1280 / 720.
 
 	myDirection = glm::vec3(0.0f, 0.0f, -1.0f);
-	myPosition = glm::vec3(0.0f, 0.0f, 3.0f); //Oh okay so that's wy my camera is offset when starting the editor.
+	myPosition = startPosition; //Oh okay so that's wy my camera is offset when starting the editor.
 	myUp = glm::vec3(0.0f, 1.0f, 0.0f);
 }
 
