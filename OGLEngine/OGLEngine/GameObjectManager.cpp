@@ -10,6 +10,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include "EditorGUI.h"
 
 std::mutex myMutex2; //oh my god I can't be doing this, I need to have a new mutex name for every new mutex I make. Not convenient.
 
@@ -41,10 +42,20 @@ GameObject* GameObjectManager::CreateGameObject()
 void GameObjectManager::DeleteGameObject(GameObject* gameObject)
 {
 	//remove gameObject from vector.
+	if (gameObject->ID == EditorGUI::Get().currentlySelectedGameObject)
+	{
+		EditorGUI::Get().currentlySelectedGameObject = -1;
+	}
 	gameObjects.erase(std::remove(gameObjects.begin(), gameObjects.end(), gameObject));
+
+	for (int i = 0; i < gameObjects.size(); i++) //refresh IDs of remaining GameObjects in the scene.
+	{
+		gameObjects[i]->ID = i;
+	}
 
 	//release any resources/memory gameObject was using here:
 	delete gameObject;
+	std::cout << "Deletion of Game Object completed." << std::endl;
 }
 
 void GameObjectManager::ProcessMessage(Message* message)

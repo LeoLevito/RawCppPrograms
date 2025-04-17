@@ -439,7 +439,7 @@ void Graphics::RenderOutlinePass()
 	glViewport(0, 0, EditorGUI::Get().sceneWindowWidth, EditorGUI::Get().sceneWindowHeight);
 	glBindFramebuffer(GL_FRAMEBUFFER, outlineMaskFBO);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	GameObject* owner = GameObjectManager::Get().gameObjects[EditorGUI::Get().currentlySelectedGameObject];
+	GameObject* owner = GameObjectManager::Get().gameObjects.at(EditorGUI::Get().currentlySelectedGameObject);
 	for (size_t i = 0; i < owner->components.size(); i++)
 	{
 		if (dynamic_cast<MeshComponent*>(owner->components[i])) //checking if owner has a component of type MeshComponent. Is of-type correct word-use in this case?

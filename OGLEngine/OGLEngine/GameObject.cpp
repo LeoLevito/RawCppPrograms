@@ -10,6 +10,7 @@
 #include "LightComponent.h"
 #include "ColliderComponent.h"
 #include "RigidbodyComponent.h"
+#include "ObjectMessage.h"
 
 
 GameObject::GameObject()
@@ -169,9 +170,9 @@ void GameObject::DrawObjectSpecificImGuiHierarchyAdjustables(std::vector<GameObj
 
 	if (ImGui::Button("Remove Game Object"))
 	{
-		//maybe I should make this a function, in case I want to call delete from another class. This would require vec be more accessible, like a singleton maybe.
-		GameObjectManager::Get().DeleteGameObject(this);
-		std::cout << "Deletion of Game Object completed." << std::endl;
+		ObjectMessage* newMessage = new ObjectMessage(ObjectMessageType::Delete);
+		newMessage->gameObjectToDelete = this;
+		GameObjectManager::Get().QueueMessage(newMessage); //send a message to delete this game object.
 	}
 }
 
