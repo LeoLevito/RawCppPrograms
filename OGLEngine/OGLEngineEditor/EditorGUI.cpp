@@ -100,6 +100,12 @@ void EditorGUI::RenderImGui()
 		ImGui::RenderPlatformWindowsDefault();
 		glfwMakeContextCurrent(backup_current_context); //https://github.com/ocornut/imgui/blob/0c079e453bf74acebc6c8b4f64c4fa40e76af760/examples/example_glfw_opengl3/main.cpp#L213
 	}
+
+	if (DoOnce == false)
+	{
+		DoOnce = true;
+		Deserialization();
+	}
 }
 
 void EditorGUI::CloseImGui() //When shutting down program, make sure ImGui is shut down properly as well. Could probably make this a destructor instead of a void function for it to automatically be called once the program closes!
@@ -113,7 +119,7 @@ void EditorGUI::CloseImGui() //When shutting down program, make sure ImGui is sh
 void EditorGUI::SceneWindow()
 {
 	//Camera view can become stretched for a fraction of a second when resizing this window (not resizing main GLFW window), presumably because there's a delay from when sceneWindowWidth and sceneWindowHeight are set below and when they're used to render the framebuffer image.
-	
+
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0)); //https://github.com/ocornut/imgui/issues/1490 gets rid of window padding so we can display the framebuffer image on the ENTIRE window.
 	ImGui::Begin("Scene");
 
@@ -181,7 +187,7 @@ void EditorGUI::SceneWindow()
 	ImGui::BeginChild("Scene2"); //child allows for larger area of window to be used.
 
 	ImGuizmo::SetDrawlist();
-	
+
 
 	if (ImGui::GetWindowSize().x != sceneWindowWidth || ImGui::GetWindowSize().y != sceneWindowHeight)
 	{
@@ -393,39 +399,47 @@ void EditorGUI::CameraWindow()
 
 void EditorGUI::MainMenuBar()
 {
+	bool openScene = false;
+	bool saveNewScene = false;
+	bool startupScene = false;
 	if (ImGui::BeginMainMenuBar())
 	{
-		if (ImGui::BeginMenu("File"))
+		if (ImGui::BeginMenu("Scene"))
 		{
-			if (ImGui::MenuItem("New scene"))
+			if (ImGui::MenuItem("New"))
 			{
 				GameObjectManager::Get().DeleteAllGameObjects();
-				Camera::Get().myPosition = Camera::Get().startPosition;
+				GameObjectManager::Get().currentSceneName = "empty";
 
 			}
-			if (ImGui::MenuItem("Open scene"))
+			if (ImGui::MenuItem("Open"))
 			{
-
+				openScene = true;
 			}
-			if (ImGui::MenuItem("Save this scene", "Ctrl+S"))
+			if (ImGui::MenuItem("Save", "Ctrl+S")) //Ctrl+S doesn't do anything.
 			{
-				GameObjectManager::Get().Serialization("../Levels/LevelSaveTest2.scene");
-
-				//Serialization("../Levels/LevelSaveTest.test");
+				if (GameObjectManager::Get().currentSceneName != "empty") //if current scene has been loaded from file.
+				{
+					GameObjectManager::Get().Serialization(GameObjectManager::Get().currentSceneName.c_str());
+				}
+				else //if it hasn't been loaded from file, it's a new scene.
+				{
+					saveNewScene = true;
+				}
 			}
-			if (ImGui::MenuItem("Save As..."))
+			if (ImGui::MenuItem("Save as...")) //manual 
 			{
-
+				saveNewScene = true;
 			}
-			if (ImGui::MenuItem("Load"))
+			if (ImGui::MenuItem("Specify startup scene")) //manual 
 			{
-				GameObjectManager::Get().Deserialization("../Levels/LevelSaveTest2.scene");
-
-				//Deserialization("../Levels/LevelSaveTest.test");
+				startupScene = true;
 			}
+
 			ImGui::EndMenu();
 		}
-		if (ImGui::BeginMenu("Edit"))
+
+		if (ImGui::BeginMenu("Edit")) //this menu doesn't do anything at the moment. Though in the future i would like to get Undo and Redo functionality.
 		{
 			if (ImGui::MenuItem("Undo", "Ctrl+Z"))
 			{
@@ -451,6 +465,137 @@ void EditorGUI::MainMenuBar()
 		}
 		ImGui::EndMainMenuBar();
 	}
+
+	if (openScene == true)
+	{
+		ImGui::OpenPopup("Scene selection popup");
+	}
+
+	if (saveNewScene == true)
+	{
+		ImGui::OpenPopup("New scene save popup");
+	}
+
+	if (startupScene == true)
+	{
+		ImGui::OpenPopup("Startup scene popup");
+	}
+
+	if (ImGui::BeginPopup("Scene selection popup"))
+	{
+		//Get all scene file names.
+		std::vector<std::filesystem::directory_entry> sceneVector;
+
+		std::string path = "../Levels/";
+		for (const std::filesystem::directory_entry& entry : std::filesystem::recursive_directory_iterator(path))
+		{
+			sceneVector.push_back(entry);
+		}
+
+		ImGui::SeparatorText("SCENES:");
+
+		for (int i = 0; i < sceneVector.size(); i++)
+		{
+			std::string selectableSceneName = sceneVector[i].path().string().c_str();
+			if (!(selectableSceneName == "../Levels/_startupScene.startup"))
+			{
+				if (ImGui::Selectable(selectableSceneName.c_str())) //Display new Selectable for scene files.
+				{
+					GameObjectManager::Get().Deserialization(selectableSceneName);
+				}
+			}
+		}
+		ImGui::EndPopup();
+	}
+
+	if (ImGui::BeginPopup("New scene save popup"))
+	{
+		ImGui::SeparatorText("SAVE THIS SCENE AS:");
+
+		static char str0[128]; //how it's done in the ImGui demo, tho it is replicated across all objects now...
+		ImGui::InputText("Input scene name", str0, IM_ARRAYSIZE(str0));
+
+		std::string inputSceneName = str0;
+		if (ImGui::Button("Save"))
+		{
+			std::string newSceneName = "../Levels/";
+			newSceneName.append(inputSceneName);
+			newSceneName.append(".scene");
+
+			identicalSceneName = false;
+			invalidSceneName = false;
+
+			std::vector<std::filesystem::directory_entry> sceneVector;
+			std::string path = "../Levels/";
+			for (const std::filesystem::directory_entry& entry : std::filesystem::recursive_directory_iterator(path))
+			{
+				sceneVector.push_back(entry);
+			}
+			for (int i = 0; i < sceneVector.size(); i++)
+			{
+				if (newSceneName == sceneVector[i].path())
+				{
+					identicalSceneName = true;
+				}
+			}
+
+			if (inputSceneName == "empty" || inputSceneName.size() == 0)
+			{
+				invalidSceneName = true;
+			}
+			else
+			{
+				invalidSceneName = false;
+			}
+
+			if (identicalSceneName == false && invalidSceneName == false)
+			{
+				GameObjectManager::Get().Serialization(newSceneName);
+				ImGui::CloseCurrentPopup();
+			}
+		}
+		if (invalidSceneName == true)
+		{
+			ImGui::SameLine();
+			ImGui::Text("please write anything other than 'empty'.");
+		}
+		if (identicalSceneName == true)
+		{
+			ImGui::SameLine();
+			ImGui::Text("That name already exists, please write something else.");
+		}
+
+		ImGui::EndPopup();
+	}
+
+	if (ImGui::BeginPopup("Startup scene popup"))
+	{
+		//Get all scene file names.
+		std::vector<std::filesystem::directory_entry> sceneVector;
+
+		std::string path = "../Levels/";
+		for (const std::filesystem::directory_entry& entry : std::filesystem::recursive_directory_iterator(path))
+		{
+			sceneVector.push_back(entry);
+		}
+
+		ImGui::SeparatorText("SELECT STARTUP SCENE:");
+
+		for (int i = 0; i < sceneVector.size(); i++)
+		{
+
+			std::string selectableSceneName = sceneVector[i].path().string().c_str();
+			if (!(selectableSceneName == "../Levels/_startupScene.startup"))
+			{
+				if (ImGui::Selectable(selectableSceneName.c_str())) //Display new Selectable for scene files.
+				{
+					Serialization(selectableSceneName);
+				}
+			}
+		}
+		ImGui::EndPopup();
+	}
+
 
 }
 
@@ -519,7 +664,7 @@ void EditorGUI::TransformStart(glm::mat4* cameraView, glm::mat4* cameraProjectio
 
 void EditorGUI::EditTransform(glm::mat4* cameraView, glm::mat4* cameraProjection, TransformComponent& tComp)
 {
-	
+
 	float tmpMatrix[16]; //https://github.com/CedricGuillemet/ImGuizmo/issues/125 came in clutch, always try solutions that my brain feels I understand first.
 	ImGuizmo::RecomposeMatrixFromComponents(&tComp.position.x, &tComp.rotation.x, &tComp.scale.x, tmpMatrix);
 	ImGuizmo::Manipulate(glm::value_ptr(*cameraView), glm::value_ptr(*cameraProjection), ImGuizmo::OPERATION(currentImGizmoOperation), ImGuizmo::MODE(currentImGizmoMode), tmpMatrix);
@@ -537,8 +682,8 @@ void EditorGUI::EditTransform(glm::mat4* cameraView, glm::mat4* cameraProjection
 			break;
 		case ImGuizmo::ROTATE:
 			tComp.rotation = glm::vec3(matrixRotation[0], matrixRotation[1], matrixRotation[2]); //Note about rotation: gizmo behavior is as expected both for WORLD and LOCAL space compared with Unity, where two axes will affect every other axis when dragging the gizmo, while one axis will only affect itself.
-																								 //and setting rotation manually on the TransformComponent in the inspector (in world and local space) results in same behavior as Unity does it, where one axis is world aligned (when in world space), 
-																								 //while the other two are either locally aligned or something because of the underlying code. And two axes will affect every other axis when dragging the gizmo, while one axis will only affect itself.
+			//and setting rotation manually on the TransformComponent in the inspector (in world and local space) results in same behavior as Unity does it, where one axis is world aligned (when in world space), 
+			//while the other two are either locally aligned or something because of the underlying code. And two axes will affect every other axis when dragging the gizmo, while one axis will only affect itself.
 			break;
 		case ImGuizmo::SCALE:
 			tComp.scale = glm::vec3(matrixScale[0], matrixScale[1], matrixScale[2]);
@@ -557,63 +702,38 @@ void EditorGUI::TransformEnd()
 {
 }
 
-//void EditorGUI::Serialization(const std::string& filename) //not functional at the moment.
-//{
-//	//I could try to write the entire GameObjectManager, if it's possible to even do something like that. Like, getting everything in it and writing/reading all of the data to a binary file.
-//	std::fstream file;
-//	file.open(filename.c_str(), std::ios_base::out | std::ios_base::binary);
-//	static const size_t DATA_CAPACITY = 0x1000;
-//
-//	if (file.is_open())
-//	{
-//		//get size of vectors to integers.
-//		int a = GameObjectManager::Get().gameObjects.size();
-//
-//		//write sizes of vectors, https://stackoverflow.com/a/31213593
-//		file.write(reinterpret_cast<char*>(&a), sizeof(a));
-//		//write contents of vectors, https://stackoverflow.com/a/31213593
-//		file.write(reinterpret_cast<char*>(&GameObjectManager::Get().gameObjects[0]), sizeof(GameObject) * GameObjectManager::Get().gameObjects.size());
-//
-//		for (size_t i = 0; i < a; i++)
-//		{
-//			int b = GameObjectManager::Get().gameObjects[i]->components.size();
-//			if (b > 0)
-//			{
-//				file.write(reinterpret_cast<char*>(&b), sizeof(b));
-//				file.write(reinterpret_cast<char*>(&GameObjectManager::Get().gameObjects[i]->components[0]), sizeof(Component) * GameObjectManager::Get().gameObjects[i]->components.size());
-//			}
-//		}
-//	}
-//	file.close();
-//}
-//
-//void EditorGUI::Deserialization(const std::string& filename) //not functional at the moment.
-//{
-//	std::fstream file;
-//	file.open(filename.c_str(), std::ios_base::in | std::ios_base::binary);
-//	if (file.is_open())
-//	{
-//		int a;
-//
-//		//read sizes of vectors, https://stackoverflow.com/a/31213593
-//		file.read(reinterpret_cast<char*>(&a), sizeof(a)); //I see the issue now, we don't know the size of the vector when we want to read it, and since we input the size of an empty vector right now, it's gonna return nothing as well. so maybe we need to write the size to the file for us to retrieve when reading it.
-//		GameObjectManager::Get().gameObjects.clear();
-//		GameObjectManager::Get().gameObjects.resize(a);
-//
-//		//read contents of vectors, https://stackoverflow.com/a/31213593
-//		file.read(reinterpret_cast<char*>(&GameObjectManager::Get().gameObjects[0]), sizeof(GameObject) * GameObjectManager::Get().gameObjects.size());
-//
-//		for (size_t i = 0; i < a; i++)
-//		{
-//			int b;
-//			file.read(reinterpret_cast<char*>(&b), sizeof(b));
-//			if (b > 0)
-//			{
-//				GameObjectManager::Get().gameObjects[i]->components.clear();
-//				GameObjectManager::Get().gameObjects[i]->components.resize(b);
-//				file.write(reinterpret_cast<char*>(&GameObjectManager::Get().gameObjects[i]->components[0]), sizeof(Component) * GameObjectManager::Get().gameObjects[i]->components.size());
-//			}
-//		}
-//	}
-//	file.close();
-//}
+void EditorGUI::Serialization(const std::string& sceneName) //not functional at the moment.
+{
+	std::fstream file;
+	file.open(_startupSceneFilePath.c_str(), std::ios_base::out | std::ios_base::binary);
+
+	if (file.is_open())
+	{
+		std::string write = sceneName;
+		int nameSize = sceneName.size();
+
+		file.write(reinterpret_cast<char*>(&nameSize), sizeof(int));
+
+		file.write(reinterpret_cast<char*>(&write[0]), nameSize); //https://stackoverflow.com/a/37035925
+	}
+	file.close();
+}
+
+void EditorGUI::Deserialization() //not functional at the moment.
+{
+	std::fstream file;
+	file.open(_startupSceneFilePath.c_str(), std::ios_base::in | std::ios_base::binary);
+
+	if (file.is_open())
+	{
+		int nameSize;
+
+		file.read(reinterpret_cast<char*>(&nameSize), sizeof(int));
+		GameObjectManager::Get().currentSceneName.resize(nameSize);
+
+		file.read(reinterpret_cast<char*>(&GameObjectManager::Get().currentSceneName[0]), nameSize); //https://stackoverflow.com/a/37035925
+
+		GameObjectManager::Get().Deserialization(GameObjectManager::Get().currentSceneName);
+	}
+	file.close();
+}

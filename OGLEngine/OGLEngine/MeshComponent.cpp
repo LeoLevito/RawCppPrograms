@@ -160,7 +160,7 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 		ImGui::EndPopup();
 	}
 
-	if (MeshManager::Get().currentlyLoadingMesh != false)
+	if (MeshManager::Get().currentlyLoadingMesh != false) //why doesn't this work with the TreeTrunk? Is my PC so fast loading the TreeTrunk that this just doesn't turn true?
 	{
 		ImGui::SameLine();
 		ImGui::Text("Loading mesh into memory...");

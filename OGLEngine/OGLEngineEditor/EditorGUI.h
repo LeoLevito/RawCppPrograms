@@ -32,8 +32,8 @@ public:
 	bool gammaCorrection;
 
 	//testing if writing whole game objects will work.
-	//void Serialization(const std::string& filename);
-	//void Deserialization(const std::string& filename);
+	void Serialization(const std::string& filename);
+	void Deserialization();
 
 	float sceneWindowWidth = 0.f;
 	float sceneWindowHeight = 0.f;
@@ -52,6 +52,12 @@ public:
 	int currentPolygonMode;
 
 	bool manipulatingImGuizmo;
+	bool invalidSceneName = false;
+	bool identicalSceneName = false;
+
+	bool DoOnce = false;
+
+	std::string _startupSceneFilePath = "../Levels/_startupScene.startup";
 private:
 	Graphics* myGraphics;
 	//Camera myCamera;

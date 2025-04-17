@@ -31,7 +31,7 @@ public:
 
 	//I should have a copy/paste function for game objects.
 
-
+	std::string currentSceneName = "empty";
 
 
 private:
