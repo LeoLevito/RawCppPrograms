@@ -1,4 +1,5 @@
 #include "LightComponent.h"
+#include <GLAD/glad.h>
 #include <GameObject.h>
 #include <TransformComponent.h>
 #include <iostream>
@@ -7,6 +8,10 @@
 #include "imgui_impl_opengl3.h"
 #include "LightManager.h"
 #include "ShaderManager.h"
+#include "glm.hpp"
+#include <gtc/matrix_transform.hpp>
+#include <gtc/quaternion.hpp>
+#include <gtx/quaternion.hpp>
 
 LightComponent::LightComponent()
 {
@@ -15,6 +20,14 @@ LightComponent::LightComponent()
 
 	myLight = LightManager::Get().AddNewLight(LightType::DirectionalLightType);
 	myLight->SetToDefault();
+
+
+	SetIconTexture();
+
+	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO);
+	glGenBuffers(1, &EBO);	
+	glGenBuffers(1, &UVBO);
 }
 
 LightComponent::~LightComponent()
@@ -39,6 +52,11 @@ void LightComponent::Update()
 		}
 	}
 	myLight->SetLightSpaceMatrix(); //fix issue where shadowmap light view position wouldn't be set to 0,0,0 upon light deletion (well, it still doesn't do that), and when re-adding a light without a transform component the shadows would have a different angle compared to where the light is if you changed the angles/position before deleting the first time. You can still, for a split second, see the previous shadowmap when adding a new light after deleting a light that had a position other than 0,0,0.
+	
+	if (allowDrawIcon)
+	{
+		DrawIcon();
+	}
 }
 
 void LightComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
@@ -95,6 +113,84 @@ void LightComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 		ImGui::EndPopup();
 	}
 	myLight->DrawImgui();
+
+
+	ImGui::Checkbox("Draw Icon", &allowDrawIcon);
+}
+
+void LightComponent::DrawIcon()
+{
+	//setup iconfacing camera transform
+	glm::vec3 camToIconDirection = position - Camera::Get().myPosition;
+
+	glm::quat myRotationQuaternion = glm::quatLookAt(glm::normalize(camToIconDirection), glm::vec3(0.0f, 1.0f, 0.0f)); //woah it just works!
+	glm::mat4 rotationMatrix = glm::toMat4(myRotationQuaternion);
+
+	glm::mat4 FacingCameraTrans = glm::mat4(1.0f);
+	FacingCameraTrans = glm::translate(FacingCameraTrans, position); //translate first so that each object rotates independently.
+	FacingCameraTrans = FacingCameraTrans * rotationMatrix;
+
+	ShaderManager::Get().iconShader->Use();
+	ShaderManager::Get().iconShader->SetMatrix4(FacingCameraTrans, "transform"); //apperently there's a better way to do this compared to using a Uniform type variable inside the vertex shader, Shader Buffer Storage Object, something like that, where we can have even more variables inside the shader and update them.
+	ShaderManager::Get().iconShader->SetMatrix4(Camera::Get().myView, "view");
+	ShaderManager::Get().iconShader->SetMatrix4(Camera::Get().projection, "projection");
+
+
+	//copied from RenderWorldGrid(), we need to have a two triangle plane so the OutlineActualShader can do its magic using the Normalized Device Coordinates positions of these vertices:
+	//doing draw elements to a shader that ONLY HAS VERTEX POSITION (aPos) and not multiplying with a transform, projection or view, means that the vertices will be layed out in Normalized Device Coordinates: https://learnopengl.com/Getting-started/Hello-Triangle
+	glm::vec3 vert1 = { 1.0f,  1.0f,  0.0f };
+	glm::vec3 vert2 = { 1.0f, -1.0f,  0.0f };
+	glm::vec3 vert3 = { -1.0f,-1.0f,  0.0f };
+	glm::vec3 vert4 = { -1.0f, 1.0f,  0.0f };
+
+	std::vector<glm::vec3> verts = { vert1, vert2, vert3, vert4 };
+	std::vector<unsigned int> indices = { 0, 1, 3, 1, 2, 3 };
+
+	glm::vec2 texCoord1 = { 1.0f, 1.0f };
+	glm::vec2 texCoord2 = { 1.0f, 0.0f };
+	glm::vec2 texCoord3 = { 0.0f, 0.0f };
+	glm::vec2 texCoord4 = { 0.0f, 1.0f };
+
+	std::vector<glm::vec2> indexed_uvs = { texCoord1, texCoord2, texCoord3, texCoord4 };
+
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(glm::vec3), &verts[0], GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ARRAY_BUFFER, UVBO);
+	glBufferData(GL_ARRAY_BUFFER, indexed_uvs.size() * sizeof(glm::vec2), &indexed_uvs[0], GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW); //the indices might be wrong
+
+	
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0); //these are probably not right, need to modify to read correctly.
+
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, UVBO);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
+
+	glActiveTexture(GL_TEXTURE5);
+	glBindTexture(GL_TEXTURE_2D, iconTexture->TextureObject); //so we have a new texture binding in Draw() because otherwise fragment shader would take the last binded texture, this allows us to use different textures for different objects (in the future).
+	ShaderManager::Get().iconShader->SetInt(5, "icon");
+
+	//now we just need to specify texcoords
+
+	glBindVertexArray(VAO); //only bind VAO when drawing the mesh since it already has a VBO reference already.
+	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0); //doing draw elements to a shader that only has vertex position and not a transform, projection or view, means that the vertices will be layed out in Normalized Device Coordinates: https://learnopengl.com/Getting-started/Hello-Triangle
+	glBindVertexArray(0);
+}
+
+void LightComponent::SetIconTexture()
+{
+	delete iconTexture;
+	iconTexture = new Texture("../Textures/Bliss\\Bliss.jpg", 5, 1, false);
 }
 
 void LightComponent::Serialization(std::fstream& file)

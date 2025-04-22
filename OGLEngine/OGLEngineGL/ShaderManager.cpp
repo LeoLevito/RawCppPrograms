@@ -27,6 +27,8 @@ void ShaderManager::Initialize()
 	outlineShader->Initialize("../Shaders/OutlineShader.vertexs", "../Shaders/OutlineShader.fragments");
 	outlineActualShader = new Shader();
 	outlineActualShader->Initialize("../Shaders/OutlineActualShader.vertexs", "../Shaders/OutlineActualShader.fragments");
+	iconShader = new Shader();
+	iconShader->Initialize("../Shaders/IconShader.vertexs", "../Shaders/IconShader.fragments");
 	shadowMap = new ShadowMap();
 	shadowCubeMap = new ShadowCubeMap();
 	depthPass = false;

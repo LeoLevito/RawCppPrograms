@@ -20,6 +20,7 @@ public:
 	Shader* pickingShader;
 	Shader* outlineShader;
 	Shader* outlineActualShader;
+	Shader* iconShader;
 	ShadowMap* shadowMap;
 	ShadowCubeMap* shadowCubeMap;
 	bool depthPass;
