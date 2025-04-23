@@ -11,6 +11,7 @@
 #include "MeshManager.h"
 #include "CollisionManager.h"
 #include "LightManager.h"
+#include "TextureManager.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -619,7 +620,7 @@ void EditorGUI::QuickGUITesting()
 	CollisionManager::Get().DebugGUI();
 	LightManager::Get().DrawImgui();
 	Graphics::Get().DrawImgui();
-
+	TextureManager::Get().DrawImgui();
 
 
 
@@ -702,7 +703,7 @@ void EditorGUI::TransformEnd()
 {
 }
 
-void EditorGUI::Serialization(const std::string& sceneName) //not functional at the moment.
+void EditorGUI::Serialization(const std::string& sceneName) 
 {
 	std::fstream file;
 	file.open(_startupSceneFilePath.c_str(), std::ios_base::out | std::ios_base::binary);
@@ -719,7 +720,7 @@ void EditorGUI::Serialization(const std::string& sceneName) //not functional at 
 	file.close();
 }
 
-void EditorGUI::Deserialization() //not functional at the moment.
+void EditorGUI::Deserialization() 
 {
 	std::fstream file;
 	file.open(_startupSceneFilePath.c_str(), std::ios_base::in | std::ios_base::binary);

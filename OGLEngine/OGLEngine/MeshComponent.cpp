@@ -30,8 +30,8 @@ MeshComponent::MeshComponent()
 
 	diffuseMapPath = "../Textures/Bliss\\Bliss.jpg";
 	specularMapPath = "../Textures/Bliss\\Bliss2.jpg";
-	diffuseMap = new Texture(diffuseMapPath.c_str(), selectedMinType, selectedMagType, false);
-	specularMap = new Texture(specularMapPath.c_str(), selectedMinType, selectedMagType, false);
+	diffuseMap = new Texture(diffuseMapPath.c_str(), selectedMinType, selectedMagType, false,false);
+	specularMap = new Texture(specularMapPath.c_str(), selectedMinType, selectedMagType, false,false);
 
 	position = glm::vec3(0, 0, 0);
 	rotation = glm::vec3(0, 0, 0);
@@ -323,7 +323,7 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 			if (!TextureManager::Get().texturePaths[i].path().has_extension())
 			{
 				currentDirectoryName = TextureManager::Get().texturePaths[i].path().string().c_str();
-				if (TextureManager::Get().texturePaths[i].path().string().find("\\_previews") == std::string::npos) //if path name doesn't have "/_previews" in it.
+				if (TextureManager::Get().texturePaths[i].path().string().find("\\_") == std::string::npos) //if path name doesn't have "/_previews" in it.
 				{
 					//currentDirectoryName = TextureManager::Get().texturePaths[i].path().string().c_str();
 					//lastDirectoryName = currentDirectoryName;
@@ -335,8 +335,6 @@ void MeshComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 			{
 				if (TextureManager::Get().texturePaths[i].path().string().find("_preview.jpg") != std::string::npos)
 				{
-
-
 					ImTextureID texid = TextureManager::Get().texturePreviews[previewIterator]->TextureObject;
 					ImVec2 texsize = ImVec2(32, 32);
 					previewIterator++;
@@ -475,7 +473,7 @@ void MeshComponent::Update()
 void MeshComponent::ReloadTextures()
 {
 	delete diffuseMap;
-	diffuseMap = new Texture(diffuseMapPath.c_str(), selectedMinType, selectedMagType, false); //full path with file extension needed for stbi_load to work.
+	diffuseMap = new Texture(diffuseMapPath.c_str(), selectedMinType, selectedMagType, false,false); //full path with file extension needed for stbi_load to work.
 	if (ShaderManager::Get().depthPass == false)
 	{
 		ShaderManager::Get().shader->Use();
@@ -483,7 +481,7 @@ void MeshComponent::ReloadTextures()
 		mesh->ApplyDiffuseMap(diffuseMap);
 	}
 	delete specularMap;
-	specularMap = new Texture(specularMapPath.c_str(), selectedMinType, selectedMagType, false); //full path with file extension needed for stbi_load to work.
+	specularMap = new Texture(specularMapPath.c_str(), selectedMinType, selectedMagType, false,false); //full path with file extension needed for stbi_load to work.
 	if (ShaderManager::Get().depthPass == false)
 	{
 		ShaderManager::Get().shader->Use();
@@ -547,8 +545,8 @@ void MeshComponent::Deserialization(std::fstream& file)
 		//do (TEXTURE):
 		delete diffuseMap;
 		delete specularMap;
-		diffuseMap = new Texture(diffuseMapPath.c_str(), selectedMinType, selectedMagType, false);
-		specularMap = new Texture(specularMapPath.c_str(), selectedMinType, selectedMagType, false);
+		diffuseMap = new Texture(diffuseMapPath.c_str(), selectedMinType, selectedMagType, false,false);
+		specularMap = new Texture(specularMapPath.c_str(), selectedMinType, selectedMagType, false,false);
 	}
 
 	//do (MATERIAL):

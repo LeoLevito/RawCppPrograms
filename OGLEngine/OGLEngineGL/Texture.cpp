@@ -6,10 +6,12 @@
 #include "stb_image_write.h"
 #include "stb_image_resize2.h"
 #include <filesystem>
+#include <fstream>
+#include <sstream>
 
 
 
-Texture::Texture(const char* path, int minfilter, int magfilter, bool writePreview)
+Texture::Texture(const char* path, int minfilter, int magfilter, bool writePreview, bool readPreview)
 {
 	name = path;
 	if (name.find(".jpg") == std::string::npos) //if ".jpg" doesn't exist at any position in the string
@@ -17,12 +19,53 @@ Texture::Texture(const char* path, int minfilter, int magfilter, bool writePrevi
 		return;
 	}
 
-	int Channels = 0;
+	Channels = 0;
 	Width = 0; //set in stbi_load.
 	Height = 0; //set in stbi_load.
 
-	stbi_set_flip_vertically_on_load(true); //mirror texture vertically before loading it because OpenGL is weird. //https://learnopengl.com/index.php?p=Getting-started/Textures
-	unsigned char* data = stbi_load(path, &Width, &Height, &Channels, 0); //load in texture from path using stb_image header.
+
+
+	unsigned char* data;
+	std::string path2 = path;
+	if (std::string(path).find(".jpg.bin") != std::string::npos)
+	{
+		Deserialization(path);
+		data = (unsigned char*)masterstring.c_str();
+	}
+	else
+	{
+		if (writePreview == true)
+		{
+			stbi_set_flip_vertically_on_load(true); //mirror texture vertically before loading it because OpenGL is weird. //https://learnopengl.com/index.php?p=Getting-started/Textures
+			data = stbi_load(path, &Width, &Height, &Channels, 0); //load in texture from path using stb_image header.
+		}
+		else if (readPreview == true)
+		{
+			stbi_set_flip_vertically_on_load(true); //mirror texture vertically before loading it because OpenGL is weird. //https://learnopengl.com/index.php?p=Getting-started/Textures
+			data = stbi_load(path, &Width, &Height, &Channels, 0); //load in texture from path using stb_image header.
+		}
+		else
+		{
+			int pos = std::string(path).find("\\");
+			std::string newDirectoryName = path;
+			newDirectoryName.erase(pos, newDirectoryName.length());
+			newDirectoryName.append("/_bins");
+
+			std::string fileName = path;
+			fileName.erase(0, pos);
+			fileName.erase(fileName.length() - 4); //remove ".jpg"
+			fileName.append(".jpg.bin"); //Add "_preview.jpg"
+
+			std::string newName;
+			newName.append(newDirectoryName);
+			newName.append(fileName);
+
+			Deserialization(newName);
+			data = (unsigned char*)masterstring.c_str();
+		}
+		
+	}
+
 
 	std::cout << "how many channels in texture? Answer: " << Channels << std::endl;
 	glGenTextures(1, &TextureObject); //similar to what we do in Mesh constructor with the VBO and VAO, we have to generate the TextureObject and bind it.
@@ -116,6 +159,8 @@ Texture::Texture(const char* path, int minfilter, int magfilter, bool writePrevi
 	if (writePreview)
 	{
 		int pos = std::string(path).find("\\");
+
+		//serialize preview versions of textures.
 		if (std::string(path).find("_preview.jpg") == std::string::npos) //extra check for if "_preview.jpg" doesn't exist in the string name
 		{
 
@@ -138,12 +183,88 @@ Texture::Texture(const char* path, int minfilter, int magfilter, bool writePrevi
 			stbi_flip_vertically_on_write(true);
 			stbi_write_jpg(newName.c_str(), 32, 32, Channels, data2, 100);
 		}
+
+		//serialize binary versions of textures.
+		if (std::string(path).find(".jpg.bin") == std::string::npos) //extra check for if ".jpg.bin" doesn't exist in the string name
+		{
+			std::string newDirectoryName = path;
+			newDirectoryName.erase(pos, newDirectoryName.length());
+			newDirectoryName.append("/_bins");
+
+			std::filesystem::create_directory(newDirectoryName);
+
+			std::string fileName = path;
+			fileName.erase(0, pos);
+			fileName.erase(fileName.length() - 4); //remove ".jpg"
+			fileName.append(".jpg.bin"); //Add "_preview.jpg"
+
+			std::string newName;
+			newName.append(newDirectoryName);
+			newName.append(fileName);
+
+
+			masterstring.resize((Width * Height * Channels));
+
+			for (int i = 0; i < (Width * Height * Channels); i++)
+			{
+				masterstring[i] = data[i];
+			}
+			Serialization(newName);
+		}
 	}
 
-	stbi_image_free(data); //free up data when we're done.
+	if (path2.find(".jpg.preview") == std::string::npos)
+	{
+		if (writePreview == true)
+		{
+			stbi_image_free(data); //free up data when we're done.
+		}
+		else if (readPreview == true)
+		{
+			stbi_image_free(data); //free up data when we're done.
+		}
+	}
 }
 
 Texture::~Texture()
 {
 	glDeleteTextures(1, &TextureObject);
+}
+
+
+void Texture::Serialization(const std::string& filename)
+{
+	std::fstream file;
+	file.open(filename, std::ios_base::out | std::ios_base::binary);
+
+	if (file.is_open())
+	{
+		int nameSize = masterstring.size();
+		file.write(reinterpret_cast<char*>(&nameSize), sizeof(int));
+		file.write(reinterpret_cast<char*>(&masterstring[0]), nameSize); //https://stackoverflow.com/a/37035925
+	
+		file.write(reinterpret_cast<char*>(&Width), sizeof(int));
+		file.write(reinterpret_cast<char*>(&Height), sizeof(int));
+		file.write(reinterpret_cast<char*>(&Channels), sizeof(int));
+	}
+	file.close();
+}
+
+void Texture::Deserialization(const std::string& filename)
+{
+	std::fstream file;
+	file.open(filename, std::ios_base::in | std::ios_base::binary);
+
+	if (file.is_open())
+	{
+		int nameSize;
+		file.read(reinterpret_cast<char*>(&nameSize), sizeof(int));
+		masterstring.resize(nameSize);
+		file.read(reinterpret_cast<char*>(&masterstring[0]), nameSize); //https://stackoverflow.com/a/37035925
+	
+		file.read(reinterpret_cast<char*>(&Width), sizeof(int));
+		file.read(reinterpret_cast<char*>(&Height), sizeof(int));
+		file.read(reinterpret_cast<char*>(&Channels), sizeof(int));
+	}
+	file.close();
 }

@@ -1,12 +1,11 @@
 #include "TextureManager.h"
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 
 TextureManager::TextureManager()
 {
-	path = "../Textures/";
-	for (const std::filesystem::directory_entry& entry : std::filesystem::recursive_directory_iterator(path))
-	{
-		texturePaths.push_back(entry);
-	}
+	GetTexturePaths();
 	//RefreshTexturePreviews();
 	LoadTexturePreviews();
 }
@@ -21,20 +20,39 @@ TextureManager& TextureManager::Get()
 	return instance;
 }
 
-void TextureManager::RefreshTexturePreviews()
+void TextureManager::GetTexturePaths()
 {
+	texturePaths.clear();
+	path = "../Textures/";
 	for (const std::filesystem::directory_entry& entry : std::filesystem::recursive_directory_iterator(path))
 	{
+		std::string test = entry.path().string();
+		if (!entry.path().has_extension() && test.find("_system") != std::string::npos) //exclude that directory.
+		{
+			continue;
+		}
+		else if (entry.path().has_extension() && test.find("_system") != std::string::npos) //exclude files in that directory.
+		{
+			continue;
+		}
+
 		texturePaths.push_back(entry);
 	}
+}
 
+void TextureManager::RefreshTexturePreviews()
+{
+	//for (const std::filesystem::directory_entry& entry : std::filesystem::recursive_directory_iterator(path))
+	//{
+	//	texturePaths.push_back(entry);
+	//}
 	for (int i = 0; i < texturePaths.size(); i++)
 	{
 		if (texturePaths[i].path().has_extension()) //if does have extension
 		{
-			if (texturePaths[i].path().string().find("_preview.jpg") == std::string::npos) //if we don't find "_preview.jpg" in the path name.
+			if (texturePaths[i].path().string().find("_preview.jpg") == std::string::npos && texturePaths[i].path().string().find(".jpg.bin") == std::string::npos) //if we don't find "_preview.jpg" in the path name.
 			{
-				Texture preview(texturePaths[i].path().string().c_str(), 5, 1, true);
+				Texture preview(texturePaths[i].path().string().c_str(), 5, 1, true, false);
 			}
 		}
 	}
@@ -48,10 +66,36 @@ void TextureManager::LoadTexturePreviews()
 		{
 			if (texturePaths[i].path().string().find("_preview.jpg") != std::string::npos) //if we find "_preview.jpg" in the path name.
 			{
-				Texture* texture = new Texture(texturePaths[i].path().string().c_str(), 5, 1, false);
+				Texture* texture = new Texture(texturePaths[i].path().string().c_str(), 5, 1, false, true);
 				texturePreviews.push_back(texture); 
 			}
+
+			//if (texturePaths[i].path().string().find(".jpg.bin") != std::string::npos) //if we find "_preview.jpg" in the path name.
+			//{
+			//	Texture* texture = new Texture(texturePaths[i].path().string().c_str(), 5, 1, false);
+			//	textures.push_back(texture);
+			//}
 		}
+	}
+	int i;
+}
+
+void TextureManager::DrawImgui()
+{
+	ImGui::BeginDisabled(disableRefreshButton == true);
+	if (ImGui::Button("Refresh texture previews & bins"))
+	{
+		
+		GetTexturePaths();
+		RefreshTexturePreviews();
+		GetTexturePaths();
+		disableRefreshButton = true;
+	}
+	ImGui::EndDisabled();
+	if (disableRefreshButton == true)
+	{
+		ImGui::SameLine();
+		ImGui::Text("Done... Took a while.");
 	}
 }
 

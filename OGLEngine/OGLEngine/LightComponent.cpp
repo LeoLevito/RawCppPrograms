@@ -190,7 +190,7 @@ void LightComponent::DrawIcon()
 void LightComponent::SetIconTexture()
 {
 	delete iconTexture;
-	iconTexture = new Texture("../Textures/Bliss\\Bliss.jpg", 5, 1, false);
+	iconTexture = new Texture("../Textures/Bliss\\Bliss.jpg", 5, 1, false, false);
 }
 
 void LightComponent::Serialization(std::fstream& file)
