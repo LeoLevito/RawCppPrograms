@@ -123,7 +123,7 @@ void LightComponent::DrawIcon()
 	//setup iconfacing camera transform
 	glm::vec3 camToIconDirection = position - Camera::Get().myPosition;
 
-	glm::quat myRotationQuaternion = glm::quatLookAt(glm::normalize(camToIconDirection), glm::vec3(0.0f, 1.0f, 0.0f)); //woah it just works!
+	glm::quat myRotationQuaternion = glm::quatLookAt(Camera::Get().myDirection, Camera::Get().myUp);
 	glm::mat4 rotationMatrix = glm::toMat4(myRotationQuaternion);
 
 	glm::mat4 FacingCameraTrans = glm::mat4(1.0f);
