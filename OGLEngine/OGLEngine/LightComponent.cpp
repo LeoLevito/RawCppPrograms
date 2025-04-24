@@ -12,6 +12,7 @@
 #include <gtc/matrix_transform.hpp>
 #include <gtc/quaternion.hpp>
 #include <gtx/quaternion.hpp>
+#include "TextureManager.h"
 
 LightComponent::LightComponent()
 {
@@ -91,6 +92,7 @@ void LightComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 			if (ImGui::Selectable(typeNames[i]))
 			{
 				selectedType = i;
+				SetIconTexture();
 				switch (selectedType)
 				{
 				case 0:
@@ -130,10 +132,34 @@ void LightComponent::DrawIcon()
 	FacingCameraTrans = glm::translate(FacingCameraTrans, position); //translate first so that each object rotates independently.
 	FacingCameraTrans = FacingCameraTrans * rotationMatrix;
 
-	ShaderManager::Get().iconShader->Use();
-	ShaderManager::Get().iconShader->SetMatrix4(FacingCameraTrans, "transform"); //apperently there's a better way to do this compared to using a Uniform type variable inside the vertex shader, Shader Buffer Storage Object, something like that, where we can have even more variables inside the shader and update them.
-	ShaderManager::Get().iconShader->SetMatrix4(Camera::Get().myView, "view");
-	ShaderManager::Get().iconShader->SetMatrix4(Camera::Get().projection, "projection");
+
+
+	if (ShaderManager::Get().pickingPass == true)
+	{
+		ShaderManager::Get().pickingShader->Use();
+		ShaderManager::Get().pickingShader->SetMatrix4(FacingCameraTrans, "transform"); //apperently there's a better way to do this compared to using a Uniform type variable inside the vertex shader, Shader Buffer Storage Object, something like that, where we can have even more variables inside the shader and update them.
+		ShaderManager::Get().pickingShader->SetMatrix4(Camera::Get().myView, "view");
+		ShaderManager::Get().pickingShader->SetMatrix4(Camera::Get().projection, "projection");
+
+		//here I want to write to the fragment shader with my unique color.
+		int r = (owner->ID & 0x000000FF) >> 0;
+		int g = (owner->ID & 0x0000FF00) >> 8;
+		int b = (owner->ID & 0x00FF0000) >> 16;
+
+		glm::vec4 color = { r / 255.0f, g / 255.0f, b / 255.0f, 1.0f }; //change to r/5.0f for a more noticeable color with a small amount of meshes in the scene.
+
+		ShaderManager::Get().pickingShader->SetVector4(color, "pickingColor");
+
+	}
+	else if (ShaderManager::Get().depthPass == false)
+	{
+		ShaderManager::Get().iconShader->Use();
+		ShaderManager::Get().iconShader->SetMatrix4(FacingCameraTrans, "transform"); //apperently there's a better way to do this compared to using a Uniform type variable inside the vertex shader, Shader Buffer Storage Object, something like that, where we can have even more variables inside the shader and update them.
+		ShaderManager::Get().iconShader->SetMatrix4(Camera::Get().myView, "view");
+		ShaderManager::Get().iconShader->SetMatrix4(Camera::Get().projection, "projection");
+	}
+
+	
 
 
 	//copied from RenderWorldGrid(), we need to have a two triangle plane so the OutlineActualShader can do its magic using the Normalized Device Coordinates positions of these vertices:
@@ -180,8 +206,6 @@ void LightComponent::DrawIcon()
 	glBindTexture(GL_TEXTURE_2D, iconTexture->TextureObject); //so we have a new texture binding in Draw() because otherwise fragment shader would take the last binded texture, this allows us to use different textures for different objects (in the future).
 	ShaderManager::Get().iconShader->SetInt(5, "icon");
 
-	//now we just need to specify texcoords
-
 	glBindVertexArray(VAO); //only bind VAO when drawing the mesh since it already has a VBO reference already.
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0); //doing draw elements to a shader that only has vertex position and not a transform, projection or view, means that the vertices will be layed out in Normalized Device Coordinates: https://learnopengl.com/Getting-started/Hello-Triangle
 	glBindVertexArray(0);
@@ -190,7 +214,7 @@ void LightComponent::DrawIcon()
 void LightComponent::SetIconTexture()
 {
 	delete iconTexture;
-	iconTexture = new Texture("../Textures/Bliss\\Bliss.jpg", 5, 1, false, false);
+	iconTexture = new Texture(TextureManager::Get().lightIconPaths[selectedType].path().string().c_str(), 5, 1, false, true, true); //assumes order of entries in lightIconPaths is the same as the other uses of selectedType in this script.
 }
 
 void LightComponent::Serialization(std::fstream& file)
@@ -215,6 +239,7 @@ void LightComponent::Deserialization(std::fstream& file)
 
 	file.read(reinterpret_cast<char*>(&myLight->ID), sizeof(int));
 	file.read(reinterpret_cast<char*>(&selectedType), sizeof(int));
+	SetIconTexture();
 
 	myLight->UpdateIDBasedStrings();
 

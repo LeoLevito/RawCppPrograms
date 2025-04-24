@@ -29,14 +29,19 @@ void TextureManager::GetTexturePaths()
 		std::string test = entry.path().string();
 		if (!entry.path().has_extension() && test.find("_system") != std::string::npos) //exclude that directory.
 		{
-			continue;
+			//continue;
 		}
 		else if (entry.path().has_extension() && test.find("_system") != std::string::npos) //exclude files in that directory.
 		{
-			continue;
+			if (test.find("_light_icons") != std::string::npos)
+			{
+				lightIconPaths.push_back(entry);
+			}
 		}
-
-		texturePaths.push_back(entry);
+		else
+		{
+			texturePaths.push_back(entry);
+		}
 	}
 }
 

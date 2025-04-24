@@ -11,6 +11,7 @@
 #include "ShaderManager.h"
 #include "MemoryCheckManager.h"
 #include "CollisionManager.h"
+#include "TextureManager.h"
 
 int main()
 {
@@ -32,6 +33,7 @@ int main()
 	glfwSwapInterval(1); //set max framerate, think (1/50) * 50 for 1 fps at 50hz, this doesn't function like a VSYNC toggle it seems to my eyes. Edit: well, when a big mesh is rendering it does seem to lock the framerate perfectly.
 
 	ShaderManager::Get().Initialize(); //initialize shadermanager with shadowmap.
+	TextureManager::Get(); //initialize TextureManager.
 	while (!Graphics::Get().ShouldClose())
 	{
 		currentTime = glfwGetTime(); //May or may not be super accurate at the moment.

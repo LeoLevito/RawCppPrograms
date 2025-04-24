@@ -8,4 +8,28 @@ uniform sampler2D icon;
 void main()
 {
 	FragColor = texture(icon, texCoord);
+
+	if(FragColor.x < 0.1) //jpeg compression sucks, it's literally just black and white, why does MS Paint add 'almost white' and 'almost black' when saving to a jpeg?
+	{
+		FragColor.x = 0.0;
+	}
+	if(FragColor.y < 0.1) //jpeg compression sucks, it's literally just black and white, why does MS Paint add 'almost white' and 'almost black' when saving to a jpeg?
+	{
+		FragColor.y = 0.0;
+	}
+	if(FragColor.z < 0.1) //jpeg compression sucks, it's literally just black and white, why does MS Paint add 'almost white' and 'almost black' when saving to a jpeg?
+	{
+		FragColor.z = 0.0;
+	}
+
+	if(FragColor.xyz == vec3(0.0,0.0,0.0))
+	{
+		FragColor = vec4(0.0,0.0,0.0,0.0);
+	}
+
+	if(FragColor.a == 0.0)
+	{
+		discard; //https://www.khronos.org/opengl/wiki/Transparency_Sorting
+	}
+	
 }

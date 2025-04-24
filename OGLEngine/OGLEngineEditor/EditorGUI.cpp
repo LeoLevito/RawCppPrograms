@@ -563,7 +563,16 @@ void EditorGUI::MainMenuBar()
 		if (identicalSceneName == true)
 		{
 			ImGui::SameLine();
-			ImGui::Text("That name already exists, please write something else.");
+			ImGui::Text("That name already exists, overwrite?");
+			if (ImGui::Button("Overwrite"))
+			{
+				std::string newSceneName = "../Levels/"; //copied from above.
+				newSceneName.append(inputSceneName);
+				newSceneName.append(".scene");
+
+				GameObjectManager::Get().Serialization(newSceneName);
+				ImGui::CloseCurrentPopup();
+			}
 		}
 
 		ImGui::EndPopup();

@@ -18,6 +18,7 @@ public:
 	std::vector<Texture*> textures;
 	std::vector<Texture*> texturePreviews;
 	std::vector<std::filesystem::directory_entry> texturePaths;
+	std::vector<std::filesystem::directory_entry> lightIconPaths;
 
 	bool disableRefreshButton = false;
 private:

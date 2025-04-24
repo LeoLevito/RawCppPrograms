@@ -11,7 +11,7 @@
 
 
 
-Texture::Texture(const char* path, int minfilter, int magfilter, bool writePreview, bool readPreview)
+Texture::Texture(const char* path, int minfilter, int magfilter, bool writePreview, bool readPreview, bool transparent)
 {
 	name = path;
 	if (name.find(".jpg") == std::string::npos) //if ".jpg" doesn't exist at any position in the string
@@ -42,7 +42,17 @@ Texture::Texture(const char* path, int minfilter, int magfilter, bool writePrevi
 		else if (readPreview == true)
 		{
 			stbi_set_flip_vertically_on_load(true); //mirror texture vertically before loading it because OpenGL is weird. //https://learnopengl.com/index.php?p=Getting-started/Textures
-			data = stbi_load(path, &Width, &Height, &Channels, 0); //load in texture from path using stb_image header.
+			
+			if (transparent)
+			{
+
+				data = stbi_load(path, &Width, &Height, &Channels, 4); //load in texture from path using stb_image header.
+				Channels = 4; //sets resulting texture to RGBA with alpha channel further down.
+			}
+			else
+			{
+				data = stbi_load(path, &Width, &Height, &Channels, 0); //load in texture from path using stb_image header.
+			}
 		}
 		else
 		{

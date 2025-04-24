@@ -3,7 +3,7 @@
 class Texture
 {
 public:
-	Texture(const char* path, int minfilter, int magfilter, bool writePreview, bool readPreview);
+	Texture(const char* path, int minfilter, int magfilter, bool writePreview, bool readPreview, bool transparent = false); //Default parameters are cool!
 	~Texture();
 	int Width;
 	int Height;
