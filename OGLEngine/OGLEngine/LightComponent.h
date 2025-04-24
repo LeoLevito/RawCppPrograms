@@ -34,7 +34,7 @@ public:
 
 	unsigned int VBO, VAO, EBO, UVBO;
 
-	bool allowDrawIcon = false;
+	bool allowDrawIcon = true;
 private:
 };
 

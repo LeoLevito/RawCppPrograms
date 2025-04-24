@@ -225,6 +225,8 @@ void LightComponent::Serialization(std::fstream& file)
 	file.write(reinterpret_cast<char*>(&myLight->ID), sizeof(int));
 	file.write(reinterpret_cast<char*>(&selectedType), sizeof(int));
 
+	file.write(reinterpret_cast<char*>(&allowDrawIcon), sizeof(int));
+
 	myLight->Serialization(file);
 }
 
@@ -239,6 +241,9 @@ void LightComponent::Deserialization(std::fstream& file)
 
 	file.read(reinterpret_cast<char*>(&myLight->ID), sizeof(int));
 	file.read(reinterpret_cast<char*>(&selectedType), sizeof(int));
+
+	file.read(reinterpret_cast<char*>(&allowDrawIcon), sizeof(int));
+
 	SetIconTexture();
 
 	myLight->UpdateIDBasedStrings();
