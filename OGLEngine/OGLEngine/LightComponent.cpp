@@ -169,7 +169,7 @@ void LightComponent::DrawIcon()
 	glm::vec3 vert3 = { -1.0f,-1.0f,  0.0f };
 	glm::vec3 vert4 = { -1.0f, 1.0f,  0.0f };
 
-	std::vector<glm::vec3> verts = { vert1, vert2, vert3, vert4 };
+	std::vector<glm::vec3> verts = { vert1 / 2.0f, vert2 / 2.0f, vert3 / 2.0f, vert4 / 2.0f }; // div by 2.0f for smaller icon.
 	std::vector<unsigned int> indices = { 0, 1, 3, 1, 2, 3 };
 
 	glm::vec2 texCoord1 = { 1.0f, 1.0f };
