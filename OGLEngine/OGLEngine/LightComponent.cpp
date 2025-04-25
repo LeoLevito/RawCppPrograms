@@ -34,7 +34,7 @@ LightComponent::LightComponent()
 LightComponent::~LightComponent()
 {
 	std::cout << "-->Deleting Light component." << std::endl;
-	LightManager::Get().DeleteLight(myLight->type, *myLight);
+	LightManager::Get().DeleteLight(myLight->type, myLight);
 }
 
 void LightComponent::Update()
@@ -96,15 +96,15 @@ void LightComponent::DrawComponentSpecificImGuiHierarchyAdjustables()
 				switch (selectedType)
 				{
 				case 0:
-					LightManager::Get().DeleteLight(myLight->type, *myLight);
+					LightManager::Get().DeleteLight(myLight->type, myLight);
 					myLight = LightManager::Get().AddNewLight(LightType::DirectionalLightType);
 					break;
 				case 1:
-					LightManager::Get().DeleteLight(myLight->type, *myLight);
+					LightManager::Get().DeleteLight(myLight->type, myLight);
 					myLight = LightManager::Get().AddNewLight(LightType::PointLightType);
 					break;
 				case 2:
-					LightManager::Get().DeleteLight(myLight->type, *myLight);
+					LightManager::Get().DeleteLight(myLight->type, myLight);
 					myLight = LightManager::Get().AddNewLight(LightType::SpotLightType);
 					break;
 				default:
@@ -236,7 +236,7 @@ void LightComponent::Deserialization(std::fstream& file)
 	file.read(reinterpret_cast<char*>(&lightTypeSize), sizeof(int));
 
 	LightType currentType = static_cast<LightType>(lightTypeSize);
-	LightManager::Get().DeleteLight(myLight->type, *myLight);
+	LightManager::Get().DeleteLight(myLight->type, myLight);
 	myLight = LightManager::Get().AddNewLight(currentType);
 
 	file.read(reinterpret_cast<char*>(&myLight->ID), sizeof(int));

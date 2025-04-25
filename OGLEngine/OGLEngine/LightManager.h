@@ -15,7 +15,7 @@ public:
 	static LightManager& Get();
 
 	Light* AddNewLight(LightType type);
-	void DeleteLight(LightType type, Light& light);
+	void DeleteLight(LightType type, Light* light);
 
 	std::vector<DirectionalLight*> directionalLightVector;
 	std::vector<PointLight*> pointLightVector;
