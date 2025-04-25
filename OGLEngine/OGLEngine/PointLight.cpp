@@ -114,7 +114,7 @@ void PointLight::SetLightSpaceMatrix()
 			ShaderManager::Get().depthCubeMapShader->SetMatrix4(shadowTransforms[i], "shadowMatrices[" + std::to_string(i) + "]"); //this is not going to work without the geometry shader initialized.
 		}
 		ShaderManager::Get().depthCubeMapShader->SetFloat(far_plane, "far_plane");
-		//ShaderManager::Get().depthCubeMapShader->SetVector3(position, positionString); //not needed because we already do this above.
+		ShaderManager::Get().depthCubeMapShader->SetVector3(position, "lightPos"); //not needed because we already do this above.
 	}
 }
 
