@@ -56,9 +56,20 @@ void PointLight::SetToCurrent()
 	ShaderManager::Get().shader->SetFloat(quadratic, quadraticString);
 }
 
-void PointLight::SetToZero()
+void PointLight::SetToZero(bool alsoSetVariables)
 {
+	if (alsoSetVariables) //if setting to zero was done by pressing the 'Set to zero' imgui::button, then we deliberately set variables to zero. Otherwise if this light is being deleted, then we don't do this.
+	{
+		ambient = glm::vec3(0, 0, 0);
+		diffuse = glm::vec3(0, 0, 0);
+		specular = glm::vec3(0, 0, 0);
+
+		linear = 0.0f;
+		quadratic = 0.0f;
+	}
+
 	ShaderManager::Get().shader->Use();
+
 	ShaderManager::Get().shader->SetVector3(glm::vec3(0, 0, 0), ambientString);
 	ShaderManager::Get().shader->SetVector3(glm::vec3(0, 0, 0), diffuseString);
 	ShaderManager::Get().shader->SetVector3(glm::vec3(0, 0, 0), specularString);
@@ -83,12 +94,12 @@ void PointLight::SetLightSpaceMatrix()
 	float far_plane = 100.f;
 	shadowProj = glm::perspective(glm::radians(90.f), (float)ShaderManager::Get().shadowCubeMap->SHADOW_WIDTH / (float)ShaderManager::Get().shadowCubeMap->SHADOW_HEIGHT, near_plane, far_plane);
 	std::vector<glm::mat4> shadowTransforms;
-	shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3( 1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)));
-	shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)));
-	shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3( 0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f)));
-	shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3( 0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)));
-	shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3( 0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f)));
-	shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f)));
+	shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+	shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+	shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
+	shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)));
+	shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+	shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
 
 	if (ShaderManager::Get().depthPass == false)
 	{
@@ -117,7 +128,7 @@ void PointLight::DrawImgui()
 	}
 	if (ImGui::Button("reset to zero"))
 	{
-		SetToZero();
+		SetToZero(true);
 	}
 
 	if (ImGui::DragFloat3("ambient", &ambient.x, .01f))
@@ -166,14 +177,13 @@ void PointLight::Deserialization(std::fstream& file)
 	file.read(reinterpret_cast<char*>(&quadratic), sizeof(float));
 
 
-	if (ShaderManager::Get().depthPass == false)
-	{
-		ShaderManager::Get().shader->Use();
-		ShaderManager::Get().shader->SetVector3(ambient, ambientString);
-		ShaderManager::Get().shader->SetVector3(diffuse, diffuseString);
-		ShaderManager::Get().shader->SetVector3(specular, specularString);
-	
-		ShaderManager::Get().shader->SetFloat(linear, linearString);
-		ShaderManager::Get().shader->SetFloat(quadratic, quadraticString);
-	}
+
+	ShaderManager::Get().shader->Use();
+	ShaderManager::Get().shader->SetVector3(ambient, ambientString);
+	ShaderManager::Get().shader->SetVector3(diffuse, diffuseString);
+	ShaderManager::Get().shader->SetVector3(specular, specularString);
+
+	ShaderManager::Get().shader->SetFloat(linear, linearString);
+	ShaderManager::Get().shader->SetFloat(quadratic, quadraticString);
+
 }

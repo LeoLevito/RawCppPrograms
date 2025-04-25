@@ -32,7 +32,7 @@ public:
 	virtual void UpdateIDBasedStrings();
 	virtual void SetToDefault();
 	virtual void SetToCurrent();
-	virtual void SetToZero();
+	virtual void SetToZero(bool alsoSetVariables);
 
 	virtual void SetPosition(glm::vec3 pos);
 	virtual void SetDirection(glm::vec3 dir);

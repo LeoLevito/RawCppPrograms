@@ -78,9 +78,23 @@ void SpotLight::SetToCurrent()
 	ShaderManager::Get().shader->SetFloat(myOuterCutoff, outerCutoffString);
 }
 
-void SpotLight::SetToZero()
+void SpotLight::SetToZero(bool alsoSetVariables)
 {
+	if (alsoSetVariables) //if setting to zero was done by pressing the 'Set to zero' imgui::button, then we deliberately set variables to zero. Otherwise if this light is being deleted, then we don't do this.
+	{
+		ambient = glm::vec3(0, 0, 0);
+		diffuse = glm::vec3(0, 0, 0);
+		specular = glm::vec3(0, 0, 0);
+
+		linear = 0.0f;
+		quadratic = 0.0f;
+
+		cutoff = 0.0f;
+		outerCutoff = 0.0f;
+	}
+
 	ShaderManager::Get().shader->Use();
+
 	ShaderManager::Get().shader->SetVector3(glm::vec3(0, 0, 0), ambientString);
 	ShaderManager::Get().shader->SetVector3(glm::vec3(0, 0, 0), diffuseString);
 	ShaderManager::Get().shader->SetVector3(glm::vec3(0, 0, 0), specularString);
@@ -118,7 +132,7 @@ void SpotLight::DrawImgui()
 	}
 	if (ImGui::Button("reset to zero"))
 	{
-		SetToZero();
+		SetToZero(true);
 	}
 
 	if (ImGui::DragFloat3("ambient", &ambient.x, .01f))
@@ -184,19 +198,18 @@ void SpotLight::Deserialization(std::fstream& file)
 	file.read(reinterpret_cast<char*>(&outerCutoff), sizeof(float));
 
 
-	if (ShaderManager::Get().depthPass == false)
-	{
-		ShaderManager::Get().shader->Use();
-		ShaderManager::Get().shader->SetVector3(ambient, ambientString);
-		ShaderManager::Get().shader->SetVector3(diffuse, diffuseString);
-		ShaderManager::Get().shader->SetVector3(specular, specularString);
 
-		ShaderManager::Get().shader->SetFloat(linear, linearString);
-		ShaderManager::Get().shader->SetFloat(quadratic, quadraticString);
+	ShaderManager::Get().shader->Use();
+	ShaderManager::Get().shader->SetVector3(ambient, ambientString);
+	ShaderManager::Get().shader->SetVector3(diffuse, diffuseString);
+	ShaderManager::Get().shader->SetVector3(specular, specularString);
 
-		float myCutoff = glm::cos(glm::radians(cutoff)); //calculate cosine value before handing it to the fragment shader because it's an expensive operation and we don't wanna do that inside the shader.
-		ShaderManager::Get().shader->SetFloat(myCutoff, cutoffString);
-		float myOuterCutoff = glm::cos(glm::radians(outerCutoff)); //calculate cosine value before handing it to the fragment shader because it's an expensive operation and we don't wanna do that inside the shader.
-		ShaderManager::Get().shader->SetFloat(myOuterCutoff, outerCutoffString);
-	}
+	ShaderManager::Get().shader->SetFloat(linear, linearString);
+	ShaderManager::Get().shader->SetFloat(quadratic, quadraticString);
+
+	float myCutoff = glm::cos(glm::radians(cutoff)); //calculate cosine value before handing it to the fragment shader because it's an expensive operation and we don't wanna do that inside the shader.
+	ShaderManager::Get().shader->SetFloat(myCutoff, cutoffString);
+	float myOuterCutoff = glm::cos(glm::radians(outerCutoff)); //calculate cosine value before handing it to the fragment shader because it's an expensive operation and we don't wanna do that inside the shader.
+	ShaderManager::Get().shader->SetFloat(myOuterCutoff, outerCutoffString);
+
 }

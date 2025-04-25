@@ -39,7 +39,7 @@ public:
 
 	virtual void SetToDefault() override;
 	virtual void SetToCurrent() override;
-	virtual void SetToZero() override;
+	virtual void SetToZero(bool alsoSetVariables) override;
 
 	virtual void SetPosition(glm::vec3 pos);
 	virtual void SetDirection(glm::vec3 dir);

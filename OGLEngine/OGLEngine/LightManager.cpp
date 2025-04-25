@@ -60,32 +60,43 @@ void LightManager::DeleteLight(LightType type, Light& light)
 	//mark for deletion?
 	//NOTE: Shifting IDs causes a problem where lights may be swapped between light components. This causes confusion and should be worked out.
 
-	light.SetToZero();
+	light.SetToZero(false);
 	switch (type)
 	{
 	case LightType::DirectionalLightType:
 		directionalLightVector.erase(std::remove(directionalLightVector.begin(), directionalLightVector.end(), &light));
 		for (int i = 0; i < directionalLightVector.size(); i++)
 		{
+			directionalLightVector[i]->SetToZero(false);
+
 			directionalLightVector[i]->ID = i; //this is where the ID shift happens on the previous light. I don't want this to happen when I manually set the ID's.
 			directionalLightVector[i]->UpdateIDBasedStrings();
+
+			directionalLightVector[i]->SetToCurrent();
 		}
 		break;
 	case LightType::PointLightType:
 		pointLightVector.erase(std::remove(pointLightVector.begin(), pointLightVector.end(), &light));
 		for (int i = 0; i < pointLightVector.size(); i++)
 		{
+			pointLightVector[i]->SetToZero(false);
+
 			pointLightVector[i]->ID = i;
 			pointLightVector[i]->UpdateIDBasedStrings();
-		}
 
+			pointLightVector[i]->SetToCurrent();
+		}
 		break;
 	case LightType::SpotLightType:
 		spotLightVector.erase(std::remove(spotLightVector.begin(), spotLightVector.end(), &light));
 		for (int i = 0; i < spotLightVector.size(); i++)
 		{
+			spotLightVector[i]->SetToZero(false);
+
 			spotLightVector[i]->ID = i;
 			spotLightVector[i]->UpdateIDBasedStrings();
+
+			spotLightVector[i]->SetToCurrent();
 		}
 		break;
 	default:

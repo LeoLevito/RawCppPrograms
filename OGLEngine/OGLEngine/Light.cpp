@@ -20,7 +20,7 @@ void Light::SetToCurrent()
 {
 }
 
-void Light::SetToZero()
+void Light::SetToZero(bool alsoSetVariables)
 {
 }
 
